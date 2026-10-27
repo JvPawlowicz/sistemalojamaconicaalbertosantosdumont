@@ -1,7 +1,7 @@
 # Escopo do Sistema — Loja Maçônica Alberto Santos Dumont
 
 **Rito:** Schröder (alemão, quadro de cargos reduzido) · **Potência:** Grande Loja Maçônica do Estado de São Paulo (GLESP) · **Ano maçônico:** julho a julho
-**Status:** versão 1.0 candidata (escopo fechado, pendente de revisão final) — base para desenho dos fluxos
+**Status:** versão 1.0 (escopo fechado) — base para desenho dos fluxos
 
 ## Premissas gerais
 
@@ -68,7 +68,7 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 - **Termo de aceite claramente exibido** antes de assinar, informando que a assinatura digital pelo sistema é válida para a loja e quais dados serão coletados (LGPD).
 - Qualquer alteração depois de assinada gera nova versão e invalida as assinaturas anteriores.
 - **Base legal:** MP 2.200-2/2001, art. 10, §2º, e Lei 14.063/2020, art. 4º, que admitem assinatura eletrônica **avançada** por meio diferente do certificado ICP-Brasil, desde que **aceita pelas partes**. O sistema coleta o **aceite expresso de cada irmão** (data, IP e hash do termo) no primeiro acesso.
-- **Toda ata assinada pelo sistema sai com a fundamentação legal impressa** na página/bloco de assinaturas do PDF (texto configurável pelo administrador, com a MP 2.200-2/2001 e a Lei 14.063/2020 como padrão), junto com hash, QR Code de verificação e evidências de cada assinatura, para dar segurança jurídica ao ato. Recomenda-se validar o texto final com advogado.
+- **Toda ata assinada pelo sistema sai com a fundamentação legal impressa** na página/bloco de assinaturas do PDF (texto configurável pelo administrador). Texto padrão: *"Assinatura eletrônica avançada, válida nos termos do art. 10, §2º, da Medida Provisória nº 2.200-2/2001 e do art. 4º, II, da Lei nº 14.063/2020, mediante aceite prévio das partes. Autoria e integridade comprovadas por hash SHA-256, identificação do usuário autenticado com 2FA, IP, data/hora e geolocalização registrados."*, junto com hash, QR Code de verificação e evidências de cada assinatura, para dar segurança jurídica ao ato. Recomenda-se validar o texto final com advogado.
 
 **Biblioteca de modelos de texto (digitação rápida):**
 - O Secretário pré-cadastra **cabeçalhos, abertura, encerramento, fórmulas e trechos padrão**, organizados por categoria e por tipo de sessão.
@@ -137,7 +137,10 @@ O envio por SMTP e a visibilidade dentro do sistema obedecem à mesma regra.
 **Visitantes recebidos**
 - Cadastro do visitante na sessão, feito pelo irmão designado ou pelo Secretário.
 - Alimenta um **banco de dados de visitantes** (reaproveitado em visitas futuras).
-- **Certificado de visita** emitido e enviado por e-mail e WhatsApp (API).
+- **Certificado de visita em PDF**, gerado pelo sistema com os dados do visitante e da sessão, cabeçalho da loja, hash e QR Code de verificação.
+- **Assinatura em lote:** após a sessão, o Venerável e o Secretário assinam todos os certificados pendentes de uma vez (mesmas evidências da assinatura de ata). Também é possível já deixar a assinatura de ambos pré-autorizada para a sessão.
+- **Envio em lote** para os visitantes, preferencialmente por e-mail (SMTP); WhatsApp (Evolution API) como canal opcional.
+- Controle de status por certificado: gerado, assinado, enviado, entregue/falhou.
 
 **Visitas realizadas (certificados de outras lojas)**
 - O certificado é emitido por **outra loja**. O Secretário **escaneia** (PDF ou imagem), envia ao sistema e **vincula ao irmão**, informando loja visitada, oriente, potência, data da sessão e grau da sessão.
@@ -254,15 +257,39 @@ Django 5 + PostgreSQL; HTMX + Alpine.js; Tailwind CSS (com DaisyUI); Lucide Icon
 
 ---
 
+## 17. Perfis e permissões
+
+Cada usuário tem **grau** (limita o conteúdo que enxerga) e um ou mais **perfis** (definem o que pode fazer).
+
+| Perfil | Acesso |
+|---|---|
+| Irmão | consulta ao próprio cadastro, agenda, atas e biblioteca do seu grau, mensalidades próprias, assinatura de documentos em que for signatário |
+| Tesoureiro | tesouraria completa (mensalidades, caixa, orçamento, cobranças, baixas) e relatórios financeiros |
+| Secretário | funções de Secretário (cadastros, sessões, atas, visitas, certificados, documentos, expediente, patrimônio) **mais funções de Administrador** (configurações da loja, usuários e perfis, modelos de texto, catálogo de cargos) |
+| Venerável | **todas as funções de Secretário, Tesoureiro e Administrador**, mais escalação de cargos por sessão e assinatura |
+| Desenvolvedor | acesso técnico total para manutenção: todos os módulos e funcionalidades, painel de administração do framework, logs, filas, backups, migrações e monitoramento |
+
+- Perfis são cumulativos e configuráveis; novas combinações podem ser criadas sem alterar código.
+- O grau continua limitando o conteúdo mesmo para quem tem perfil administrativo, exceto Venerável (Mestre), que vê tudo, e o Desenvolvedor.
+- **Acesso do Desenvolvedor é auditado:** toda leitura ou alteração de dados sensíveis entra na trilha de auditoria, o acesso exige 2FA e pode ser habilitado/desabilitado pelo Venerável por período (recomendação de LGPD).
+
+## 18. Operação e manutenção (software livre)
+
+Ferramentas open source sugeridas, todas autohospedáveis:
+- **Monitoramento de erros:** GlitchTip (compatível com SDK do Sentry) ou Sentry self-hosted.
+- **Disponibilidade:** Uptime Kuma.
+- **Backups:** restic ou pgBackRest, com cópia criptografada fora do servidor e teste periódico de restauração.
+- **Painel técnico:** Django Admin restrito ao perfil Desenvolvedor; logs estruturados e métricas básicas (Prometheus/Grafana, opcional).
+- **Implantação:** Docker Compose, Nginx/Caddy com HTTPS automático (Let's Encrypt), atualizações de segurança agendadas.
+- **Qualidade:** testes automatizados, lint e integração contínua no GitHub Actions.
+
+---
+
 ## Questões em aberto
 
-### Decididas
-- Potência: GLESP (com sistema próprio de presença; o nosso é registro interno). Rito Schröder, cargos configuráveis. Graus: Aprendiz, Companheiro, Mestre (iniciação, promoção, elevação). Assinatura de ata eletrônica avançada com hash, canvas, IP, geolocalização e aceite expresso; foto opcional.
-- Atas visíveis a irmãos de grau igual ou superior ao da sessão. Companheiro vê Aprendiz e Companheiro.
-- Cobrança por e-mail e link `wa.me`, boleto externo, baixa manual. SMTP como canal principal; Evolution API só para certificados pelo WhatsApp do Secretário.
-- Sem votação no sistema por ora. Sem sessão online por ora. Licença MIT. Django. ~20 irmãos, ~4 sessões/mês.
-
-### Ainda abertas
-1. **Texto da fundamentação legal:** aceita o texto padrão (MP 2.200-2/2001, art. 10, §2º, e Lei 14.063/2020, art. 4º) ou a loja já tem um texto/portaria própria a transcrever? Recomenda-se validação por advogado antes do uso oficial.
-2. **Certificado de visita recebido (nosso para visitantes):** além de arquivar os certificados de outras lojas, vamos também **emitir** certificado para os visitantes que recebemos? Se sim: texto, assinante e se leva assinatura desenhada.
-3. **Perfis de usuário:** além dos três graus, quais cargos terão poder administrativo (Venerável, Secretário, Tesoureiro, Chanceler, Orador)? Proposta: Secretário (atas, cadastros, visitas, documentos), Tesoureiro (financeiro), Venerável (escalação, leitura geral, assinatura), Administrador (configurações e usuários).
+Nenhuma bloqueante. Decisões finais registradas:
+- Fundamentação legal: MP 2.200-2/2001 e Lei 14.063/2020, impressa em toda ata e certificado assinados pelo sistema; texto editável.
+- Certificado de visitante: gerado em PDF, assinado em lote por Venerável e Secretário, enviado por e-mail (WhatsApp opcional). Certificados de outras lojas: escaneados e vinculados ao irmão.
+- Perfis: Irmão, Tesoureiro, Secretário (inclui Administrador), Venerável (inclui Secretário, Tesoureiro e Administrador) e Desenvolvedor.
+- Aceitos todos os extras: expediente, livro de atas, comissões, Conselho Fiscal, LGPD, onboarding, relatórios e painel.
+- Para revisão futura: votação e sessão online (Jitsi).
