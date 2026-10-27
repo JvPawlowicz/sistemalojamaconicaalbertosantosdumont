@@ -3,5 +3,5 @@
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Candidatos e propostas</h1><p>Acompanhamento: quem foi proposto, por quem e em que etapa está. <span class="selo selo-warn">sigiloso</span></p></div>
 <div class="acoes">{% if pode_gerir %}<a class="btn" href="{% url 'candidatos:criar' %}">{% icon "user-plus" %} Nova proposta</a>{% endif %}</div></div>
-<div class="kanban">{% for rotulo, cands in colunas %}<section aria-label="{{ rotulo }}"><h3>{{ rotulo }} ({{ cands|length }})</h3>
+<div class="kanban" tabindex="0" role="region" aria-label="Quadro de candidatos por etapa">{% for rotulo, cands in colunas %}<section aria-label="{{ rotulo }}"><h2>{{ rotulo }} ({{ cands|length }})</h2>
 {% for c in cands %}<a class="mini-card" href="{% url 'candidatos:detalhe' c.pk %}" style="display:block;text-decoration:none;color:inherit"><strong>{{ c.nome }}</strong><br><small class="muted">{{ c.profissao }}</small><br><small>Proposto por {{ c.proposto_por.nome_completo }} em {{ c.data_proposta|date:"d/m/Y" }}</small></a>{% endfor %}</section>{% endfor %}</div>{% endblock %}

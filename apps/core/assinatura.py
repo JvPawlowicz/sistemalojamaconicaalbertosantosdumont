@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from .models import AceiteTermo, Loja, TermoAceite
-from .utils import ip_do_cliente, sha256_texto
+from .utils import carimbo, ip_do_cliente, sha256_texto
 
 _PNG_B64 = re.compile(r"^data:image/png;base64,([A-Za-z0-9+/=]+)$")
 LIMITE_IMAGEM = 400_000  # bytes de texto base64
@@ -39,7 +39,7 @@ def novo_codigo():
 
 
 def calcular_hash_assinatura(hash_documento, irmao_id, assinado_em, ip, codigo, imagem):
-    base = "|".join([hash_documento, str(irmao_id), assinado_em.isoformat(), ip or "", codigo, sha256_texto(imagem or "")])
+    base = "|".join([hash_documento, str(irmao_id), carimbo(assinado_em), ip or "", codigo, sha256_texto(imagem or "")])
     return sha256_texto(base)
 
 
@@ -72,7 +72,7 @@ def evidencias_da_requisicao(request):
         "autenticacao_2fa": bool(request.user.is_verified()),
         "aceite": aceite,
         "texto_legal": Loja.atual().texto_legal,
-        "assinado_em": timezone.now(),
+        "assinado_em": timezone.now().replace(microsecond=0),
     }
 
 

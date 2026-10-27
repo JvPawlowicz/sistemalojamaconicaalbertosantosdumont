@@ -3,7 +3,7 @@ from django.db import models
 from simple_history.models import HistoricalRecords
 
 from apps.core.models import AssinaturaBase, Loja
-from apps.core.utils import sha256_texto
+from apps.core.utils import carimbo, sha256_texto
 from apps.sessoes.models import Sessao
 
 
@@ -62,7 +62,7 @@ class Ata(models.Model):
         s = self.sessao
         return "\n".join([
             Loja.atual().nome, f"ata:{self.numero or ''}", f"livro:{self.livro}", f"folha:{self.folha}",
-            f"sessao:{s.data_hora.isoformat()}", f"grau:{s.grau}", f"tipo:{s.tipo}", f"versao:{self.versao}",
+            f"sessao:{carimbo(s.data_hora)}", f"grau:{s.grau}", f"tipo:{s.tipo}", f"versao:{self.versao}",
             self.conteudo.strip(),
         ])
 

@@ -2,6 +2,6 @@
 {% block titulo %}Categorias de irmão{% endblock %}
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Categorias de irmão</h1><p>Definem o valor da mensalidade (integral, remido etc.).</p></div></div>
-<div class="grade-2"><div class="tabela-wrap"><table class="tabela"><thead><tr><th>Categoria</th><th class="num">Mensalidade</th><th>Isenta</th><th></th></tr></thead><tbody>
+<div class="grade-2"><div class="tabela-wrap"><table class="tabela"><thead><tr><th>Categoria</th><th class="num">Mensalidade</th><th>Isenta</th><th><span class="sr-only">Ações</span></th></tr></thead><tbody>
 {% for c in categorias %}<tr><td>{{ c.nome }}</td><td class="num">{{ c.valor_mensal|moeda }}</td><td>{{ c.isento|yesno:"Sim,Não" }}</td><td><a class="btn btn-sec btn-peq" href="{% url 'irmaos:categoria_editar' c.pk %}">Editar</a></td></tr>{% endfor %}</tbody></table></div>
 <form method="post" class="card"><h2>{% if editando %}Editar{% else %}Nova{% endif %} categoria</h2>{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">{% icon "check" %} Salvar</button></form></div>{% endblock %}

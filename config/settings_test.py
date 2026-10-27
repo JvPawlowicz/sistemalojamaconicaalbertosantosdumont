@@ -1,3 +1,7 @@
+import os
+
+os.environ.setdefault("DJANGO_SECRET_KEY", "teste")
+os.environ.setdefault("DJANGO_DEBUG", "0")
 from .settings import *  # noqa
 
 DEBUG = False

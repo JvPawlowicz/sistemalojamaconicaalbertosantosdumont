@@ -132,3 +132,13 @@
     window.addEventListener('beforeprint', () => paineis.forEach((p) => { p.hidden = false; }));
   });
 })();
+
+/* Acessibilidade: regiões roláveis (tabelas largas) ficam alcançáveis pelo teclado */
+(function () {
+  document.querySelectorAll('.tabela-wrap, .kanban').forEach((el) => {
+    if (el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight) {
+      if (!el.hasAttribute('tabindex')) el.tabIndex = 0;
+      if (!el.getAttribute('role')) { el.setAttribute('role', 'region'); el.setAttribute('aria-label', 'Tabela rolável'); }
+    }
+  });
+})();

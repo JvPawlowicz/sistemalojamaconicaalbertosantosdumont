@@ -70,6 +70,14 @@ Os testes automáticos rodam com `python -m pytest`.
 1. *Candidatos → Nova proposta*; mova até **Aprovado** e use *Iniciar candidato* (cria o irmão Aprendiz).
 2. Na sessão, aba **Cerimônias** → promover o Aprendiz a Companheiro; em Configurações defina um interstício e veja o bloqueio.
 
+**F2. Novidades para conferir**
+1. *Administração → Configurações*: preencha as **regras do regimento** (ex.: quórum 5, 3 faltas, multa 2%, juros 1%) e use **Enviar e-mail de teste** / **Testar WhatsApp**.
+2. Aprove uma ata: os signatários recebem e-mail com o link para assinar. Crie uma **nova versão** e veja *Ata → Versões* (comparação).
+3. Aba **Visitantes** → *Pré-autorizar assinatura*: assine antes e veja os certificados já saírem assinados ao gerar.
+4. *Relatórios → Pacote do Conselho Fiscal* (como `tesoureiro`) e *Alertas do regimento*.
+5. Foto do irmão (*Meu cadastro*) e brasão da Loja (*Configurações*) aparecem normalmente.
+6. Faça um **backup** e **restaure** num banco vazio: `BACKUP_PASSPHRASE=x python manage.py backup_dados /tmp/bk`.
+
 **G. Navegação** (confira os atalhos)
 O **Início** lista o que precisa da sua atenção, cada item com botão direto. Pressione `Ctrl+K` (ou `/`) e busque um irmão, ata ou página.
 O menu tem 8 seções com abas; conta e sair ficam em *Conta* (canto superior direito).

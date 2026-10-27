@@ -35,3 +35,10 @@ def ip_do_cliente(request) -> str:
 
 def somente_digitos(valor: str) -> str:
     return "".join(c for c in (valor or "") if c.isdigit())
+
+
+def carimbo(dt) -> str:
+    """Data/hora canônica para hashes: UTC, precisão de segundos (estável em backups e entre bancos)."""
+    from datetime import timezone as _tz
+
+    return dt.astimezone(_tz.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

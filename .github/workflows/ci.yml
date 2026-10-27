@@ -5,12 +5,47 @@ on:
 jobs:
   testes:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        banco: [sqlite, postgres]
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: loja, POSTGRES_PASSWORD: loja, POSTGRES_DB: loja }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U loja" --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.13", cache: pip }
       - run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
       - run: pip install -r requirements-dev.txt
-      - run: python manage.py makemigrations --check --dry-run
+      - name: Migrações em dia
+        run: python manage.py makemigrations --check --dry-run
         env: { DJANGO_SECRET_KEY: ci, DJANGO_DEBUG: "1" }
-      - run: python -m pytest -q
+      - name: Testes (SQLite)
+        if: matrix.banco == 'sqlite'
+        run: python -m pytest -q
+      - name: Testes (PostgreSQL)
+        if: matrix.banco == 'postgres'
+        run: python -m pytest -q --ds=config.settings_pg_test
+        env: { DB_NAME: loja, DB_USER: loja, DB_PASSWORD: loja, DB_HOST: localhost }
+  acessibilidade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+      - run: pip install -r requirements-dev.txt
+      - run: npm i --no-save playwright@1.49 axe-core@4.10.2 && npx playwright install --with-deps chromium
+      - name: Servidor de demonstração + auditoria axe
+        env: { DJANGO_SECRET_KEY: ci, DJANGO_DEBUG: "1", EXIGIR_2FA: "0" }
+        run: |
+          python manage.py migrate -v0 && python manage.py seed_inicial --demo -v0
+          python manage.py runserver 127.0.0.1:8000 --noreload &
+          sleep 6
+          BASE=http://127.0.0.1:8000 node tools/a11y_audit.js

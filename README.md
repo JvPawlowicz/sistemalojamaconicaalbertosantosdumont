@@ -58,6 +58,23 @@ Agende diariamente (cron/systemd) para lembretes de sessão, marcação de mensa
 
 Importação inicial do quadro: **Irmãos → Importar planilha** (modelo CSV disponível na própria tela; use "Apenas validar" antes).
 
+## Qualidade e validações
+
+- **Testes automatizados** (`python -m pytest`, ~80): regras, fluxos, permissões, 2FA de ponta a ponta, backup/restauração,
+  integrações. Rodam em **SQLite e PostgreSQL 16** (`--ds=config.settings_pg_test`, ver CI).
+- **Integrações exercitadas com servidores reais**: SMTP (aiosmtpd) e Evolution API (servidor HTTP simulado, formato do
+  `sendMedia`). Em *Configurações* há botões para **testar o e-mail e o WhatsApp** antes de usar em produção
+  (`python manage.py testar_email destino@x.org` também funciona).
+- **Acessibilidade**: `tools/a11y_audit.js` roda o axe-core (WCAG 2.0/2.1/2.2 A/AA) em 32 telas × 3 temas — sem violações.
+- **Produção verificada** com gunicorn + PostgreSQL + WhiteNoise + SMTP real (cadastro de 2FA, assinatura de ata, PDF).
+- **Backup/restauração**: `python manage.py backup_dados DESTINO` (dados + arquivos, criptografado com `BACKUP_PASSPHRASE`) e
+  `python manage.py restaurar_dados ARQUIVO --confirmar`; as assinaturas continuam íntegras após restaurar. Veja `deploy/backup.sh`.
+
+## Regras do regimento (opcionais)
+
+Em *Configurações*: limite de faltas consecutivas, frequência mínima, quórum mínimo, multa e juros de atraso, interstício
+entre graus. Com `0` a regra fica desligada. Alertas aparecem no Início da Secretaria e em *Relatórios → Alertas do regimento*.
+
 ## Perfis e graus
 
 | Perfil | Acesso |

@@ -6,7 +6,7 @@
 <form method="post" action="{% url 'visitas:enviar_lote' sessao.pk %}" style="display:flex;gap:.6rem;align-items:center">{% csrf_token %}
 <label style="display:flex;gap:.3rem;align-items:center"><input class="check" type="checkbox" name="whatsapp"> também por WhatsApp</label>
 <button class="btn" type="submit" data-confirmar="Enviar os certificados assinados por e-mail?">{% icon "send" %} Enviar em lote</button></form></div></section>
-<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Visitante</th><th>Grau</th><th>Loja</th><th>Contato</th><th>Certificado</th><th></th></tr></thead><tbody>
+<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Visitante</th><th>Grau</th><th>Loja</th><th>Contato</th><th>Certificado</th><th><span class="sr-only">Ações</span></th></tr></thead><tbody>
 {% for v in visitas %}{% with c=cert_status|get_item:v.pk %}<tr><td>{{ v.visitante.nome }}</td><td>{{ v.visitante.get_grau_display }}</td><td>{{ v.visitante.loja_nome }} {{ v.visitante.loja_numero }}<br><small class="muted">{{ v.visitante.oriente }}</small></td><td>{{ v.visitante.email|default:"sem e-mail" }}</td>
 <td>{% if c %}{% selo c.status c.get_status_display %}{% if c.envio_obs %}<br><small class="muted">{{ c.envio_obs }}</small>{% endif %} <a href="{% url 'visitas:certificado_pdf' c.pk %}" target="_blank" rel="noopener">PDF</a>{% else %}<span class="muted">não gerado</span>{% endif %}</td>
 <td><form method="post" action="{% url 'visitas:remover' v.pk %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit" data-confirmar="Remover o visitante desta sessão?">Remover</button></form></td></tr>{% endwith %}

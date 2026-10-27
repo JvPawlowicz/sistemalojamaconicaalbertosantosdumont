@@ -366,3 +366,26 @@ def test_paginacao_das_listas(cliente, usuarios):
     p3 = c.get(reverse("core:emails"), {"pagina": 3}).content.decode()
     assert "Página 3 de 3" in p3 and "pagina=2" in p3
     assert c.get(reverse("core:emails"), {"pagina": "lixo"}).status_code == 200
+
+
+@pytest.mark.django_db(transaction=True)
+def test_assinaturas_continuam_integras_apos_backup_e_restauracao(tmp_path, monkeypatch, settings, cliente, usuarios, cargos):
+    """Regressão: o backup (JSON) trunca microssegundos; o hash usa carimbo canônico (UTC, segundos)."""
+    from apps.atas.models import AssinaturaAta
+    from apps.core.assinatura import assinatura_integra
+    s = Sessao.objects.create(data_hora=timezone.now().replace(microsecond=123456) - timedelta(days=1), grau=1,
+                              status="realizada")
+    ses.gerar_escala(s)
+    ata = _fluxo_ata(cliente, usuarios, s, cargos)
+    _assinar(cliente, "veneravel", ata)
+    _assinar(cliente, "secretario", ata)
+    antes = {a.codigo: a.hash_assinatura for a in AssinaturaAta.objects.all()}
+    hash_ata = Ata.objects.get().hash_conteudo
+    settings.MEDIA_ROOT = str(tmp_path / "media")
+    monkeypatch.setenv("BACKUP_PASSPHRASE", "x")
+    call_command("backup_dados", str(tmp_path / "bk"), verbosity=0)
+    call_command("restaurar_dados", str(next((tmp_path / "bk").iterdir())), "--confirmar", verbosity=0)
+    depois = AssinaturaAta.objects.all()
+    assert {a.codigo: a.hash_assinatura for a in depois} == antes
+    assert all(assinatura_integra(a) for a in depois) and len(depois) == 2
+    assert Ata.objects.get().hash_conteudo == hash_ata
