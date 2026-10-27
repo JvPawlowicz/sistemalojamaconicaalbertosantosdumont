@@ -1,7 +1,7 @@
 # Escopo do Sistema — Loja Maçônica Alberto Santos Dumont
 
 **Rito:** Schröder (alemão, quadro de cargos reduzido) · **Potência:** Grande Loja Maçônica do Estado de São Paulo (GLESP) · **Ano maçônico:** julho a julho
-**Status:** rascunho v0.2 — base para desenho dos fluxos
+**Status:** rascunho v0.3 — base para desenho dos fluxos
 
 ## Premissas gerais
 
@@ -131,18 +131,61 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 
 ---
 
+## 13. Graus e Cerimônias
+
+Sequência fixa de graus: **Aprendiz → Companheiro → Mestre**.
+
+| Cerimônia | Passagem de grau | Data registrada no cadastro |
+|---|---|---|
+| Iniciação | ingresso como Aprendiz | data de iniciação |
+| Promoção | Aprendiz → Companheiro | data de promoção |
+| Elevação | Companheiro → Mestre | data de elevação |
+
+- A cerimônia é registrada **na sessão** em que ocorre e, ao ser concluída, atualiza o grau e a data do irmão automaticamente.
+- Interstício mínimo entre graus configurável (a loja define; pode ficar vazio).
+- Linha do tempo maçônica do irmão e aniversários maçônicos (iniciação, promoção, elevação).
+
+## 14. Extras sugeridos
+
+- **Painel inicial** por perfil: próximas sessões, pendências de assinatura, mensalidades em aberto, aniversariantes.
+- **Aniversariantes e datas maçônicas** com aviso automático.
+- **Busca global** (irmãos, atas, documentos, visitantes).
+- **Importação inicial** por planilha (CSV/XLSX) para migrar o quadro atual.
+- **Sessão online/híbrida (opcional):** link de videoconferência por sessão (Jitsi Meet, open source) e presença remota registrada. Módulo desativável, pois nem toda loja admite sessão remota.
+- **Escrutínio/votação** de propostas (sigilo definido pela loja).
+- **Diretório de lojas** (nome, número, oriente, potência) para alimentar visitação.
+- **Backup e exportação** completos dos dados (portabilidade e LGPD).
+- **PWA:** instalável no celular, usado principalmente para presença e leitura de atas.
+
+## 15. Requisitos técnicos e de experiência
+
+- **Open source e extensível:** só componentes de código aberto; arquitetura em apps/plugins Django por módulo, ativáveis/desativáveis.
+- **Localização pt-BR completa:** idioma, datas (dd/mm/aaaa), moeda (R$), fuso de São Paulo, máscaras e validação de CPF, CNPJ, CEP, telefone e RG.
+- **Acessibilidade (WCAG 2.2 AA):** contraste alto, fonte ajustável, navegação por teclado, leitor de tela, modo escuro e modo alto contraste; pensado para público de idade variada.
+- **Visual:** interface limpa, ícones consistentes (biblioteca Lucide), tema com identidade da loja (cores e brasão configuráveis).
+- **E-mail:** envio preferencialmente por **SMTP** (configurável); fila de envio com registro de entregas e falhas.
+- **WhatsApp:** via **Evolution API** (instância própria, número do Secretário conectado por QR); uso restrito a certificados e avisos pontuais, com SMTP sempre como canal principal e fallback. Observação: é uma integração não oficial baseada no WhatsApp Web, adequada para baixo volume.
+- **Escala:** ~4 sessões/mês e quadro pequeno; basta uma instância simples (Docker Compose) com backup diário.
+- **Visualizador embutido** de PDF e imagem (pdf.js) dentro da página, sem download obrigatório.
+
+## Stack proposta
+
+Django 5 + PostgreSQL; HTMX + Alpine.js; Tailwind CSS (com DaisyUI); Lucide Icons; django-allauth + django-otp (login e 2FA); django-simple-history (auditoria); WeasyPrint (PDFs com cabeçalho); django-q2 ou Celery (envios agendados); pdf.js (viewer); Evolution API (WhatsApp); Jitsi Meet (opcional); Docker Compose.
+
+---
+
 ## Questões em aberto
 
 ### Decididas
-- Potência: GLESP. Assinatura de ata: eletrônica interna com hash, canvas, IP, geolocalização e integridade; foto opcional. Mensalidade por categoria, com remidos e integral. Visibilidade de atas por grau.
+- Potência: GLESP. Assinatura de ata: eletrônica interna com hash, canvas, IP, geolocalização e integridade; foto opcional. Mensalidade por categoria, com remidos e integral. Visibilidade de atas por grau (Aprendiz só o seu; Mestre todos). Cargos configuráveis pelo usuário. Stack Django. WhatsApp via Evolution API; SMTP como canal principal. Open source, plugins, pt-BR.
+- Volume: cerca de 4 sessões por mês.
 
 ### Ainda abertas
-1. **Cargos do Rito Schröder:** qual a lista oficial de cargos da loja (para já cadastrar)?
-2. **Companheiro:** você escreveu que ele vê "aprendiz e mestre". Imagino que seja Aprendiz e Companheiro (seu próprio grau e o inferior), certo? Um Companheiro não deveria ver atas de Mestre.
-3. **Outros conteúdos por grau:** a regra "ver o próprio grau e os inferiores" vale também para biblioteca, documentos e presença?
-4. **Cobrança:** o Tesoureiro só envia o aviso/cobrança, ou o sistema também deve gerar PIX/boleto com baixa automática (exige integração com banco ou gateway)?
-5. **Ata por e-mail:** quem recebe a ata para aprovação, todos os irmãos do grau ou uma lista escolhida pelo Secretário? E o e-mail leva o texto no corpo, PDF anexo ou link para ler no sistema (recomendo o link, por segurança)?
-6. **"Portaria" da assinatura digital:** entendi como um termo de aceite exibido no sistema. Se for um documento formal da loja (portaria/decreto do Venerável autorizando a assinatura digital), podemos anexá-lo e linkar no termo. Qual dos dois?
-7. **Usuários:** quantos irmãos e quantas sessões por mês, aproximadamente?
-8. **WhatsApp:** já há provedor de API em mente (Meta Cloud API, Twilio, Z-API etc.)?
-9. **Stack:** confirmar Django + PostgreSQL.
+1. **Portaria:** qual é a norma (número/órgão) que embasa a assinatura digital? Anexamos o PDF dela no sistema e o termo de aceite passa a citá-la. Preciso do documento ou da referência exata; não vou citar número de norma sem ter sido informado.
+2. **Companheiro e atas:** vê Aprendiz + Companheiro (próprio grau e inferior)? Mantive essa regra como padrão até a confirmação.
+3. **Outros conteúdos por grau:** a mesma regra vale para biblioteca, documentos e presença?
+4. **Cobrança:** só aviso/cobrança por e-mail, ou também PIX/boleto com baixa automática?
+5. **Ata por e-mail:** destinatários (todos do grau ou lista escolhida) e formato (recomendo link para ler no sistema, com PDF opcional).
+6. **Sessão online (Jitsi):** quer o módulo ou deixamos de fora?
+7. **Quórum e escrutínio:** a loja usa votação no sistema ou só registro do resultado?
+8. **Número de irmãos** no quadro (dimensionamento e importação inicial).
