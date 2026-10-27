@@ -8,5 +8,6 @@ urlpatterns = [
     path("", views.painel, name="painel"),
     path("novo/", views.criar, name="criar"),
     path("<int:pk>/", views.detalhe, name="detalhe"),
+    path("<int:pk>/iniciar/", views.iniciar, name="iniciar"),
     path("<int:pk>/mover/", views.mover, name="mover"),
 ]

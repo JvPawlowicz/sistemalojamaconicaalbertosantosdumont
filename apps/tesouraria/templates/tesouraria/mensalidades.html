@@ -3,6 +3,7 @@
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Mensalidades</h1><p>Competência {{ mes|date:"m/Y" }} · total {{ total|moeda }}</p></div>
 <div class="acoes">
+<a class="btn btn-sec" href="{% url 'tesouraria:avulso' %}">{% icon "plus" %} Cobrança avulsa</a>
 <form method="post" action="{% url 'tesouraria:gerar' %}">{% csrf_token %}<input type="hidden" name="mes" value="{{ mes|date:'Y-m' }}"><button class="btn" type="submit">{% icon "refresh-cw" %} Gerar mensalidades do mês</button></form>
 <form method="post" action="{% url 'tesouraria:cobrar_todos' %}">{% csrf_token %}<input type="hidden" name="mes" value="{{ mes|date:'Y-m' }}"><button class="btn btn-sec" type="submit" data-confirmar="Enviar cobrança por e-mail a todos os inadimplentes do mês?">{% icon "send" %} Cobrar inadimplentes (e-mail)</button></form></div></div>
 {% include "tesouraria/_abas.html" with aba="mensalidades" %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Agenda{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Agenda — {{ mes_ref|date:"F \d\e Y" }}</h1><p>Sessões, eventos e aniversários em um só lugar.</p></div>
+<div class="acoes"><a class="btn btn-sec" href="?mes={{ anterior|date:'Y-m' }}">{% icon "arrow-left" %} Anterior</a><a class="btn btn-sec" href="?mes={{ proximo|date:'Y-m' }}">Próximo {% icon "chevron-right" %}</a>
+<a class="btn btn-sec" href="{% url 'sessoes:agenda_ics' %}">{% icon "download" %} Exportar (.ics)</a><a class="btn btn-sec" href="{% url 'sessoes:eventos' %}">Eventos</a></div></div>
+{% for dia, itens in dias %}<section class="card"><h2>{{ dia|date:"l, d/m" }}</h2>
+{% for dt, tipo, titulo, url in itens %}<p class="mb0"><a href="{{ url }}">{% if tipo == "sessao" %}{% icon "scroll-text" %}{% elif tipo == "evento" %}{% icon "calendar" %}{% else %}{% icon "bell" %}{% endif %} {% if tipo != "aniversario" %}{{ dt|date:"H:i" }} — {% endif %}{{ titulo }}</a></p>{% endfor %}</section>
+{% empty %}<div class="card vazio">Nada agendado neste mês.</div>{% endfor %}{% endblock %}

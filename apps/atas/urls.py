@@ -6,6 +6,7 @@ app_name = "atas"
 
 urlpatterns = [
     path("", views.lista, name="lista"),
+    path("livro.pdf", views.livro_pdf, name="livro_pdf"),
     path("nova/<int:sessao_pk>/", views.criar, name="criar"),
     path("modelos/", views.ModelosView.as_view(), name="modelos"),
     path("modelos/novo/", views.NovoModelo.as_view(), name="modelo_novo"),

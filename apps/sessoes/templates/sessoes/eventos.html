@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Eventos{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Agenda social</h1><p>Ágapes, confraternizações e demais eventos da Loja.</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'sessoes:agenda' %}">{% icon "calendar-days" %} Agenda do mês</a>{% if pode_gerir %}<a class="btn" href="{% url 'sessoes:evento_novo' %}">{% icon "plus" %} Novo evento</a>{% endif %}</div></div>
+<div class="grade">{% for e in eventos %}{% with m=minhas|get_item:e.pk %}<a class="card" href="{% url 'sessoes:evento' e.pk %}" style="text-decoration:none;color:inherit"><h3>{% icon "calendar" %} {{ e.titulo }}</h3>
+<p>{{ e.data_hora|date:"d/m/Y H:i" }}{% if e.local %} · {{ e.local }}{% endif %}</p><p class="muted">{{ e.get_tipo_display }}{% if e.valor_por_pessoa %} · {{ e.valor_por_pessoa|moeda }} por pessoa{% endif %}</p>
+<p class="mb0">{% if m %}{% selo m.resposta m.get_resposta_display %}{% else %}<span class="selo selo-warn">sem resposta</span>{% endif %}</p></a>{% endwith %}
+{% empty %}<div class="card vazio" style="grid-column:1/-1">Nenhum evento agendado.</div>{% endfor %}</div>{% endblock %}

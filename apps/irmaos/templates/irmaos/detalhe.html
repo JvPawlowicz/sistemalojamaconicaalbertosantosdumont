@@ -7,6 +7,8 @@
 <div class="acoes">
  {% if pode_gerir %}<a class="btn" href="{% url 'irmaos:editar' irmao.pk %}">{% icon "pencil" %} Editar</a>
  <form method="post" action="{% url 'irmaos:convidar' irmao.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit">{% icon "mail" %} Enviar convite de senha</button></form>{% endif %}
+ {% if user|tem_perfil:"administrador" and not proprio %}<form method="post" action="{% url 'irmaos:resetar_2fa' irmao.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit" data-confirmar="Redefinir o 2FA deste irmão?">{% icon "key-round" %} Redefinir 2FA</button></form>
+ <form method="post" action="{% url 'irmaos:alternar_acesso' irmao.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit" data-confirmar="Alterar o acesso deste irmão ao sistema?">{% icon "lock" %} {% if irmao.is_active %}Desativar{% else %}Reativar{% endif %} acesso</button></form>{% endif %}
  {% if proprio %}<a class="btn" href="{% url 'irmaos:meu_perfil' %}">{% icon "pencil" %} Atualizar meus dados</a>{% endif %}
  {% if proprio or user|tem_perfil:"tesoureiro" %}<a class="btn btn-sec" href="{% url 'tesouraria:extrato_pdf' irmao.pk %}">{% icon "download" %} Extrato financeiro</a>{% endif %}
 </div></div>
@@ -16,6 +18,8 @@
 <dt>Promoção</dt><dd>{{ irmao.data_promocao|date:"d/m/Y"|default:"—" }}</dd>
 <dt>Elevação</dt><dd>{{ irmao.data_elevacao|date:"d/m/Y"|default:"—" }}</dd>
 {% if completo %}<dt>Categoria</dt><dd>{{ irmao.categoria|default:"—" }}</dd>{% endif %}</dl>
+<h3 class="mt">Linha do tempo</h3>
+{% for c in cerimonias %}<p class="mb0">{{ c.data|date:"d/m/Y" }} — {{ c.get_tipo_display }} ({{ c.get_grau_resultante_display }})</p>{% empty %}<p class="muted">Sem cerimônias registradas no sistema.</p>{% endfor %}
 <h3 class="mt">Cargos exercidos</h3>
 {% for g in cargos %}<p>{{ g.ano.nome }} — {{ g.cargo.nome }}</p>{% empty %}<p class="muted">Nenhum cargo registrado.</p>{% endfor %}</section>
 <section class="card"><h2>{% icon "briefcase-business" %} Profissional</h2><dl class="lista-def">

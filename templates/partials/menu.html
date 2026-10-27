@@ -5,7 +5,8 @@
   <li class="nav-grupo">Loja</li>
   <li><a href="{% url 'irmaos:lista' %}" {% if nome == 'irmaos' %}aria-current="page"{% endif %}>{% icon "users" %} Irmãos</a></li>
   <li><a href="{% url 'cargos:quadro' %}" {% if nome == 'cargos' %}aria-current="page"{% endif %}>{% icon "award" %} Cargos e gestão</a></li>
-  <li><a href="{% url 'sessoes:lista' %}" {% if nome == 'sessoes' %}aria-current="page"{% endif %}>{% icon "calendar-days" %} Sessões</a></li>
+  <li><a href="{% url 'sessoes:agenda' %}" {% if request.resolver_match.url_name == 'agenda' %}aria-current="page"{% endif %}>{% icon "calendar" %} Agenda</a></li>
+  <li><a href="{% url 'sessoes:lista' %}" {% if nome == 'sessoes' and request.resolver_match.url_name != 'agenda' %}aria-current="page"{% endif %}>{% icon "calendar-days" %} Sessões</a></li>
   <li><a href="{% url 'atas:lista' %}" {% if nome == 'atas' %}aria-current="page"{% endif %}>{% icon "scroll-text" %} Atas</a></li>
   <li><a href="{% url 'visitas:realizadas' %}" {% if nome == 'visitas' %}aria-current="page"{% endif %}>{% icon "handshake" %} Visitação</a></li>
   <li><a href="{% url 'documentos:lista' %}" {% if nome == 'documentos' %}aria-current="page"{% endif %}>{% icon "book-open" %} Biblioteca</a></li>
@@ -28,6 +29,7 @@
   {% endif %}
   {% if user|tem_perfil:"administrador" %}
   <li><a href="{% url 'atas:modelos' %}">{% icon "file-text" %} Modelos de texto</a></li>
+  <li><a href="{% url 'core:solicitacoes_lgpd' %}">{% icon "stamp" %} Solicitações LGPD</a></li>
   <li><a href="{% url 'core:configuracoes' %}" {% if request.resolver_match.url_name == 'configuracoes' %}aria-current="page"{% endif %}>{% icon "settings" %} Configurações</a></li>
   {% endif %}
   {% if user|tem_perfil:"desenvolvedor" %}
@@ -35,6 +37,7 @@
   {% endif %}
   <li class="nav-grupo">Conta</li>
   <li><a href="{% url 'irmaos:meu_perfil' %}">{% icon "user" %} Meu cadastro</a></li>
+  <li><a href="{% url 'core:meus_dados' %}">{% icon "shield-check" %} Meus dados (LGPD)</a></li>
   <li><a href="{% url 'password_change' %}">{% icon "lock" %} Alterar senha</a></li>
 </ul>
 </nav>{% endwith %}

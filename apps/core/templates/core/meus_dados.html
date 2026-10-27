@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Meus dados (LGPD){% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Meus dados e privacidade</h1><p>Direitos do titular previstos na LGPD.</p></div>
+<div class="acoes"><a class="btn" href="{% url 'core:exportar_meus_dados' %}">{% icon "download" %} Baixar meus dados (JSON)</a><a class="btn btn-sec" href="{% url 'core:privacidade' %}">Política de privacidade</a></div></div>
+<div class="grade-2"><form method="post" class="card"><h2>{% icon "mail" %} Nova solicitação</h2>{% csrf_token %}
+<div class="campo"><label for="tipo">Tipo</label><select class="input" id="tipo" name="tipo">{% for v, n in tipos %}<option value="{{ v }}">{{ n }}</option>{% endfor %}</select></div>
+<div class="campo"><label for="mensagem">Descreva o pedido</label><textarea class="input" id="mensagem" name="mensagem" rows="5" required></textarea></div>
+<button class="btn" type="submit">Enviar solicitação</button></form>
+<section class="card"><h2>Minhas solicitações</h2>{% for s in solicitacoes %}<p><strong>{{ s.get_tipo_display }}</strong> · {{ s.criada_em|date:"d/m/Y" }} · {% selo s.status s.get_status_display %}<br>{{ s.mensagem }}{% if s.resposta %}<br><em>Resposta: {{ s.resposta }}</em>{% endif %}</p>{% empty %}<p class="muted">Nenhuma solicitação.</p>{% endfor %}</section></div>{% endblock %}

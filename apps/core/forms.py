@@ -59,7 +59,8 @@ class LojaForm(ModelFormBase):
         model = Loja
         fields = [
             "nome", "numero", "oriente", "potencia", "rito", "cnpj", "endereco", "email_contato",
-            "brasao", "cabecalho_documentos", "texto_legal", "mensalidade_dia_vencimento", "chave_pix",
+            "brasao", "cabecalho_documentos", "texto_legal", "mensalidade_dia_vencimento", "chave_pix", "intersticio_promocao_meses",
+            "intersticio_elevacao_meses", "lembrete_sessao_horas", "cobranca_automatica",
         ]
         widgets = {"cabecalho_documentos": forms.Textarea(attrs={"rows": 4}),
                    "texto_legal": forms.Textarea(attrs={"rows": 5})}

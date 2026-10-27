@@ -45,6 +45,14 @@ class Loja(models.Model):
     texto_legal = models.TextField("Fundamentação legal da assinatura", default=TEXTO_LEGAL_PADRAO)
     mensalidade_dia_vencimento = models.PositiveSmallIntegerField("Dia de vencimento da mensalidade", default=10)
     chave_pix = models.CharField("Chave PIX (para cobrança)", max_length=120, blank=True)
+    intersticio_promocao_meses = models.PositiveSmallIntegerField(
+        "Interstício mínimo: iniciação → promoção (meses)", default=0, help_text="0 = sem exigência")
+    intersticio_elevacao_meses = models.PositiveSmallIntegerField(
+        "Interstício mínimo: promoção → elevação (meses)", default=0, help_text="0 = sem exigência")
+    lembrete_sessao_horas = models.PositiveSmallIntegerField(
+        "Lembrete automático de sessão (horas antes)", default=48, help_text="0 = desligado")
+    cobranca_automatica = models.BooleanField(
+        "Enviar cobrança por e-mail automaticamente às mensalidades vencidas (semanal)", default=False)
 
     class Meta:
         verbose_name = "Loja"
@@ -210,3 +218,32 @@ class AssinaturaBase(models.Model):
             tipo = mimetypes.guess_type(self.foto.name)[0] or "image/png"
             return f"data:{tipo};base64," + base64.b64encode(dados).decode()
         return ""
+
+
+class SolicitacaoLGPD(models.Model):
+    """Pedido de titular de dados (acesso, correção, eliminação, portabilidade)."""
+
+    class Tipo(models.TextChoices):
+        ACESSO = "acesso", "Acesso aos meus dados"
+        CORRECAO = "correcao", "Correção de dados"
+        ELIMINACAO = "eliminacao", "Eliminação de dados"
+        PORTABILIDADE = "portabilidade", "Portabilidade"
+        OUTRO = "outro", "Outro"
+
+    class Status(models.TextChoices):
+        ABERTA = "aberta", "Aberta"
+        ATENDIDA = "atendida", "Atendida"
+        NEGADA = "negada", "Negada (com justificativa)"
+
+    irmao = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="solicitacoes_lgpd")
+    tipo = models.CharField(max_length=14, choices=Tipo.choices)
+    mensagem = models.TextField()
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.ABERTA)
+    resposta = models.TextField(blank=True)
+    criada_em = models.DateTimeField(auto_now_add=True)
+    resolvida_em = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-criada_em"]
+        verbose_name = "Solicitação LGPD"
+        verbose_name_plural = "Solicitações LGPD"

@@ -44,7 +44,7 @@ def detalhe(request, pk):
     return render(request, "irmaos/detalhe.html", {
         "irmao": irmao, "completo": completo, "proprio": proprio, "pode_gerir": _pode_gerir(request.user),
         "cargos": Gestao.objects.filter(irmao=irmao).select_related("cargo", "ano").order_by("-ano__inicio"),
-        "ano": AnoMaconico.atual(),
+        "ano": AnoMaconico.atual(), "cerimonias": irmao.cerimonias.all(),
     })
 
 

@@ -5,6 +5,11 @@ Sistema de gestão e administração para a Loja (Rito Schröder, GLESP): irmão
 verificação pública), tesouraria, visitação (certificados em lote), biblioteca com visualizador embutido,
 candidatos, comissões, expediente, patrimônio e relatórios (PDF, XLSX, CSV).
 
+Também inclui: cerimônias (iniciação, promoção e elevação atualizam grau e datas, com interstício configurável),
+iniciação direta a partir do candidato aprovado, agenda unificada (+ exportação .ics) e agenda social com confirmação
+de presença, livro de atas em PDF, importação do quadro por planilha, painel de indicadores, direitos LGPD
+(exportação dos próprios dados e solicitações) e lembretes automáticos.
+
 Código aberto sob licença **MIT**. Escopo completo: [`docs/ESCOPO.md`](docs/ESCOPO.md).
 
 ## Stack
@@ -30,6 +35,16 @@ PDFs (WeasyPrint) exigem as bibliotecas do sistema `pango` e `harfbuzz` (no Debi
 
 Primeiros passos pelo navegador: entre como o usuário criado → **Configurações** (dados da Loja, termo, texto legal) →
 **Categorias de irmão** (valor das mensalidades) → **Catálogo de cargos** → cadastre os irmãos (convite de senha por e-mail).
+
+## Rotinas automáticas
+
+Agende diariamente (cron/systemd) para lembretes de sessão, marcação de mensalidades vencidas e cobrança semanal opcional:
+
+```bash
+0 8 * * *  cd /app && python manage.py enviar_lembretes      # em Docker: docker compose exec -T web python manage.py enviar_lembretes
+```
+
+Importação inicial do quadro: **Irmãos → Importar planilha** (modelo CSV disponível na própria tela; use "Apenas validar" antes).
 
 ## Perfis e graus
 

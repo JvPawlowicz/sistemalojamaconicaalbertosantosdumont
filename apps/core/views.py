@@ -5,7 +5,7 @@ import qrcode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -16,7 +16,7 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from . import perfis as P
 from .forms import LojaForm, TokenForm
-from .models import AceiteTermo, AnoMaconico, EmailLog, Loja, TermoAceite
+from .models import AceiteTermo, AnoMaconico, EmailLog, Loja, SolicitacaoLGPD, TermoAceite
 from .utils import ip_do_cliente
 
 
@@ -53,7 +53,31 @@ def painel(request):
 
         ctx["saldo"] = saldo_caixa()
         ctx["inadimplentes"] = Lancamento.objects.filter(status=Lancamento.Status.VENCIDO).count()
+    if user.tem_algum_perfil(P.SECRETARIO, P.TESOUREIRO):
+        ctx["indicadores"] = _indicadores(ctx["ano"])
     return render(request, "core/painel.html", ctx)
+
+
+def _indicadores(ano):
+    """Números do ano maçônico para o painel da gestão."""
+    from apps.atas.models import Ata
+    from apps.candidatos.models import Candidato
+    from apps.irmaos.models import Irmao
+    from apps.sessoes import services as ses
+    from apps.sessoes.models import Sessao
+
+    ativos = Irmao.objects.filter(is_active=True, grau__isnull=False)
+    freqs = [f["percentual"] for f in (ses.frequencia(i, ano) for i in ativos) if f["percentual"] is not None]
+    return {
+        "irmaos": ativos.count(),
+        "por_grau": [(n, ativos.filter(grau=g).count()) for g, n in P.GRAU_CHOICES],
+        "frequencia_media": round(sum(freqs) / len(freqs), 1) if freqs else None,
+        "sessoes_realizadas": Sessao.objects.filter(ano=ano, status=Sessao.Status.REALIZADA).count(),
+        "atas_pendentes": Ata.objects.filter(status=Ata.Status.APROVADA).count(),
+        "atas_sem_aprovacao": Ata.objects.filter(status__in=[Ata.Status.RASCUNHO, Ata.Status.CIRCULACAO]).count(),
+        "candidatos": Candidato.objects.exclude(
+            etapa__in=[Candidato.Etapa.INICIADO, Candidato.Etapa.REPROVADO, Candidato.Etapa.DESISTIU]).count(),
+    }
 
 
 @login_required
@@ -173,3 +197,48 @@ def emails_enviados(request):
     if not request.user.tem_perfil(P.ADMINISTRADOR):
         raise PermissionDenied
     return render(request, "core/emails.html", {"emails": EmailLog.objects.all()[:200]})
+
+
+# --- LGPD: direitos do titular ---
+@login_required
+def meus_dados(request):
+    if request.method == "POST":
+        tipo = request.POST.get("tipo")
+        mensagem = request.POST.get("mensagem", "").strip()
+        if tipo in SolicitacaoLGPD.Tipo.values and mensagem:
+            SolicitacaoLGPD.objects.create(irmao=request.user, tipo=tipo, mensagem=mensagem[:2000])
+            messages.success(request, "Solicitação registrada. A Secretaria responderá em breve.")
+        else:
+            messages.error(request, "Informe o tipo e descreva a solicitação.")
+        return redirect("core:meus_dados")
+    return render(request, "core/meus_dados.html", {
+        "solicitacoes": request.user.solicitacoes_lgpd.all(), "tipos": SolicitacaoLGPD.Tipo.choices,
+    })
+
+
+@login_required
+def exportar_meus_dados(request):
+    from django.http import HttpResponse
+
+    from .lgpd import exportar_json
+
+    resp = HttpResponse(exportar_json(request.user), content_type="application/json; charset=utf-8")
+    resp["Content-Disposition"] = 'attachment; filename="meus-dados.json"'
+    return resp
+
+
+@login_required
+def solicitacoes_lgpd(request):
+    if not request.user.tem_algum_perfil(P.SECRETARIO, P.ADMINISTRADOR):
+        raise PermissionDenied
+    if request.method == "POST":
+        s = get_object_or_404(SolicitacaoLGPD, pk=request.POST.get("id"))
+        status = request.POST.get("status")
+        if status in (SolicitacaoLGPD.Status.ATENDIDA, SolicitacaoLGPD.Status.NEGADA):
+            s.status = status
+            s.resposta = request.POST.get("resposta", "")[:2000]
+            s.resolvida_em = timezone.now()
+            s.save()
+            messages.success(request, "Solicitação atualizada.")
+        return redirect("core:solicitacoes_lgpd")
+    return render(request, "core/solicitacoes_lgpd.html", {"solicitacoes": SolicitacaoLGPD.objects.select_related("irmao")})

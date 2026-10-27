@@ -1,0 +1,17 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+@page { size: A4; margin: 2.2cm 2cm 2.4cm; @bottom-center { content: "Livro de atas {{ ano.nome }} — página " counter(page) " de " counter(pages); font-size: 9pt; color: #555; } }
+body { font-family: Georgia, "Times New Roman", serif; font-size: 12pt; line-height: 1.55; color: #111; }
+.cab { text-align: center; white-space: pre-line; font-weight: bold; border-bottom: 2px solid #1f3a5f; padding-bottom: .4cm; margin-bottom: .6cm; }
+.capa { text-align: center; page-break-after: always; padding-top: 8cm; } .capa h1 { font-size: 24pt; }
+.ata { page-break-before: always; } .ata:first-of-type { page-break-before: avoid; }
+.tit { text-align: center; text-transform: uppercase; margin-bottom: .5cm; } .texto { white-space: pre-wrap; text-align: justify; }
+.ass-item { display: inline-block; width: 46%; text-align: center; margin: .3cm 1%; vertical-align: top; } .ass-item img { max-height: 1.6cm; }
+.linha { border-top: 1px solid #000; font-size: 10pt; padding-top: 2px; } .ev { font-size: 7.5pt; color: #444; word-break: break-all; }
+</style></head><body>
+<div class="capa"><div class="cab">{{ loja.cabecalho }}</div><h1>LIVRO DE ATAS</h1><p>Ano maçônico {{ ano.nome }}</p><p>{{ blocos|length }} ata(s) assinada(s)</p></div>
+{% for b in blocos %}<div class="ata"><div class="cab">{{ loja.cabecalho }}</div>
+<div class="tit">Ata nº {{ b.ata.numero|default:"____" }}{% if b.ata.livro %} — Livro {{ b.ata.livro }}, folha {{ b.ata.folha }}{% endif %}<br><small>{{ b.ata.sessao.titulo }} — {{ b.ata.sessao.data_hora|date:"d/m/Y" }}</small></div>
+<div class="texto">{{ b.ata.conteudo }}</div>
+<p>{% for a in b.assinaturas %}<span class="ass-item">{% if a.imagem_src %}<img src="{{ a.imagem_src }}" alt="">{% endif %}<span class="linha" style="display:block">{{ a.irmao.nome_completo }}<br>{{ a.assinado_em|date:"d/m/Y H:i" }}</span><span class="ev" style="display:block">IP {{ a.ip|default:"—" }} · {{ a.codigo }}</span></span>{% endfor %}</p>
+<p class="ev">{{ texto_legal }} Hash SHA-256: {{ b.hash }}</p></div>{% endfor %}
+</body></html>

@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Importar irmãos{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Importar quadro por planilha</h1><p>CSV (separado por ; ou ,) ou XLSX, com a primeira linha de cabeçalho. Irmãos já existentes (mesmo e-mail ou CPF) são atualizados.</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'irmaos:modelo_importacao' %}">{% icon "download" %} Baixar modelo</a><a class="btn btn-sec" href="{% url 'irmaos:lista' %}">{% icon "arrow-left" %} Irmãos</a></div></div>
+<form method="post" enctype="multipart/form-data" class="card">{% csrf_token %}
+<div class="campo"><label for="planilha">Planilha (.csv ou .xlsx)</label><input class="input" type="file" id="planilha" name="planilha" accept=".csv,.xlsx" required></div>
+<p class="ajuda">Colunas: {{ colunas|join:", " }}. Datas no formato dd/mm/aaaa. Grau: Aprendiz, Companheiro ou Mestre. Obrigatórias: nome_completo, email, grau.</p>
+<div class="acoes"><button class="btn btn-sec" type="submit" name="acao" value="validar">{% icon "search" %} Apenas validar</button><button class="btn" type="submit" name="acao" value="importar">{% icon "upload" %} Importar</button></div></form>
+{% if resultado %}<section class="card"><h2>Resultado</h2><p>{{ resultado.criados }} novo(s) · {{ resultado.atualizados }} atualizado(s) {% if resultado.aplicado %}<span class="selo selo-ok">gravado</span>{% elif not resultado.erros %}<span class="selo selo-info">validação ok — nada foi gravado</span>{% endif %}</p>
+{% if resultado.erros %}<table class="tabela"><thead><tr><th>Linha</th><th>Problema</th></tr></thead><tbody>{% for n, msg in resultado.erros %}<tr><td>{{ n }}</td><td>{{ msg }}</td></tr>{% endfor %}</tbody></table>{% endif %}</section>{% endif %}{% endblock %}

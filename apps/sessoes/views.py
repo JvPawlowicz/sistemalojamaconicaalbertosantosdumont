@@ -28,6 +28,16 @@ def _sessao_visivel(request, pk):
     return sessao
 
 
+def _expedientes_da_sessao(sessao):
+    """Correspondências lidas nesta sessão ou, se ainda não realizada, as pendentes de leitura."""
+    from apps.expediente.models import Correspondencia
+
+    if sessao.status == Sessao.Status.REALIZADA:
+        return sessao.expedientes.all()
+    return Correspondencia.objects.filter(leva_a_sessao=True, lida_em_sessao__isnull=True,
+                                          data__lte=sessao.data_hora.date())
+
+
 @login_required
 def lista(request):
     anos = AnoMaconico.objects.all()
@@ -52,7 +62,7 @@ def detalhe(request, pk):
         "ata": Ata.objects.filter(sessao=sessao).first(),
         "visitantes": sessao.visitantes.select_related("visitante"),
         "pode_ver_presenca": _gerir(request.user),
-        "expedientes": sessao.expedientes.all(),
+        "expedientes": _expedientes_da_sessao(sessao),
     }
     return render(request, "sessoes/detalhe.html", ctx)
 
@@ -147,6 +157,10 @@ def concluir(request, pk):
     sessao.status = Sessao.Status.REALIZADA
     sessao.save()
     services.gerar_presencas(sessao)
+    from apps.expediente.models import Correspondencia
+
+    Correspondencia.objects.filter(leva_a_sessao=True, lida_em_sessao__isnull=True,
+                                   data__lte=sessao.data_hora.date()).update(lida_em_sessao=sessao)
     messages.success(request, "Sessão marcada como realizada. A frequência foi atualizada.")
     return redirect("sessoes:detalhe", pk=pk)
 

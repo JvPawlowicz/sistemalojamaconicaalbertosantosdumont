@@ -8,7 +8,14 @@
 {% for a in pendencias_assinatura %}<a href="{% url 'atas:detalhe' a.pk %}">Ata {{ a.numero|default:"s/nº" }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>
 {% endif %}
 
-<div class="grade">
+{% if indicadores %}
+<div class="grade" aria-label="Indicadores do ano maçônico">
+<div class="card indicador"><span class="rotulo">Irmãos ativos</span><span class="valor">{{ indicadores.irmaos }}</span><span class="rotulo">{% for n, q in indicadores.por_grau %}{{ q }} {{ n }}{% if not forloop.last %} · {% endif %}{% endfor %}</span></div>
+<div class="card indicador"><span class="rotulo">Frequência média</span><span class="valor">{% if indicadores.frequencia_media is None %}—{% else %}{{ indicadores.frequencia_media }}%{% endif %}</span><span class="rotulo">{{ indicadores.sessoes_realizadas }} sessão(ões) realizada(s)</span></div>
+<div class="card indicador"><span class="rotulo">Atas</span><span class="valor">{{ indicadores.atas_pendentes }}</span><span class="rotulo">aguardando assinaturas · {{ indicadores.atas_sem_aprovacao }} em redação/circulação</span></div>
+<div class="card indicador"><span class="rotulo">Candidatos em andamento</span><span class="valor">{{ indicadores.candidatos }}</span></div></div>
+{% endif %}
+<div class="grade mt">
   <section class="card" aria-labelledby="h-prox"><h2 id="h-prox">{% icon "calendar-days" %} Próximas sessões</h2>
     {% for s in proximas %}<p><a href="{% url 'sessoes:detalhe' s.pk %}"><strong>{{ s.data_hora|date:"d/m/Y H:i" }}</strong></a><br><span class="muted">{{ s.titulo }}</span></p>
     {% empty %}<p class="muted">Nenhuma sessão agendada.</p>{% endfor %}

@@ -7,6 +7,8 @@ from django.views.decorators.http import require_POST
 
 from apps.core import perfis as P
 
+from apps.sessoes.models import Sessao
+
 from .forms import CandidatoForm, ParecerForm
 from .models import Candidato
 
@@ -62,6 +64,7 @@ def detalhe(request, pk):
     return render(request, "candidatos/detalhe.html", {
         "c": c, "form": form, "etapas": Candidato.Etapa.choices, "pode_gerir": _gerir(request.user),
         "pareceres": c.pareceres.select_related("irmao"), "historico": c.history.all()[:15],
+        "sessoes_recentes": Sessao.objects.order_by("-data_hora")[:15],
     })
 
 
@@ -78,3 +81,23 @@ def mover(request, pk):
         c.save()
         messages.success(request, f"Etapa alterada para {c.get_etapa_display()}.")
     return redirect("candidatos:detalhe", pk=pk)
+
+
+@login_required
+@require_POST
+def iniciar(request, pk):
+    """Inicia o candidato aprovado: cria o irmão (Aprendiz) e registra a cerimônia na sessão escolhida."""
+    if not _gerir(request.user):
+        raise PermissionDenied
+    from apps.sessoes import services
+    from apps.sessoes.models import Sessao
+
+    c = get_object_or_404(Candidato, pk=pk)
+    sessao = get_object_or_404(Sessao, pk=request.POST.get("sessao"))
+    try:
+        irmao = services.iniciar_candidato(c, sessao, request.user)
+    except services.CerimoniaInvalida as exc:
+        messages.error(request, str(exc))
+        return redirect("candidatos:detalhe", pk=pk)
+    messages.success(request, f"{irmao.nome_completo} foi iniciado. Envie o convite de acesso pelo cadastro do irmão.")
+    return redirect("irmaos:detalhe", pk=irmao.pk)

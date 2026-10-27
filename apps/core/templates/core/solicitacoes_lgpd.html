@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Solicitações LGPD{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Solicitações de titulares (LGPD)</h1><p>Responda e registre o atendimento. Registros que a Loja deve manter por obrigação legal (ex.: atas assinadas) não são eliminados.</p></div></div>
+{% for s in solicitacoes %}<form method="post" class="card">{% csrf_token %}<input type="hidden" name="id" value="{{ s.pk }}">
+<h3>{{ s.irmao.nome_completo }} — {{ s.get_tipo_display }} {% selo s.status s.get_status_display %}</h3><p class="muted">{{ s.criada_em|date:"d/m/Y H:i" }}</p><p>{{ s.mensagem }}</p>
+{% if s.status == "aberta" %}<div class="campo"><label for="r{{ s.pk }}">Resposta</label><textarea class="input" id="r{{ s.pk }}" name="resposta" rows="3"></textarea></div>
+<div class="acoes"><button class="btn" name="status" value="atendida" type="submit">Marcar como atendida</button><button class="btn btn-sec" name="status" value="negada" type="submit">Negar (com justificativa)</button></div>{% else %}<p><em>{{ s.resposta }}</em></p>{% endif %}</form>
+{% empty %}<div class="card vazio">Nenhuma solicitação.</div>{% endfor %}{% endblock %}

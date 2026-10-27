@@ -1,7 +1,7 @@
 # Escopo do Sistema — Loja Maçônica Alberto Santos Dumont
 
 **Rito:** Schröder (alemão, quadro de cargos reduzido) · **Potência:** Grande Loja Maçônica do Estado de São Paulo (GLESP) · **Ano maçônico:** julho a julho
-**Status:** versão 1.0 (escopo fechado) — base para desenho dos fluxos
+**Status:** versão 1.0 (escopo fechado e implementado — ver README) — base para desenho dos fluxos
 
 ## Premissas gerais
 

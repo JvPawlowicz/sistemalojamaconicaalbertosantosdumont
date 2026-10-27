@@ -289,3 +289,21 @@ def verificar(request, codigo):
             "loja": Loja.atual(),
         })
     raise Http404
+
+
+@login_required
+def livro_pdf(request):
+    """Livro de atas do ano maçônico (atas assinadas, em ordem), para impressão/arquivo."""
+    if not _gerir(request.user):
+        raise PermissionDenied
+    from apps.core.models import AnoMaconico
+
+    ano = AnoMaconico.atual()
+    if request.GET.get("ano", "").isdigit():
+        ano = get_object_or_404(AnoMaconico, pk=request.GET["ano"])
+    atas = Ata.objects.filter(sessao__ano=ano, status=Ata.Status.ASSINADA).select_related("sessao") \
+        .order_by("sessao__data_hora")
+    blocos = [{"ata": a, "assinaturas": list(a.assinaturas_validas.select_related("irmao")), "hash": a.hash_conteudo}
+              for a in atas]
+    dados = pdf_bytes("atas/livro_pdf.html", {"ano": ano, "blocos": blocos, "texto_legal": Loja.atual().texto_legal}, request)
+    return resposta_pdf(f"livro-de-atas-{ano.nome.replace('/', '-')}.pdf", dados)

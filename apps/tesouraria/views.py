@@ -260,3 +260,20 @@ def extrato_pdf(request, pk):
         "aberto": lancs.filter(status__in=["pendente", "vencido"]).aggregate(s=Sum("valor"))["s"] or 0,
     }, request)
     return resposta_pdf(f"extrato-{irmao.pk}.pdf", dados)
+
+
+@login_required
+def lancamento_avulso(request):
+    """Cobrança avulsa (joia, contribuição extra, evento etc.)."""
+    _tesoureiro(request.user)
+    form = LancamentoAvulsoForm(request.POST or None, initial={"competencia": timezone.localdate().replace(day=1)})
+    form.fields["irmao"].queryset = Irmao.objects.filter(is_active=True, grau__isnull=False)
+    if request.method == "POST" and form.is_valid():
+        l = form.save(commit=False)
+        l.competencia = l.competencia.replace(day=1)
+        l.status = Lancamento.Status.PENDENTE
+        l.save()
+        messages.success(request, "Cobrança lançada.")
+        return redirect(f"{reverse('tesouraria:mensalidades')}?mes={l.competencia:%Y-%m}")
+    return render(request, "crud/form.html", {"form": form, "titulo": "Cobrança avulsa",
+                                              "cancelar_url": reverse("tesouraria:mensalidades")})
