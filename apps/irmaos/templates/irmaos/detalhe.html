@@ -2,7 +2,7 @@
 {% block titulo %}{{ irmao.nome_completo }}{% endblock %}
 {% block conteudo %}
 <div class="cabecalho-pagina"><div style="display:flex;gap:1rem;align-items:center">
-  {% if irmao.foto %}<img class="avatar avatar-lg" src="{{ irmao.foto.url }}" alt="Foto de {{ irmao.nome_completo }}">{% else %}<span class="avatar avatar-lg" aria-hidden="true">{{ irmao.iniciais }}</span>{% endif %}
+  {% if irmao.foto %}<img class="avatar avatar-lg" src="{% url 'core:foto_irmao' irmao.pk %}" alt="Foto de {{ irmao.nome_completo }}">{% else %}<span class="avatar avatar-lg" aria-hidden="true">{{ irmao.iniciais }}</span>{% endif %}
   <div><h1 class="mb0">{{ irmao.nome_completo }}</h1><p>{{ irmao.grau_nome }} · {% selo irmao.situacao irmao.get_situacao_display %}{% if irmao.matricula %} · Matrícula {{ irmao.matricula }}{% endif %}</p></div></div>
 <div class="acoes">
  {% if pode_gerir %}<a class="btn" href="{% url 'irmaos:editar' irmao.pk %}">{% icon "pencil" %} Editar</a>

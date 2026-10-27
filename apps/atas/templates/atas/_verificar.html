@@ -3,7 +3,7 @@
 {% if tipo == "ata" %}
 <div class="card">
 {% if integra and vigente and documento_confere %}<div class="alerta alerta-success">{% icon "circle-check" %}<span><strong>Assinatura íntegra e válida.</strong> O hash do documento registrado confere com o texto atual da ata.</span></div>
-{% elif integra and not vigente %}<div class="alerta alerta-warning">{% icon "triangle-alert" %}<span><strong>Assinatura íntegra, porém de uma versão anterior.</strong> A ata foi revisada depois desta assinatura.</span></div>
+{% elif integra and not vigente and documento_confere %}<div class="alerta alerta-warning">{% icon "triangle-alert" %}<span><strong>Assinatura íntegra, porém de uma versão anterior.</strong> A ata foi revisada depois desta assinatura; o texto daquela versão está arquivado e confere com o hash assinado.</span></div>
 {% else %}<div class="alerta alerta-error">{% icon "circle-x" %}<span><strong>Atenção:</strong> a verificação de integridade falhou. O documento ou o registro pode ter sido alterado.</span></div>{% endif %}
 <dl class="lista-def">
 <dt>Documento</dt><dd>Ata {{ ass.ata.numero|default:"s/nº" }} — {{ ass.ata.sessao.titulo }} de {{ ass.ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ass.versao }})</dd>
@@ -23,5 +23,5 @@
 <dl class="lista-def"><dt>Certificado</dt><dd><code>{{ cert.codigo }}</code></dd>
 <dt>Visitante</dt><dd>{{ cert.visita.visitante.nome }} — {{ cert.visita.visitante.loja_nome }}</dd>
 <dt>Sessão</dt><dd>{{ cert.visita.sessao.data_hora|date:"d/m/Y" }}</dd><dt>Hash do documento</dt><dd><code>{{ cert.hash_documento }}</code></dd></dl>
-{% for a in assinaturas %}<p>{{ a.irmao.nome_completo }} ({{ a.funcao }}) — {{ a.assinado_em|date:"d/m/Y H:i" }} · IP {{ a.ip|default:"—" }}</p>{% endfor %}</div>
+{% for a in assinaturas %}<p>{{ a.irmao.nome_completo }} ({{ a.funcao }}) — {{ a.assinado_em|date:"d/m/Y H:i" }} · IP {{ a.ip|default:"—" }}{% if a.autorizacao_id %} <span class="selo selo-info">pré-autorizada</span>{% endif %}</p>{% endfor %}</div>
 {% endif %}

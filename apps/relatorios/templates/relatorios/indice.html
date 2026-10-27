@@ -2,4 +2,5 @@
 {% block titulo %}Relatórios{% endblock %}
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Relatórios</h1><p>Todos podem ser exportados em PDF, planilha (XLSX) e CSV.</p></div></div>
+{% if user|tem_perfil:"tesoureiro" %}<section class="card"><h2>{% icon "stamp" %} Prestação de contas</h2><p>PDF único para o Conselho Fiscal: saldo inicial e final, fluxo mensal, orçamento, movimentos, mensalidades e pendências.</p><a class="btn" href="{% url 'relatorios:pacote_fiscal' %}">{% icon "download" %} Pacote do Conselho Fiscal ({{ ano_atual }})</a></section>{% endif %}
 {% for grupo, itens in grupos.items %}<section class="card"><h2>{% icon "chart-column" %} {{ grupo }}</h2><div class="grade">{% for slug, titulo in itens %}<a class="btn btn-sec" href="{% url 'relatorios:ver' slug %}">{{ titulo }}</a>{% endfor %}</div></section>{% empty %}<div class="card vazio">Sem relatórios disponíveis para o seu perfil.</div>{% endfor %}{% endblock %}

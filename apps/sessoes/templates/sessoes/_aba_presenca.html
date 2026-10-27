@@ -1,4 +1,5 @@
 {% load loja %}<form method="post" action="{% url 'sessoes:presenca' sessao.pk %}" class="card" id="form-presenca">{% csrf_token %}
+{% if quorum.1 %}<p class="selo {% if quorum.2 %}selo-ok{% else %}selo-danger{% endif %}">Quórum: {{ quorum.0 }} presente(s) / mínimo {{ quorum.1 }}{% if not quorum.2 %} — não atingido{% endif %}</p>{% endif %}
 <p class="ajuda">Irmãos de grau {{ sessao.get_grau_display }} ou superior. <button type="button" class="btn btn-sec btn-peq" data-marcar-todos="presente" data-form="form-presenca">{% icon "check" %} Marcar todos presentes</button></p>
 <div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th>Situação</th><th>Justificativa</th></tr></thead><tbody>
 {% for p in presencas %}<tr><td>{{ p.irmao.nome_completo }} <span class="muted">({{ p.irmao.grau_nome }})</span></td>

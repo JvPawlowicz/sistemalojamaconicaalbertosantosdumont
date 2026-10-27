@@ -1,9 +1,15 @@
 """Blocos reutilizáveis para listas, formulários e confirmações."""
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
 
 from .mixins import PerfilRequeridoMixin
+
+
+def paginar(request, queryset, por_pagina=25):
+    """Página atual de um queryset/lista (?pagina=N), tolerante a valores inválidos."""
+    return Paginator(queryset, por_pagina).get_page(request.GET.get("pagina"))
 
 
 class ListaView(PerfilRequeridoMixin, TemplateView):
@@ -17,6 +23,7 @@ class ListaView(PerfilRequeridoMixin, TemplateView):
     rotulo_novo = "Novo"
     vazio = "Nada cadastrado ainda."
     acoes_extra: list = []
+    por_pagina = 25
 
     def get_objetos(self):
         raise NotImplementedError
@@ -33,7 +40,9 @@ class ListaView(PerfilRequeridoMixin, TemplateView):
         ctx["titulo"] = self.titulo
         ctx["subtitulo"] = self.subtitulo
         ctx["cabecalho"] = [c for c, _ in self.colunas]
-        ctx["linhas"] = [self.linha(o) for o in self.get_objetos()]
+        pagina = paginar(self.request, self.get_objetos(), self.por_pagina)
+        ctx["pagina"] = pagina
+        ctx["linhas"] = [self.linha(o) for o in pagina]
         ctx["url_novo"] = self.url_novo
         ctx["rotulo_novo"] = self.rotulo_novo
         ctx["vazio"] = self.vazio

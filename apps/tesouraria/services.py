@@ -103,9 +103,13 @@ def orcamento_vs_realizado(ano: AnoMaconico):
 
 def mensagem_cobranca(lancamento):
     loja = Loja.atual()
+    v = valor_atualizado(lancamento)
+    fmt = lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")  # noqa: E731
     texto = (f"Prezado Irmão {lancamento.irmao.nome_completo}, informamos que a {lancamento.descricao.lower()} "
-             f"de {lancamento.competencia:%m/%Y} (R$ {lancamento.valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-             + f"), com vencimento em {lancamento.vencimento:%d/%m/%Y}, encontra-se em aberto.")
+             f"de {lancamento.competencia:%m/%Y} (R$ {fmt(lancamento.valor)}), com vencimento em "
+             f"{lancamento.vencimento:%d/%m/%Y}, encontra-se em aberto.")
+    if v["total"] != v["base"]:
+        texto += f" Com multa e juros ({v['dias']} dia(s) de atraso), o valor atualizado é R$ {fmt(v['total'])}."
     if loja.chave_pix:
         texto += f" PIX: {loja.chave_pix}."
     return texto + f" Fraterno abraço, Tesouraria — {loja.nome}."
@@ -113,3 +117,22 @@ def mensagem_cobranca(lancamento):
 
 def inadimplencia_do_mes(competencia: date):
     return Lancamento.objects.filter(competencia=competencia.replace(day=1), status__in=["pendente", "vencido"])
+
+
+def valor_atualizado(lancamento, hoje=None):
+    """Valor com multa e juros do regimento (pro rata por dia). Devolve dict com os componentes."""
+    from decimal import ROUND_HALF_UP
+
+    hoje = hoje or timezone.localdate()
+    base = lancamento.valor
+    zero = {"base": base, "multa": Decimal(0), "juros": Decimal(0), "total": base, "dias": 0}
+    if lancamento.status not in (Lancamento.Status.PENDENTE, Lancamento.Status.VENCIDO) or base <= 0:
+        return zero
+    loja = Loja.atual()
+    dias = (hoje - lancamento.vencimento).days - loja.dias_carencia_atraso
+    if dias <= 0 or not (loja.multa_atraso_percentual or loja.juros_mensal_percentual):
+        return zero
+    cent = Decimal("0.01")
+    multa = (base * loja.multa_atraso_percentual / 100).quantize(cent, ROUND_HALF_UP)
+    juros = (base * loja.juros_mensal_percentual / 100 * Decimal(dias) / 30).quantize(cent, ROUND_HALF_UP)
+    return {"base": base, "multa": multa, "juros": juros, "total": base + multa + juros, "dias": dias}

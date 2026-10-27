@@ -70,9 +70,31 @@ class Ata(models.Model):
     def hash_conteudo(self):
         return sha256_texto(self.texto_canonico())
 
+    def arquivar_versao(self, usuario=None):
+        """Guarda o retrato da versão atual (idempotente)."""
+        return AtaVersao.objects.get_or_create(ata=self, versao=self.versao, defaults={
+            "conteudo": self.conteudo, "texto_canonico": self.texto_canonico(), "hash": self.hash_conteudo,
+            "criada_por": usuario})[0]
+
     def faltam_assinar(self):
         assinaram = set(self.assinaturas_validas.values_list("irmao_id", flat=True))
         return [s for s in self.signatarios.select_related("irmao") if s.irmao_id not in assinaram]
+
+
+class AtaVersao(models.Model):
+    """Retrato imutável do texto de cada versão aprovada (permite comparar e verificar versões antigas)."""
+
+    ata = models.ForeignKey(Ata, on_delete=models.CASCADE, related_name="versoes")
+    versao = models.PositiveIntegerField()
+    conteudo = models.TextField()
+    texto_canonico = models.TextField()
+    hash = models.CharField(max_length=64)
+    criada_em = models.DateTimeField(auto_now_add=True)
+    criada_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
+
+    class Meta:
+        unique_together = [("ata", "versao")]
+        ordering = ["versao"]
 
 
 class AtaSignatario(models.Model):
@@ -80,6 +102,7 @@ class AtaSignatario(models.Model):
     irmao = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
     funcao = models.CharField("Função", max_length=60, blank=True)
     ordem = models.PositiveSmallIntegerField(default=0)
+    ultimo_aviso_em = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = [("ata", "irmao")]

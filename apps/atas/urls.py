@@ -13,6 +13,7 @@ urlpatterns = [
     path("modelos/buscar/", views.buscar_modelos, name="modelos_buscar"),
     path("modelos/<int:pk>/", views.EditarModelo.as_view(), name="modelo_editar"),
     path("<int:pk>/", views.detalhe, name="detalhe"),
+    path("<int:pk>/versoes/", views.versoes, name="versoes"),
     path("<int:pk>/editar/", views.editar, name="editar"),
     path("<int:pk>/circular/", views.circular, name="circular"),
     path("<int:pk>/aprovar/", views.aprovar, name="aprovar"),

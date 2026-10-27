@@ -13,6 +13,7 @@ from apps.core import perfis as P
 from apps.core.arquivos import servir_arquivo
 from apps.core.assinatura import evidencias_da_requisicao, novo_codigo, preparar_assinatura
 from apps.core.comunicacao import enviar_email, enviar_whatsapp_documento
+from apps.core.utils import sha256_texto
 from apps.core.crud import CriarView, EditarView, ListaView
 from apps.core.models import Loja
 from apps.core.pdf import pdf_bytes, qr_data_uri, resposta_pdf
@@ -21,7 +22,9 @@ from apps.sessoes.models import Sessao
 from apps.sessoes.views import render_detalhe, url_aba
 
 from .forms import VisitaRealizadaForm, VisitanteForm
-from .models import AssinaturaCertificado, CertificadoVisita, VisitaRealizada, VisitaRecebida, Visitante
+from . import services
+from .models import (AssinaturaCertificado, AutorizacaoAssinaturaLote, CertificadoVisita, VisitaRealizada, VisitaRecebida,
+                     Visitante)
 
 
 def _gerir(user):
@@ -150,7 +153,9 @@ def gerar_certificados(request, sessao_pk):
     for v in sessao.visitantes.all():
         _, criado = CertificadoVisita.objects.get_or_create(visita=v, defaults={"codigo": novo_codigo()})
         n += criado
-    messages.success(request, f"{n} certificado(s) gerado(s).")
+    aplicadas = services.aplicar_autorizacoes(sessao)
+    messages.success(request, f"{n} certificado(s) gerado(s)." +
+                     (f" {aplicadas} assinatura(s) pré-autorizada(s) aplicada(s)." if aplicadas else ""))
     return redirect(url_aba(sessao, "visitantes"))
 
 
@@ -206,6 +211,7 @@ def _pdf_certificado(request, cert):
     return pdf_bytes("visitas/certificado_pdf.html", {
         "cert": cert, "v": cert.visita, "visitante": cert.visita.visitante, "sessao": cert.visita.sessao,
         "ass_veneravel": assinaturas.get("veneravel"), "ass_secretario": assinaturas.get("secretario"),
+        "pre_autorizadas": [a for a in assinaturas.values() if a.autorizacao_id],
         "texto_legal": Loja.atual().texto_legal, "qr": qr_data_uri(url), "hash": cert.hash_documento,
     }, request)
 
@@ -261,3 +267,34 @@ def enviar_lote(request, sessao_pk):
         msg += f" {sem_assinatura} ainda sem as duas assinaturas."
     messages.success(request, msg)
     return redirect(url_aba(sessao, "visitantes"))
+
+
+@login_required
+def preautorizar(request, sessao_pk):
+    """Venerável/Secretário assina antes da sessão; o sistema aplica aos certificados gerados depois."""
+    sessao = get_object_or_404(Sessao, pk=sessao_pk)
+    funcoes = _funcoes_do_usuario(request.user)
+    if not funcoes:
+        raise PermissionDenied
+    if request.method == "POST":
+        funcao = request.POST.get("funcao")
+        if funcao not in dict(funcoes):
+            raise PermissionDenied
+        try:
+            evidencias = evidencias_da_requisicao(request)
+            hash_doc = sha256_texto(AutorizacaoAssinaturaLote.texto_canonico_de(sessao.pk, funcao))
+            with transaction.atomic():
+                AutorizacaoAssinaturaLote.objects.filter(sessao=sessao, funcao=funcao).delete()
+                preparar_assinatura(AutorizacaoAssinaturaLote, hash_doc, evidencias, sessao=sessao, funcao=funcao).save()
+            aplicadas = services.aplicar_autorizacoes(sessao)
+        except ValidationError as exc:
+            messages.error(request, " ".join(exc.messages))
+        else:
+            messages.success(request, "Assinatura pré-autorizada. Ela será aplicada aos certificados desta sessão"
+                                      + (f" ({aplicadas} já aplicada(s))." if aplicadas else " quando forem gerados."))
+            return redirect(url_aba(sessao, "visitantes"))
+    return render(request, "visitas/assinar_lote.html", {
+        "sessao": sessao, "funcoes": funcoes, "certs": [], "pendentes": {f: "—" for f, _ in funcoes},
+        "texto_legal": Loja.atual().texto_legal, "modo": "preautorizar",
+        "validade": AutorizacaoAssinaturaLote.VALIDADE_DIAS,
+    })

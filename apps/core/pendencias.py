@@ -61,6 +61,13 @@ def tarefas_do_usuario(user):
             tarefas.append(_t(f"{aprovados} candidato(s) aprovado(s) aguardando iniciação", reverse("candidatos:painel"),
                               "user-plus", "atencao", "Ver"))
 
+        from .regimento import alertas_de_frequencia
+
+        alertas = alertas_de_frequencia()
+        if alertas:
+            tarefas.append(_t(f"{len(alertas)} irmão(s) fora das regras de frequência do regimento",
+                              reverse("relatorios:ver", args=["alertas-regimento"]), "triangle-alert", "atencao", "Ver"))
+
     # --- certificados de visita (Venerável/Secretário) ---
     for funcao, perfil in (("veneravel", P.VENERAVEL), ("secretario", P.SECRETARIO)):
         if user.tem_perfil(perfil):

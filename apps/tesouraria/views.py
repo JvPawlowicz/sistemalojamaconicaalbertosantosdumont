@@ -65,7 +65,8 @@ def mensalidades(request):
     linhas = []
     for l in qs:
         msg = services.mensagem_cobranca(l)
-        linhas.append((l, link_whatsapp(l.irmao.whatsapp or l.irmao.telefone, msg) if l.em_aberto else ""))
+        linhas.append((l, link_whatsapp(l.irmao.whatsapp or l.irmao.telefone, msg) if l.em_aberto else "",
+                       services.valor_atualizado(l)))
     total = qs.aggregate(s=Sum("valor"))["s"] or 0
     return render(request, "tesouraria/mensalidades.html", {
         "linhas": linhas, "mes": mes, "status": status, "status_choices": Lancamento.Status.choices, "total": total,

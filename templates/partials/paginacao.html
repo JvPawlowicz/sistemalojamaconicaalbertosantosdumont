@@ -1,0 +1,4 @@
+{% load loja %}{% if pagina.has_other_pages %}<nav class="paginacao" aria-label="Paginação">
+{% if pagina.has_previous %}<a class="btn btn-sec btn-peq" href="?{% querystring_sem_pagina request %}pagina={{ pagina.previous_page_number }}">{% icon "arrow-left" %} Anterior</a>{% endif %}
+<span class="muted">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }} · {{ pagina.paginator.count }} registro(s)</span>
+{% if pagina.has_next %}<a class="btn btn-sec btn-peq" href="?{% querystring_sem_pagina request %}pagina={{ pagina.next_page_number }}">Próxima {% icon "chevron-right" %}</a>{% endif %}</nav>{% endif %}

@@ -2,7 +2,9 @@
 {% block titulo %}{{ c.nome }}{% endblock %}
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>{{ c.nome }}</h1><p>{% selo c.etapa c.get_etapa_display %} desde {{ c.etapa_desde|date:"d/m/Y"|default:"—" }}</p></div>
-<div class="acoes"><a class="btn btn-sec" href="{% url 'candidatos:painel' %}">{% icon "arrow-left" %} Painel</a></div></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'candidatos:painel' %}">{% icon "arrow-left" %} Painel</a>
+{% if pode_gerir %}<a class="btn btn-sec" href="{% url 'candidatos:editar' c.pk %}">{% icon "pencil" %} Editar</a>
+<form method="post" action="{% url 'candidatos:excluir' c.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit" data-confirmar="Excluir esta proposta?">{% icon "trash-2" %} Excluir</button></form>{% endif %}</div></div>
 <div class="grade-2"><section class="card"><h2>Dados</h2><dl class="lista-def"><dt>Profissão</dt><dd>{{ c.profissao|default:"—" }}</dd><dt>Nascimento</dt><dd>{{ c.data_nascimento|date:"d/m/Y"|default:"—" }}</dd><dt>Contato</dt><dd>{{ c.telefone|telefone }} {{ c.email }}</dd><dt>Proposto por</dt><dd>{{ c.proposto_por.nome_completo }}</dd><dt>Data da proposta</dt><dd>{{ c.data_proposta|date:"d/m/Y" }}</dd></dl><p class="mt" style="white-space:pre-wrap">{{ c.observacoes }}</p>
 {% if pode_gerir %}<form method="post" action="{% url 'candidatos:mover' c.pk %}" class="acoes mt">{% csrf_token %}<label class="sr-only" for="etapa">Etapa</label><select class="input" id="etapa" name="etapa" style="max-width:220px">{% for v, n in etapas %}<option value="{{ v }}" {% if c.etapa == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select><button class="btn" type="submit">Mover de etapa</button></form>
 {% if c.etapa == "aprovado" %}<form method="post" action="{% url 'candidatos:iniciar' c.pk %}" class="card mt">{% csrf_token %}<h3>{% icon "award" %} Iniciar candidato</h3><p class="ajuda">Cria o irmão (Aprendiz) e registra a iniciação na sessão escolhida.</p>

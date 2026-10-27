@@ -40,8 +40,11 @@ def lista(request):
     sem_ata = []
     if _gerir(request.user):
         sem_ata = Sessao.objects.filter(status=Sessao.Status.REALIZADA, ata__isnull=True).order_by("-data_hora")[:10]
+    from apps.core.crud import paginar
+
+    pagina = paginar(request, atas, 20)
     return render(request, "atas/lista.html", {
-        "atas": atas, "status": status, "status_choices": Ata.Status.choices,
+        "atas": pagina, "pagina": pagina, "status": status, "status_choices": Ata.Status.choices,
         "pode_gerir": _gerir(request.user), "sem_ata": sem_ata,
         "pendentes": Ata.objects.pendentes_de(request.user),
     })
@@ -150,7 +153,9 @@ def aprovar(request, pk):
         ata.status = Ata.Status.APROVADA
         ata.aprovada_em = timezone.now()
         ata.save()
-    messages.success(request, "Ata aprovada. Os signatários já podem assinar.")
+        ata.arquivar_versao(request.user)
+    avisados = services.avisar_signatarios(ata, request.build_absolute_uri("/"))
+    messages.success(request, f"Ata aprovada. Os signatários já podem assinar ({avisados} aviso(s) enviado(s) por e-mail).")
     return redirect("atas:detalhe", pk=pk)
 
 
@@ -191,6 +196,7 @@ def nova_versao(request, pk):
     if ata.editavel:
         raise PermissionDenied
     with transaction.atomic():
+        ata.arquivar_versao(request.user)
         ata.versao += 1
         ata.status = Ata.Status.RASCUNHO
         ata.aprovada_em = None
@@ -277,7 +283,8 @@ def verificar(request, codigo):
         return render(request, "atas/verificar.html", {
             "tipo": "ata", "ass": ass, "outras": outras, "integra": assinatura_integra(ass),
             "vigente": ass.versao == ass.ata.versao, "hash_atual": ass.ata.hash_conteudo,
-            "documento_confere": ass.hash_documento == ass.ata.hash_conteudo if ass.versao == ass.ata.versao else None,
+            "documento_confere": (ass.hash_documento == ass.ata.hash_conteudo) if ass.versao == ass.ata.versao else
+            bool(ass.ata.versoes.filter(versao=ass.versao, hash=ass.hash_documento).exists()),
             "loja": Loja.atual(),
         })
     cert = CertificadoVisita.objects.select_related("visita__visitante", "visita__sessao").filter(codigo=codigo).first()
@@ -307,3 +314,44 @@ def livro_pdf(request):
               for a in atas]
     dados = pdf_bytes("atas/livro_pdf.html", {"ano": ano, "blocos": blocos, "texto_legal": Loja.atual().texto_legal}, request)
     return resposta_pdf(f"livro-de-atas-{ano.nome.replace('/', '-')}.pdf", dados)
+
+
+def _diff_html(antigo, novo):
+    """Diferença linha a linha entre dois textos, já escapada para HTML."""
+    import difflib
+
+    from django.utils.html import escape
+    from django.utils.safestring import mark_safe
+
+    a, b = antigo.splitlines(), novo.splitlines()
+    saida = []
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b).get_opcodes():
+        if tag == "equal":
+            saida += [f"<div>{escape(l) or '&nbsp;'}</div>" for l in a[i1:i2]]
+        else:
+            saida += [f'<div class="dif-del">{escape(l) or "&nbsp;"}</div>' for l in a[i1:i2]]
+            saida += [f'<div class="dif-ins">{escape(l) or "&nbsp;"}</div>' for l in b[j1:j2]]
+    return mark_safe("".join(saida))
+
+
+@login_required
+def versoes(request, pk):
+    """Histórico de versões da ata e comparação entre elas."""
+    ata = _ata_visivel(request, pk)
+    snaps = {v.versao: v for v in ata.versoes.all()}
+    snaps.setdefault(ata.versao, None)
+    textos = {v.versao: v.conteudo for v in ata.versoes.all()}
+    textos[ata.versao] = ata.conteudo if ata.editavel or ata.versao not in textos else textos[ata.versao]
+    numeros = sorted(textos)
+    try:
+        a = int(request.GET.get("a", numeros[-2] if len(numeros) > 1 else numeros[-1]))
+        b = int(request.GET.get("b", numeros[-1]))
+    except ValueError:
+        a = b = numeros[-1]
+    if a not in textos or b not in textos:
+        a = b = numeros[-1]
+    ass = {n: list(ata.assinaturas.filter(versao=n).select_related("irmao")) for n in numeros}
+    return render(request, "atas/versoes.html", {
+        "ata": ata, "numeros": numeros, "a": a, "b": b, "diff": _diff_html(textos[a], textos[b]),
+        "assinaturas": ass, "snaps": snaps, "atual": ata.versao,
+    })

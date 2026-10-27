@@ -200,7 +200,10 @@ def relatorio_aceites(request):
 def emails_enviados(request):
     if not request.user.tem_perfil(P.ADMINISTRADOR):
         raise PermissionDenied
-    return render(request, "core/emails.html", {"emails": EmailLog.objects.all()[:200]})
+    from .crud import paginar
+
+    pagina = paginar(request, EmailLog.objects.all(), 50)
+    return render(request, "core/emails.html", {"emails": pagina, "pagina": pagina})
 
 
 # --- LGPD: direitos do titular ---
@@ -289,3 +292,54 @@ def busca(request):
         for v in Visitante.objects.filter(Q(nome__icontains=q) | Q(loja_nome__icontains=q))[:4]:
             resultados.append({"grupo": "Visitantes", "rotulo": f"{v.nome} — {v.loja_nome}", "url": reverse("visitas:visitante_editar", args=[v.pk])})
     return JsonResponse({"resultados": resultados[:24]})
+
+
+def brasao(request):
+    """Brasão da Loja (institucional; aparece também na tela de login)."""
+    from .arquivos import servir_arquivo
+
+    return servir_arquivo(Loja.atual().brasao, cache=True)
+
+
+@login_required
+def foto_irmao(request, pk):
+    from apps.irmaos.models import Irmao
+
+    from .arquivos import servir_arquivo
+
+    irmao = get_object_or_404(Irmao, pk=pk, grau__isnull=False)
+    return servir_arquivo(irmao.foto, cache=True)
+
+
+@login_required
+@require_POST
+def testar_email(request):
+    """Envia um e-mail de teste ao próprio administrador (valida a configuração SMTP)."""
+    if not request.user.tem_perfil(P.ADMINISTRADOR):
+        raise PermissionDenied
+    from django.conf import settings
+
+    from .comunicacao import enviar_email
+
+    if not request.user.email:
+        messages.error(request, "Seu cadastro não tem e-mail.")
+    elif enviar_email(request.user.email, "Teste de e-mail — sistema da Loja",
+                      "Se você recebeu esta mensagem, o envio por SMTP está funcionando.", contexto="teste"):
+        modo = "SMTP" if settings.EMAIL_BACKEND.endswith("smtp.EmailBackend") else f"modo de desenvolvimento ({settings.EMAIL_BACKEND.rsplit('.', 2)[-2]})"
+        messages.success(request, f"E-mail de teste enviado para {request.user.email} via {modo}.")
+    else:
+        ultimo = EmailLog.objects.first()
+        messages.error(request, f"Falha no envio: {ultimo.erro if ultimo else 'erro desconhecido'}")
+    return redirect("core:configuracoes")
+
+
+@login_required
+@require_POST
+def testar_whatsapp(request):
+    if not request.user.tem_perfil(P.ADMINISTRADOR):
+        raise PermissionDenied
+    from .comunicacao import whatsapp_status
+
+    ok, texto = whatsapp_status()
+    (messages.success if ok else messages.warning)(request, texto)
+    return redirect("core:configuracoes")

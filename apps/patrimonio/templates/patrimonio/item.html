@@ -3,6 +3,7 @@
 {% block conteudo %}
 <div class="cabecalho-pagina"><h1>{{ item.nome }}</h1></div>
 <div class="grade-2"><form method="post" class="card">{% csrf_token %}{% include "partials/form.html" %}<div class="acoes mt"><button class="btn" type="submit">{% icon "check" %} Salvar</button><a class="btn btn-sec" href="{% url 'patrimonio:lista' %}">Voltar</a></div></form>
+<form method="post" action="{% url 'patrimonio:excluir' item.pk %}" class="no-print">{% csrf_token %}<button class="btn btn-perigo" type="submit" data-confirmar="Excluir este item do inventário?">{% icon "trash-2" %} Excluir item</button></form>
 {% if item.emprestavel %}<section class="card"><h2>{% icon "book-open" %} Empréstimos</h2>
 {% if item.emprestado_a %}<p>Emprestado a <strong>{{ item.emprestado_a.nome_completo }}</strong>.</p>{% else %}
 <form method="post">{% csrf_token %}{% include "partials/form.html" with form=emp %}<button class="btn" type="submit">Registrar empréstimo</button></form>{% endif %}

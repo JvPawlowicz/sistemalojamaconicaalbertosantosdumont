@@ -18,7 +18,7 @@
 <div class="app">
   <aside class="sidebar" id="sidebar" aria-label="Menu principal">
     <a class="brand" href="{% url 'core:painel' %}">
-      {% if loja.brasao %}<img src="{{ loja.brasao.url }}" alt="">{% else %}<span class="avatar" aria-hidden="true">{% icon "landmark" %}</span>{% endif %}
+      {% if loja.brasao %}<img src="{% url 'core:brasao' %}" alt="">{% else %}<span class="avatar" aria-hidden="true">{% icon "landmark" %}</span>{% endif %}
       <span><strong>{{ loja.nome }}</strong><small>{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}Rito {{ loja.rito }}</small></span>
     </a>
     {% include "partials/menu.html" %}

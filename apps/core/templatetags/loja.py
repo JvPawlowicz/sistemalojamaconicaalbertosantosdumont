@@ -104,3 +104,12 @@ def campo_por_nome(form, nome):
         return form[nome]
     except KeyError:
         return None
+
+
+@register.simple_tag
+def querystring_sem_pagina(request):
+    """Querystring atual sem o parâmetro de página, já pronta para anexar '&pagina=N'."""
+    q = request.GET.copy()
+    q.pop("pagina", None)
+    texto = q.urlencode()
+    return mark_safe(texto.replace("&", "&amp;") + "&amp;") if texto else ""

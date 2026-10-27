@@ -96,6 +96,31 @@ class CertificadoVisita(models.Model):
 class AssinaturaCertificado(AssinaturaBase):
     certificado = models.ForeignKey(CertificadoVisita, on_delete=models.CASCADE, related_name="assinaturas")
     funcao = models.CharField(max_length=20)  # veneravel | secretario
+    autorizacao = models.ForeignKey("AutorizacaoAssinaturaLote", null=True, blank=True, on_delete=models.SET_NULL,
+                                    related_name="aplicacoes")
 
     class Meta(AssinaturaBase.Meta):
         unique_together = [("certificado", "funcao")]
+
+
+class AutorizacaoAssinaturaLote(AssinaturaBase):
+    """Pré-autorização: o Venerável/Secretário assina antes e o sistema aplica aos certificados da sessão.
+
+    Vale por 7 dias após a data da sessão; as evidências (IP, data/hora, geolocalização, 2FA) são as do momento da autorização.
+    """
+
+    VALIDADE_DIAS = 7
+    sessao = models.ForeignKey(Sessao, on_delete=models.CASCADE, related_name="autorizacoes_certificado")
+    funcao = models.CharField(max_length=20)
+
+    class Meta(AssinaturaBase.Meta):
+        unique_together = [("sessao", "funcao")]
+
+    @staticmethod
+    def texto_canonico_de(sessao_id, funcao):
+        return f"autorizacao-certificados-de-visita|sessao:{sessao_id}|funcao:{funcao}"
+
+    def valida_em(self, quando):
+        from datetime import timedelta
+
+        return quando <= self.sessao.data_hora + timedelta(days=self.VALIDADE_DIAS)

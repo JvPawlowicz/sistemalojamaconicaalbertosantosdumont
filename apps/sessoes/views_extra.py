@@ -177,3 +177,13 @@ def agenda_ics(request):
     resp = HttpResponse("\r\n".join(linhas) + "\r\n", content_type="text/calendar; charset=utf-8")
     resp["Content-Disposition"] = 'attachment; filename="agenda-loja.ics"'
     return resp
+
+
+@login_required
+@require_POST
+def evento_excluir(request, pk):
+    if not _gerir(request.user):
+        raise PermissionDenied
+    get_object_or_404(Evento, pk=pk).delete()
+    messages.success(request, "Evento excluído.")
+    return redirect("sessoes:eventos")

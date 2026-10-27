@@ -4,6 +4,7 @@
 <div class="cabecalho-pagina"><div><h1>Ata {{ ata.numero|default:"s/nº" }} — {{ ata.sessao.titulo }}</h1>
 <p>{{ ata.sessao.data_hora|date:"d/m/Y" }} · {% selo ata.status ata.get_status_display %} · versão {{ ata.versao }}{% if ata.livro %} · Livro {{ ata.livro }}, folha {{ ata.folha }}{% endif %}</p></div>
 <div class="acoes"><a class="btn btn-sec" href="{% url 'atas:pdf' ata.pk %}" target="_blank" rel="noopener">{% icon "download" %} PDF</a>
+{% if ata.versao > 1 or versoes_anteriores %}<a class="btn btn-sec" href="{% url 'atas:versoes' ata.pk %}">{% icon "history" %} Versões</a>{% endif %}
 {% if minha_pendente %}<a class="btn" href="{% url 'atas:assinar' ata.pk %}">{% icon "pen-line" %} Assinar</a>{% endif %}
 {% if pode_gerir and ata.status == "rascunho" or pode_gerir and ata.status == "circulacao" %}<a class="btn btn-sec" href="{% url 'atas:editar' ata.pk %}">{% icon "pencil" %} Editar</a>{% endif %}
 {% if pode_gerir and ata.status == "aprovada" or pode_gerir and ata.status == "assinada" %}<form method="post" action="{% url 'atas:nova_versao' ata.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit" data-confirmar="Criar nova versão? As assinaturas anteriores deixarão de valer para o novo texto.">{% icon "refresh-cw" %} Nova versão</button></form>{% endif %}

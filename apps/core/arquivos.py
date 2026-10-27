@@ -21,7 +21,7 @@ def validar_arquivo(arquivo, extensoes=EXTENSOES_PERMITIDAS):
     return arquivo
 
 
-def servir_arquivo(fieldfile, inline=True):
+def servir_arquivo(fieldfile, inline=True, cache=False):
     """Resposta com o arquivo, tipo conforme a extensão e sem permitir execução de conteúdo ativo."""
     if not fieldfile:
         raise Http404
@@ -38,5 +38,8 @@ def servir_arquivo(fieldfile, inline=True):
     resp["Content-Disposition"] = f'{"inline" if inline else "attachment"}; filename="{nome}"'
     resp["X-Content-Type-Options"] = "nosniff"
     resp["Content-Security-Policy"] = "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'"
-    resp["Cache-Control"] = "private, no-store"
+    resp["Cache-Control"] = "private, max-age=3600" if cache else "private, no-store"
     return resp
+
+
+IMAGENS = {"png", "jpg", "jpeg", "webp", "gif"}

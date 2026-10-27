@@ -7,7 +7,8 @@
  {% if pode_gerir %}
  <form method="post" action="{% url 'sessoes:enviar_convocacao' sessao.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit" data-confirmar="Enviar a convocação por e-mail aos irmãos?">{% icon "send" %} Enviar</button></form>
  <a class="btn btn-sec" href="{% url 'sessoes:editar' sessao.pk %}">{% icon "pencil" %} Editar</a>
- {% if sessao.status == "agendada" %}<form method="post" action="{% url 'sessoes:concluir' sessao.pk %}">{% csrf_token %}<button class="btn" type="submit" data-confirmar="Marcar a sessão como realizada?">{% icon "check" %} Concluir sessão</button></form>{% endif %}
+ {% if sessao.status == "agendada" %}<details class="menu-usuario"><summary class="btn btn-sec">{% icon "x" %} Cancelar</summary><form method="post" action="{% url 'sessoes:cancelar' sessao.pk %}" class="menu-usuario-lista" style="padding:.8rem;min-width:300px">{% csrf_token %}<div class="campo"><label for="motivo">Motivo (opcional)</label><input class="input" id="motivo" name="motivo" maxlength="200"></div><div class="campo campo-check"><input class="check" type="checkbox" name="avisar" id="avisar" checked><label for="avisar">Avisar os irmãos por e-mail</label></div><button class="btn btn-perigo" type="submit">Cancelar sessão</button></form></details>
+ <form method="post" action="{% url 'sessoes:concluir' sessao.pk %}">{% csrf_token %}<button class="btn" type="submit" data-confirmar="Marcar a sessão como realizada?">{% icon "check" %} Concluir sessão</button></form>{% endif %}
  {% endif %}
 </div></div>
 <nav class="abas-sessao" aria-label="Seções da sessão">{% for a in abas %}<a href="{{ a.url }}" {% if a.ativa %}aria-current="page"{% endif %}>{{ a.rotulo }}{% if a.badge %}<span class="badge">{{ a.badge }}</span>{% endif %}</a>{% endfor %}</nav>

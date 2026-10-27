@@ -2,7 +2,8 @@
 {% block titulo %}{{ e.titulo }}{% endblock %}
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>{{ e.titulo }}</h1><p>{{ e.get_tipo_display }} · {{ e.data_hora|date:"d/m/Y H:i" }}{% if e.local %} · {{ e.local }}{% endif %}{% if e.valor_por_pessoa %} · {{ e.valor_por_pessoa|moeda }} por pessoa{% endif %}</p></div>
-<div class="acoes"><a class="btn btn-sec" href="{% url 'sessoes:eventos' %}">{% icon "arrow-left" %} Eventos</a>{% if pode_gerir %}<a class="btn btn-sec" href="{% url 'sessoes:evento_editar' e.pk %}">{% icon "pencil" %} Editar</a>{% endif %}</div></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'sessoes:eventos' %}">{% icon "arrow-left" %} Eventos</a>{% if pode_gerir %}<a class="btn btn-sec" href="{% url 'sessoes:evento_editar' e.pk %}">{% icon "pencil" %} Editar</a>
+<form method="post" action="{% url 'sessoes:evento_excluir' e.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit" data-confirmar="Excluir este evento e as confirmações?">{% icon "trash-2" %} Excluir</button></form>{% endif %}</div></div>
 {% if e.descricao %}<div class="card" style="white-space:pre-wrap">{{ e.descricao }}</div>{% endif %}
 <form method="post" class="card">{% csrf_token %}<h2>{% icon "check" %} Sua presença</h2>
 <div class="opcoes" role="radiogroup" aria-label="Resposta">{% for v, n in e.confirmacoes.model.Resposta.choices %}<label><input type="radio" class="check" name="resposta" value="{{ v }}" {% if minha.resposta == v %}checked{% endif %} required> {{ n }}</label>{% endfor %}</div>

@@ -8,4 +8,5 @@
 <form class="filtros" data-auto method="get"><div class="campo"><label for="status">Situação</label><select class="input" id="status" name="status" onchange="this.form.submit()"><option value="">Todas</option>{% for v, n in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div></form>
 <div class="tabela-wrap"><table class="tabela"><thead><tr><th scope="col">Nº</th><th scope="col">Sessão</th><th scope="col">Grau</th><th scope="col">Situação</th><th scope="col">Versão</th></tr></thead><tbody>
 {% for a in atas %}<tr><td><a href="{% url 'atas:detalhe' a.pk %}"><strong>{{ a.numero|default:"s/nº" }}</strong></a></td><td>{{ a.sessao.data_hora|date:"d/m/Y" }} — {{ a.sessao.get_tipo_display }}</td><td>{{ a.sessao.get_grau_display }}</td><td>{% selo a.status a.get_status_display %}</td><td>{{ a.versao }}</td></tr>
-{% empty %}<tr><td colspan="5" class="vazio">Nenhuma ata.</td></tr>{% endfor %}</tbody></table></div>{% endblock %}
+{% empty %}<tr><td colspan="5" class="vazio">Nenhuma ata.</td></tr>{% endfor %}</tbody></table></div>
+{% include "partials/paginacao.html" %}{% endblock %}

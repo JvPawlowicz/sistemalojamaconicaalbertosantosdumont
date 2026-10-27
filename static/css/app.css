@@ -196,3 +196,7 @@ dialog#busca::backdrop { background: rgba(8, 15, 30, .55); }
 .painel-abas [role="tablist"] { display: flex; overflow-x: auto; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
 .js form.filtros[data-auto] .btn-filtrar { display: none; }
 .tabela .opcoes { flex-wrap: nowrap; gap: .3rem 1rem; } .tabela .opcoes label { white-space: nowrap; }
+.dif { white-space: normal; } .dif div { white-space: pre-wrap; }
+.dif-del { background: var(--danger-bg); color: var(--danger); text-decoration: line-through; padding: 0 .25rem; }
+.dif-ins { background: var(--ok-bg); color: var(--ok); padding: 0 .25rem; }
+.paginacao { display: flex; gap: 1rem; align-items: center; justify-content: center; padding: .75rem 0; }

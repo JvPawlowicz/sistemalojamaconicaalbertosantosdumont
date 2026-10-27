@@ -2,6 +2,7 @@
 <div class="acoes">
 <form method="post" action="{% url 'visitas:gerar_certificados' sessao.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit">{% icon "file-check" %} Gerar certificados</button></form>
 <a class="btn btn-sec" href="{% url 'visitas:assinar_lote' sessao.pk %}">{% icon "pen-line" %} Assinar em lote</a>
+<a class="btn btn-sec" href="{% url 'visitas:preautorizar' sessao.pk %}">{% icon "stamp" %} Pré-autorizar assinatura</a>
 <form method="post" action="{% url 'visitas:enviar_lote' sessao.pk %}" style="display:flex;gap:.6rem;align-items:center">{% csrf_token %}
 <label style="display:flex;gap:.3rem;align-items:center"><input class="check" type="checkbox" name="whatsapp"> também por WhatsApp</label>
 <button class="btn" type="submit" data-confirmar="Enviar os certificados assinados por e-mail?">{% icon "send" %} Enviar em lote</button></form></div></section>

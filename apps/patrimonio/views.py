@@ -70,3 +70,16 @@ def devolver(request, pk):
     e.save()
     messages.success(request, "Devolução registrada.")
     return redirect("patrimonio:editar", pk=e.item_id)
+
+
+@login_required
+@require_POST
+def excluir(request, pk):
+    _gerir(request.user)
+    item = get_object_or_404(ItemPatrimonio, pk=pk)
+    if item.emprestado_a:
+        messages.error(request, "Item emprestado: registre a devolução antes de excluir.")
+        return redirect("patrimonio:editar", pk=pk)
+    item.delete()
+    messages.success(request, "Item excluído.")
+    return redirect("patrimonio:lista")

@@ -9,14 +9,14 @@
 <form class="filtros" data-auto method="get"><div class="campo"><label for="mes">Mês</label><input class="input" type="month" id="mes" name="mes" value="{{ mes|date:'Y-m' }}"></div>
 <div class="campo"><label for="status">Situação</label><select class="input" id="status" name="status"><option value="">Todas</option>{% for v, n in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div><button class="btn btn-filtrar" type="submit">Filtrar</button></form>
 <div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th class="num">Valor</th><th>Vencimento</th><th>Situação</th><th>Ações</th></tr></thead><tbody>
-{% for l, wa in linhas %}<tr><td>{{ l.irmao.nome_completo }}</td><td class="num">{{ l.valor|moeda }}</td><td>{{ l.vencimento|date:"d/m/Y" }}</td>
+{% for l, wa, atu in linhas %}<tr><td>{{ l.irmao.nome_completo }}</td><td class="num">{{ l.valor|moeda }}{% if atu.total != atu.base %}<br><small class="muted" title="Multa {{ atu.multa|moeda }} + juros {{ atu.juros|moeda }} ({{ atu.dias }} dia(s))">atualizado: <strong>{{ atu.total|moeda }}</strong></small>{% endif %}</td><td>{{ l.vencimento|date:"d/m/Y" }}</td>
 <td>{% selo l.status l.get_status_display %}{% if l.pago_em %}<br><small class="muted">{{ l.pago_em|date:"d/m/Y" }} · {{ l.get_forma_display }}</small>{% endif %}</td>
 <td><div class="acoes">
 {% if l.em_aberto %}
 <details><summary class="btn btn-peq">Dar baixa</summary>
 <form method="post" action="{% url 'tesouraria:baixa' l.pk %}" class="card" style="min-width:260px">{% csrf_token %}
 <div class="campo"><label for="d{{ l.pk }}">Data</label><input class="input" type="date" id="d{{ l.pk }}" name="data_pagamento" value="{{ baixa_form.data_pagamento.value|date:'Y-m-d' }}" required></div>
-<div class="campo"><label for="v{{ l.pk }}">Valor pago</label><input class="input" id="v{{ l.pk }}" name="valor_pago" value="{{ l.valor|floatformat:2 }}" inputmode="decimal" required></div>
+<div class="campo"><label for="v{{ l.pk }}">Valor pago</label><input class="input" id="v{{ l.pk }}" name="valor_pago" value="{{ atu.total|floatformat:2 }}" inputmode="decimal" required></div>
 <div class="campo"><label for="f{{ l.pk }}">Forma</label><select class="input" id="f{{ l.pk }}" name="forma">{% for v, n in baixa_form.forma.field.choices %}<option value="{{ v }}">{{ n }}</option>{% endfor %}</select></div>
 <button class="btn btn-peq" type="submit">Confirmar</button></form></details>
 <form method="post" action="{% url 'tesouraria:cobrar_email' l.pk %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit">{% icon "mail" %} E-mail</button></form>

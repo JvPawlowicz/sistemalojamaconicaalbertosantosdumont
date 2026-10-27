@@ -89,6 +89,9 @@ def render_detalhe(request, sessao, aba, **extra):
     elif aba == "presenca":
         services.gerar_presencas(sessao)
         ctx["presencas"] = sessao.presencas.select_related("irmao")
+        from apps.core.regimento import quorum
+
+        ctx["quorum"] = quorum(sessao)
     elif aba == "visitantes":
         ctx["visitas"] = sessao.visitantes.select_related("visitante", "certificado")
         ctx["existentes"] = Visitante.objects.exclude(visitas__sessao=sessao)
@@ -196,6 +199,12 @@ def concluir(request, pk):
 
     Correspondencia.objects.filter(leva_a_sessao=True, lida_em_sessao__isnull=True,
                                    data__lte=sessao.data_hora.date()).update(lida_em_sessao=sessao)
+    from apps.core.regimento import quorum
+
+    presentes, minimo, ok = quorum(sessao)
+    if not ok:
+        messages.warning(request, f"Atenção: quórum não atingido ({presentes} presente(s); mínimo {minimo}). "
+                                  "Registre a justificativa na ata.")
     messages.success(request, "Sessão marcada como realizada. A frequência foi atualizada.")
     return redirect("sessoes:detalhe", pk=pk)
 
@@ -251,3 +260,28 @@ def frequencia(request):
     return render(request, "sessoes/frequencia.html", {
         "linhas": linhas, "ano": ano, "anos": AnoMaconico.objects.all(),
     })
+
+
+@login_required
+@require_POST
+def cancelar(request, pk):
+    """Cancela a sessão (não realizada e sem ata) e avisa os irmãos elegíveis por e-mail."""
+    if not _gerir(request.user):
+        raise PermissionDenied
+    sessao = get_object_or_404(Sessao, pk=pk)
+    if sessao.status == Sessao.Status.REALIZADA or hasattr(sessao, "ata"):
+        messages.error(request, "Sessão realizada ou com ata não pode ser cancelada.")
+        return redirect(url_aba(sessao))
+    sessao.status = Sessao.Status.CANCELADA
+    sessao.save()
+    enviados = 0
+    if request.POST.get("avisar"):
+        loja = Loja.atual()
+        motivo = request.POST.get("motivo", "").strip()
+        for irmao in sessao.elegiveis().exclude(email=""):
+            corpo = (f"Prezado Irmão {irmao.nome_completo},\n\nInformamos que a Sessão {sessao.titulo} marcada para "
+                     f"{sessao.data_hora:%d/%m/%Y às %H:%M} foi CANCELADA." + (f"\nMotivo: {motivo}" if motivo else "")
+                     + f"\n\nFraterno abraço,\n{loja.nome}")
+            enviados += enviar_email(irmao.email, f"Sessão cancelada — {sessao.data_hora:%d/%m/%Y}", corpo, contexto="cancelamento")
+    messages.success(request, "Sessão cancelada." + (f" {enviados} irmão(s) avisado(s) por e-mail." if enviados else ""))
+    return redirect(url_aba(sessao))

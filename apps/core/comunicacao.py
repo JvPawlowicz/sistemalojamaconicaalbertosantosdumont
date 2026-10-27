@@ -5,9 +5,10 @@ import urllib.request
 from urllib.parse import quote
 
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
-from .models import EmailLog
+from .models import EmailLog, Loja
 from .utils import somente_digitos
 
 log = logging.getLogger(__name__)
@@ -17,7 +18,9 @@ def enviar_email(destinatario, assunto, corpo, anexos=None, contexto=""):
     """Envia um e-mail e registra o resultado. Devolve True se enviado."""
     registro = EmailLog.objects.create(destinatario=destinatario, assunto=assunto[:200], contexto=contexto)
     try:
-        msg = EmailMessage(assunto, corpo, settings.DEFAULT_FROM_EMAIL, [destinatario])
+        msg = EmailMultiAlternatives(assunto, corpo, settings.DEFAULT_FROM_EMAIL, [destinatario])
+        msg.attach_alternative(render_to_string("emails/base.html", {"loja": Loja.atual(), "corpo": corpo, "assunto": assunto}),
+                               "text/html")
         for nome, conteudo, mimetype in anexos or []:
             msg.attach(nome, conteudo, mimetype)
         msg.send(fail_silently=False)
@@ -76,3 +79,19 @@ def enviar_whatsapp_documento(telefone, legenda, nome_arquivo, conteudo_base64):
     except Exception as exc:  # noqa: BLE001
         log.warning("Falha no WhatsApp: %s", exc)
         return False, str(exc)[:300]
+
+
+def whatsapp_status():
+    """Consulta o estado da instância (conectada ao número do Secretário?). Devolve (ok, descrição)."""
+    if not whatsapp_configurado():
+        return False, "Evolution API não configurada (defina EVOLUTION_API_URL, EVOLUTION_API_KEY e EVOLUTION_INSTANCE)."
+    url = f"{settings.EVOLUTION_API_URL.rstrip('/')}/instance/connectionState/{settings.EVOLUTION_INSTANCE}"
+    req = urllib.request.Request(url, headers={"apikey": settings.EVOLUTION_API_KEY})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:  # noqa: S310 - URL vem da configuração
+            dados = json.loads(resp.read().decode() or "{}")
+    except Exception as exc:  # noqa: BLE001
+        return False, f"Falha ao consultar a Evolution API: {str(exc)[:200]}"
+    estado = (dados.get("instance") or {}).get("state") or dados.get("state") or "desconhecido"
+    return estado == "open", f"Instância '{settings.EVOLUTION_INSTANCE}': {estado}" + \
+        ("" if estado == "open" else " (escaneie o QR Code no painel da Evolution API para conectar o WhatsApp do Secretário)")

@@ -17,3 +17,5 @@ MIDDLEWARE = [m for m in MIDDLEWARE if "whitenoise" not in m]
 MEDIA_ROOT = "/tmp/loja_test_media"
 EXIGIR_2FA = False
 AXES_ENABLED = False
+OTP_TOTP_THROTTLE_FACTOR = 0
+OTP_STATIC_THROTTLE_FACTOR = 0

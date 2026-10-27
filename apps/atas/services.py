@@ -47,3 +47,26 @@ def proximo_numero():
 
     ultimo = Ata.objects.exclude(numero__isnull=True).order_by("-numero").first()
     return (ultimo.numero + 1) if ultimo else 1
+
+
+def avisar_signatarios(ata, base_url, lembrete=False, apenas_pendentes=True):
+    """E-mail (SMTP) aos signatários que ainda não assinaram a versão atual, com link direto para assinar."""
+    from django.urls import reverse
+    from django.utils import timezone
+
+    from apps.core.comunicacao import enviar_email
+
+    loja = Loja.atual()
+    link = base_url.rstrip("/") + reverse("atas:assinar", args=[ata.pk])
+    enviados = 0
+    for s in ata.faltam_assinar():
+        assunto = ("Lembrete: " if lembrete else "") + f"Ata {ata.numero or 's/nº'} aguardando a sua assinatura"
+        corpo = (f"Prezado Irmão {s.irmao.nome_completo},\n\nA ata da sessão {ata.sessao.titulo} de "
+                 f"{ata.sessao.data_hora:%d/%m/%Y} foi aprovada e aguarda a sua assinatura eletrônica.\n\n"
+                 f"Assine em: {link}\n(Acesso com o seu login; o conteúdo da ata não é enviado por e-mail.)\n\n"
+                 f"Fraterno abraço,\n{loja.nome}")
+        if s.irmao.email and enviar_email(s.irmao.email, assunto, corpo, contexto="ata-assinatura"):
+            s.ultimo_aviso_em = timezone.now()
+            s.save(update_fields=["ultimo_aviso_em"])
+            enviados += 1
+    return enviados

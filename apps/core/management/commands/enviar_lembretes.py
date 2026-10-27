@@ -37,6 +37,18 @@ class Command(BaseCommand):
                 s.save(update_fields=["lembrete_enviado_em"])
         self.stdout.write(f"{enviados} lembrete(s) de sessão enviado(s).")
 
+        from django.conf import settings
+
+        from apps.atas.models import Ata
+        from apps.atas.services import avisar_signatarios
+
+        avisos = 0
+        for ata in Ata.objects.filter(status=Ata.Status.APROVADA, aprovada_em__lte=agora - timedelta(days=2)):
+            recente = ata.signatarios.filter(ultimo_aviso_em__gt=agora - timedelta(days=3)).exists()
+            if not recente:
+                avisos += avisar_signatarios(ata, settings.SITE_URL, lembrete=True)
+        self.stdout.write(f"{avisos} lembrete(s) de assinatura de ata enviado(s).")
+
         cobrancas = 0
         if loja.cobranca_automatica:
             for l in Lancamento.objects.filter(status=Lancamento.Status.VENCIDO).select_related("irmao").exclude(irmao__email=""):

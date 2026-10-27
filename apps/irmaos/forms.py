@@ -3,6 +3,7 @@ from django.forms import inlineformset_factory
 from django.utils.text import slugify
 
 from apps.core import perfis as P
+from apps.core.arquivos import IMAGENS, validar_arquivo
 from apps.core.forms import ModelFormBase
 
 from .models import CategoriaIrmao, Familiar, Irmao
@@ -60,6 +61,9 @@ class IrmaoForm(ModelFormBase):
         if self.instance.pk:
             self.fields["perfis"].initial = self.instance.perfis
 
+    def clean_foto(self):
+        return validar_arquivo(self.cleaned_data.get("foto"), IMAGENS)
+
     def clean_username(self):
         username = self.cleaned_data.get("username", "").strip()
         if username:
@@ -104,6 +108,9 @@ class MeuPerfilForm(ModelFormBase):
         fields = ["email", "telefone", "whatsapp", "foto", "cep", "logradouro", "numero", "complemento", "bairro",
                   "cidade", "uf", "contato_emergencia_nome", "contato_emergencia_telefone", "formacao_academica",
                   "profissao", "empresa", "plano_saude", "plano_funeral"]
+
+    def clean_foto(self):
+        return validar_arquivo(self.cleaned_data.get("foto"), IMAGENS)
 
 
 class FamiliarForm(ModelFormBase):

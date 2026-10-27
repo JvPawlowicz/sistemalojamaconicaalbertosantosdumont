@@ -101,3 +101,31 @@ def iniciar(request, pk):
         return redirect("candidatos:detalhe", pk=pk)
     messages.success(request, f"{irmao.nome_completo} foi iniciado. Envie o convite de acesso pelo cadastro do irmão.")
     return redirect("irmaos:detalhe", pk=irmao.pk)
+
+
+@login_required
+def editar(request, pk):
+    if not _gerir(request.user):
+        raise PermissionDenied
+    c = get_object_or_404(Candidato, pk=pk)
+    form = CandidatoForm(request.POST or None, instance=c)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Dados do candidato atualizados.")
+        return redirect("candidatos:detalhe", pk=pk)
+    return render(request, "crud/form.html", {"form": form, "titulo": f"Editar — {c.nome}",
+                                              "cancelar_url": f"/candidatos/{pk}/"})
+
+
+@login_required
+@require_POST
+def excluir(request, pk):
+    if not _gerir(request.user):
+        raise PermissionDenied
+    c = get_object_or_404(Candidato, pk=pk)
+    if c.etapa == Candidato.Etapa.INICIADO:
+        messages.error(request, "Candidato já iniciado não pode ser excluído (vira registro do irmão).")
+        return redirect("candidatos:detalhe", pk=pk)
+    c.delete()
+    messages.success(request, "Proposta excluída.")
+    return redirect("candidatos:painel")

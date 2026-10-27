@@ -61,9 +61,17 @@ class LojaForm(ModelFormBase):
             "nome", "numero", "oriente", "potencia", "rito", "cnpj", "endereco", "email_contato",
             "brasao", "cabecalho_documentos", "texto_legal", "mensalidade_dia_vencimento", "chave_pix", "intersticio_promocao_meses",
             "intersticio_elevacao_meses", "lembrete_sessao_horas", "cobranca_automatica",
+            "limite_faltas_consecutivas", "frequencia_minima_percentual", "quorum_minimo", "multa_atraso_percentual",
+            "juros_mensal_percentual", "dias_carencia_atraso",
         ]
         widgets = {"cabecalho_documentos": forms.Textarea(attrs={"rows": 4}),
                    "texto_legal": forms.Textarea(attrs={"rows": 5})}
+
+
+    def clean_brasao(self):
+        from .arquivos import IMAGENS, validar_arquivo
+
+        return validar_arquivo(self.cleaned_data.get("brasao"), IMAGENS)
 
 
 class TokenForm(FormBase):

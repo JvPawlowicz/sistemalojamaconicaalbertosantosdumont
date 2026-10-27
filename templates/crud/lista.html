@@ -10,5 +10,6 @@
   <thead><tr>{% for c in cabecalho %}<th scope="col">{{ c }}</th>{% endfor %}<th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
   <tbody>{% for cells, url in linhas %}<tr>{% for c in cells %}<td>{{ c }}</td>{% endfor %}<td class="num">{% if url %}<a class="btn btn-sec btn-peq" href="{{ url }}">{% icon "pencil" %} Abrir</a>{% endif %}</td></tr>{% endfor %}</tbody>
 </table></div>
+{% include "partials/paginacao.html" %}
 {% else %}<div class="card vazio">{{ vazio }}</div>{% endif %}
 {% endblock %}

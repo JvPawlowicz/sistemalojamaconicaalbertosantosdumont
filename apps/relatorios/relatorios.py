@@ -38,6 +38,14 @@ def frequencia(request):
     return (f"Ano maçônico {ano}", ["Irmão", "Grau", "Presenças", "Justificadas", "Ausências", "Sessões", "Frequência"], linhas)
 
 
+def alertas_regimento(request):
+    from apps.core.regimento import alertas_de_frequencia
+
+    ano = _ano(request)
+    linhas = [[i.nome_completo, i.grau_nome, motivo] for i, motivo in alertas_de_frequencia(ano)]
+    return (f"Ano maçônico {ano} — regras configuradas em Configurações", ["Irmão", "Grau", "Motivo"], linhas)
+
+
 def quadro_obreiros(request):
     linhas = [[i.nome_completo, i.grau_nome, i.get_situacao_display(), i.categoria or "—", i.data_iniciacao,
                i.data_promocao, i.data_elevacao, i.profissao, i.telefone]
@@ -162,6 +170,7 @@ def aceites(request):
 # slug: (título, grupo, perfil exigido, função, usa ano?)
 RELATORIOS = {
     "frequencia": ("Frequência por irmão", "Secretaria", P.SECRETARIO, frequencia, True),
+    "alertas-regimento": ("Alertas do regimento (faltas e frequência)", "Secretaria", P.SECRETARIO, alertas_regimento, True),
     "quadro-obreiros": ("Quadro de obreiros", "Secretaria", P.SECRETARIO, quadro_obreiros, False),
     "oficiais": ("Quadro de oficiais", "Secretaria", P.SECRETARIO, oficiais, True),
     "atas": ("Situação das atas", "Secretaria", P.SECRETARIO, atas, True),

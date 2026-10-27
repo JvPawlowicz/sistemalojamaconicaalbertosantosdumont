@@ -51,6 +51,18 @@ class Loja(models.Model):
         "Interstício mínimo: promoção → elevação (meses)", default=0, help_text="0 = sem exigência")
     lembrete_sessao_horas = models.PositiveSmallIntegerField(
         "Lembrete automático de sessão (horas antes)", default=48, help_text="0 = desligado")
+    # Regras do regimento interno (0 = não aplicar)
+    limite_faltas_consecutivas = models.PositiveSmallIntegerField(
+        "Limite de faltas consecutivas não justificadas", default=0, help_text="0 = sem alerta")
+    frequencia_minima_percentual = models.PositiveSmallIntegerField(
+        "Frequência mínima no ano maçônico (%)", default=0, help_text="0 = sem alerta")
+    quorum_minimo = models.PositiveSmallIntegerField(
+        "Quórum mínimo para abrir a sessão (irmãos presentes)", default=0, help_text="0 = sem exigência")
+    multa_atraso_percentual = models.DecimalField(
+        "Multa por atraso (%)", max_digits=5, decimal_places=2, default=0, help_text="Aplicada uma vez após o vencimento")
+    juros_mensal_percentual = models.DecimalField(
+        "Juros por mês de atraso (%)", max_digits=5, decimal_places=2, default=0, help_text="Pro rata por dia de atraso")
+    dias_carencia_atraso = models.PositiveSmallIntegerField("Dias de carência antes de multa/juros", default=0)
     cobranca_automatica = models.BooleanField(
         "Enviar cobrança por e-mail automaticamente às mensalidades vencidas (semanal)", default=False)
 
