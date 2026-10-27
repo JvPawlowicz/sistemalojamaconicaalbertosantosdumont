@@ -1,7 +1,7 @@
 # Escopo do Sistema — Loja Maçônica Alberto Santos Dumont
 
 **Rito:** Schröder (alemão, quadro de cargos reduzido) · **Potência:** Grande Loja Maçônica do Estado de São Paulo (GLESP) · **Ano maçônico:** julho a julho
-**Status:** rascunho v0.4 — base para desenho dos fluxos
+**Status:** versão 1.0 candidata (escopo fechado, pendente de revisão final) — base para desenho dos fluxos
 
 ## Premissas gerais
 
@@ -67,7 +67,8 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
   - página de verificação: qualquer pessoa autorizada confere se o PDF corresponde ao hash registrado.
 - **Termo de aceite claramente exibido** antes de assinar, informando que a assinatura digital pelo sistema é válida para a loja e quais dados serão coletados (LGPD).
 - Qualquer alteração depois de assinada gera nova versão e invalida as assinaturas anteriores.
-- **Base legal** (a ser confirmada por advogado): MP 2.200-2/2001, art. 10, §2º, e Lei 14.063/2020, art. 4º, que admitem assinatura eletrônica **avançada** por meio diferente do certificado ICP-Brasil, desde que **aceito pelas partes**. Por isso o sistema coleta o **aceite expresso de cada irmão** (registrado com data, IP e hash do termo) no primeiro acesso, e o termo cita essa legislação.
+- **Base legal:** MP 2.200-2/2001, art. 10, §2º, e Lei 14.063/2020, art. 4º, que admitem assinatura eletrônica **avançada** por meio diferente do certificado ICP-Brasil, desde que **aceita pelas partes**. O sistema coleta o **aceite expresso de cada irmão** (data, IP e hash do termo) no primeiro acesso.
+- **Toda ata assinada pelo sistema sai com a fundamentação legal impressa** na página/bloco de assinaturas do PDF (texto configurável pelo administrador, com a MP 2.200-2/2001 e a Lei 14.063/2020 como padrão), junto com hash, QR Code de verificação e evidências de cada assinatura, para dar segurança jurídica ao ato. Recomenda-se validar o texto final com advogado.
 
 **Biblioteca de modelos de texto (digitação rápida):**
 - O Secretário pré-cadastra **cabeçalhos, abertura, encerramento, fórmulas e trechos padrão**, organizados por categoria e por tipo de sessão.
@@ -75,7 +76,7 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 - Modelos aceitam **variáveis** preenchidas automaticamente: `{{data}}`, `{{grau}}`, `{{venerável}}`, `{{local}}`, `{{ano_maçônico}}`, `{{presentes}}`, `{{visitantes}}` etc.
 - Cabeçalho oficial da loja (nome, número, oriente, brasão) é um modelo fixo aplicado a toda ata.
 
-**Quem recebe a ata (por grau da sessão):** a ata de uma sessão de grau X é visível apenas para irmãos de grau **igual ou superior** a X.
+**Quem recebe a ata (por grau da sessão):** a ata de uma sessão de grau X é visível apenas para irmãos de grau **igual ou superior** a X. Como o Mestre é o último grau, ele acessa todas as atas.
 
 | Ata da sessão de grau | Aprendiz | Companheiro | Mestre |
 |---|---|---|---|
@@ -138,8 +139,10 @@ O envio por SMTP e a visibilidade dentro do sistema obedecem à mesma regra.
 - Alimenta um **banco de dados de visitantes** (reaproveitado em visitas futuras).
 - **Certificado de visita** emitido e enviado por e-mail e WhatsApp (API).
 
-**Visitas realizadas**
-- Registro de visitas feitas pelos irmãos a outras lojas.
+**Visitas realizadas (certificados de outras lojas)**
+- O certificado é emitido por **outra loja**. O Secretário **escaneia** (PDF ou imagem), envia ao sistema e **vincula ao irmão**, informando loja visitada, oriente, potência, data da sessão e grau da sessão.
+- O arquivo abre dentro do sistema (visualizador embutido).
+- Histórico de visitas por irmão e por período; contagem para relatórios e currículo maçônico.
 
 ## 11. Comunicação
 
@@ -148,8 +151,29 @@ O envio por SMTP e a visibilidade dentro do sistema obedecem à mesma regra.
 
 ## 12. Relatórios
 
-- Frequência por irmão/ano; quadro de obreiros; financeiro e orçamento; visitas recebidas/realizadas; candidatos; inventário.
-- Exportação em PDF/planilha.
+Todos exportáveis em **PDF e planilha (XLSX/CSV)**, com filtros por ano maçônico, período, grau e irmão, e com cabeçalho da loja.
+
+**Secretaria**
+- Frequência por irmão (percentual, faltas justificadas e não justificadas) e por sessão; ranking de assiduidade por ano maçônico.
+- Quadro de obreiros (lista de irmãos por grau e situação) e quadro de oficiais por gestão.
+- Atas: situação (rascunho, circulação, aprovada, assinadas/pendentes) e quem ainda não assinou.
+- Aniversariantes do mês e aniversários maçônicos.
+- Candidatos: propostos por quem, etapa atual, tempo em cada etapa.
+- Cerimônias realizadas por ano (iniciações, promoções, elevações).
+- Visitas realizadas e visitantes recebidos (por loja, por período).
+
+**Tesouraria**
+- Mensalidades: pagas, pendentes, vencidas, isentas; inadimplência por irmão e por mês; extrato individual.
+- Fluxo de caixa; receitas e despesas por categoria; orçamento previsto × realizado.
+- Prestação de contas e **pacote da comissão de auditoria** do ano maçônico.
+
+**Patrimônio e biblioteca**
+- Inventário por categoria, estado e responsável; empréstimos em aberto.
+
+**Administração e segurança**
+- Acessos e alterações (trilha de auditoria); usuários por perfil e último acesso; relatório de aceites do termo de assinatura.
+
+**Painel de indicadores (dashboard)** com os principais números do ano maçônico: frequência média, inadimplência, saldo de caixa, pendências de assinatura e próximas sessões.
 
 ---
 
@@ -169,7 +193,18 @@ Sequência fixa de graus: **Aprendiz → Companheiro → Mestre**.
 
 ## 14. Extras sugeridos
 
-- **Painel inicial** por perfil: próximas sessões, pendências de assinatura, mensalidades em aberto, aniversariantes.
+**Incluídos no escopo para fechar o sistema:**
+- **Expediente (correspondências):** registro de documentos recebidos e enviados pela loja (com anexo e leitura no sistema), que alimenta o "expediente do dia" na pauta.
+- **Numeração e livro de atas:** numeração sequencial e controle de livro/folha, com impressão para o livro físico, se a loja mantiver.
+- **Comissões e Conselho Fiscal:** cadastro de comissões (sindicância, auditoria, eventos) com membros, prazo e parecer.
+- **Configurações da loja:** nome, número, oriente, potência, brasão, cores, cabeçalho de documentos, categorias de irmão, catálogo de cargos, modelos de texto.
+- **Termos e privacidade (LGPD):** política de privacidade, consentimento por irmão, solicitação de acesso/correção/exclusão de dados e registro de incidentes.
+- **Trilha de auditoria** visível ao administrador.
+- **Onboarding guiado:** primeiro acesso com troca de senha, 2FA, aceite do termo de assinatura e conferência dos dados pessoais.
+
+**Opcionais (podem ficar para depois):**
+
+- **Painel inicial** por perfil (também listado em Relatórios): próximas sessões, pendências de assinatura, mensalidades em aberto, aniversariantes.
 - **Aniversariantes e datas maçônicas** com aviso automático.
 - **Busca global** (irmãos, atas, documentos, visitantes).
 - **Importação inicial** por planilha (CSV/XLSX) para migrar o quadro atual.
@@ -228,8 +263,6 @@ Django 5 + PostgreSQL; HTMX + Alpine.js; Tailwind CSS (com DaisyUI); Lucide Icon
 - Sem votação no sistema por ora. Sem sessão online por ora. Licença MIT. Django. ~20 irmãos, ~4 sessões/mês.
 
 ### Ainda abertas
-1. **Base legal:** confirmo com você se "a portaria" é a MP 2.200-2/2001 e a Lei 14.063/2020 citadas acima, ou se há outro ato (por exemplo, norma da GLESP ou do Ministério Público) que deva ser citado no termo. Recomendo validar o texto do termo com um advogado.
-2. **Ata de Mestre:** você disse que na sessão de Mestre "todos" recebem; interpretei como slip, já que sessão de Mestre só deveria ser visível a Mestres. Confirma?
-3. **Outros conteúdos por grau:** a regra "grau igual ou superior" vale para biblioteca, documentos e presença?
-4. **Sessão online (Jitsi):** fica fora do MVP; manter como módulo futuro?
-5. **Certificado de visita:** modelo do texto, assinante (Venerável? Secretário?) e se leva assinatura desenhada.
+1. **Texto da fundamentação legal:** aceita o texto padrão (MP 2.200-2/2001, art. 10, §2º, e Lei 14.063/2020, art. 4º) ou a loja já tem um texto/portaria própria a transcrever? Recomenda-se validação por advogado antes do uso oficial.
+2. **Certificado de visita recebido (nosso para visitantes):** além de arquivar os certificados de outras lojas, vamos também **emitir** certificado para os visitantes que recebemos? Se sim: texto, assinante e se leva assinatura desenhada.
+3. **Perfis de usuário:** além dos três graus, quais cargos terão poder administrativo (Venerável, Secretário, Tesoureiro, Chanceler, Orador)? Proposta: Secretário (atas, cadastros, visitas, documentos), Tesoureiro (financeiro), Venerável (escalação, leitura geral, assinatura), Administrador (configurações e usuários).
