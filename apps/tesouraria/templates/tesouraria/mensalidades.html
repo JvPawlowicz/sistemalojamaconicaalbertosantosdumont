@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Mensalidades{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Mensalidades</h1><p>Competência {{ mes|date:"m/Y" }} · total {{ total|moeda }}</p></div>
+<div class="acoes">
+<form method="post" action="{% url 'tesouraria:gerar' %}">{% csrf_token %}<input type="hidden" name="mes" value="{{ mes|date:'Y-m' }}"><button class="btn" type="submit">{% icon "refresh-cw" %} Gerar mensalidades do mês</button></form>
+<form method="post" action="{% url 'tesouraria:cobrar_todos' %}">{% csrf_token %}<input type="hidden" name="mes" value="{{ mes|date:'Y-m' }}"><button class="btn btn-sec" type="submit" data-confirmar="Enviar cobrança por e-mail a todos os inadimplentes do mês?">{% icon "send" %} Cobrar inadimplentes (e-mail)</button></form></div></div>
+{% include "tesouraria/_abas.html" with aba="mensalidades" %}
+<form class="filtros" method="get"><div class="campo"><label for="mes">Mês</label><input class="input" type="month" id="mes" name="mes" value="{{ mes|date:'Y-m' }}"></div>
+<div class="campo"><label for="status">Situação</label><select class="input" id="status" name="status"><option value="">Todas</option>{% for v, n in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div><button class="btn" type="submit">Filtrar</button></form>
+<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th class="num">Valor</th><th>Vencimento</th><th>Situação</th><th>Ações</th></tr></thead><tbody>
+{% for l, wa in linhas %}<tr><td>{{ l.irmao.nome_completo }}</td><td class="num">{{ l.valor|moeda }}</td><td>{{ l.vencimento|date:"d/m/Y" }}</td>
+<td>{% selo l.status l.get_status_display %}{% if l.pago_em %}<br><small class="muted">{{ l.pago_em|date:"d/m/Y" }} · {{ l.get_forma_display }}</small>{% endif %}</td>
+<td><div class="acoes">
+{% if l.em_aberto %}
+<details><summary class="btn btn-peq">Dar baixa</summary>
+<form method="post" action="{% url 'tesouraria:baixa' l.pk %}" class="card" style="min-width:260px">{% csrf_token %}
+<div class="campo"><label for="d{{ l.pk }}">Data</label><input class="input" type="date" id="d{{ l.pk }}" name="data_pagamento" value="{{ baixa_form.data_pagamento.value|date:'Y-m-d' }}" required></div>
+<div class="campo"><label for="v{{ l.pk }}">Valor pago</label><input class="input" id="v{{ l.pk }}" name="valor_pago" value="{{ l.valor|floatformat:2 }}" inputmode="decimal" required></div>
+<div class="campo"><label for="f{{ l.pk }}">Forma</label><select class="input" id="f{{ l.pk }}" name="forma">{% for v, n in baixa_form.forma.field.choices %}<option value="{{ v }}">{{ n }}</option>{% endfor %}</select></div>
+<button class="btn btn-peq" type="submit">Confirmar</button></form></details>
+<form method="post" action="{% url 'tesouraria:cobrar_email' l.pk %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit">{% icon "mail" %} E-mail</button></form>
+{% if wa %}<a class="btn btn-sec btn-peq" href="{{ wa }}" target="_blank" rel="noopener">{% icon "message-circle" %} WhatsApp</a>{% endif %}
+<form method="post" action="{% url 'tesouraria:dispensar' l.pk %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit" data-confirmar="Dispensar esta mensalidade?">Dispensar</button></form>
+{% elif l.status == "pago" %}<form method="post" action="{% url 'tesouraria:estornar' l.pk %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit" data-confirmar="Estornar a baixa e remover a receita do caixa?">Estornar</button></form>{% endif %}
+{% if l.boleto %}<a class="btn btn-sec btn-peq" href="{% url 'tesouraria:boleto' l.pk %}" target="_blank" rel="noopener">{% icon "file-text" %} Boleto</a>{% endif %}
+</div></td></tr>
+{% empty %}<tr><td colspan="5" class="vazio">Nenhuma mensalidade nesta competência. Use “Gerar mensalidades do mês”. (Os irmãos precisam ter uma categoria definida.)</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% load loja %}
+{% block conteudo %}<div class="cabecalho-pagina"><h1>Aceites do termo (versão {{ termo.versao|default:"—" }})</h1></div>
+<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th>Aceitou</th></tr></thead><tbody>
+{% for i, ok in linhas %}<tr><td>{{ i.nome_completo }}</td><td>{% if ok %}<span class="selo selo-ok">Sim</span>{% else %}<span class="selo selo-warn">Pendente</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% endblock %}

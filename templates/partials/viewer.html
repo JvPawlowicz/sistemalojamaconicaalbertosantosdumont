@@ -1,0 +1,5 @@
+{% comment %}Visualizador embutido (PDF e imagem) sem sair da página. Recebe: url (rota protegida) e nome.{% endcomment %}
+{% with n=nome|lower %}
+{% if n|slice:"-4:" == ".pdf" %}<iframe class="viewer" src="{{ url }}" title="Visualização do documento"></iframe>
+{% else %}<img class="viewer-img" src="{{ url }}" alt="Documento">{% endif %}{% endwith %}
+<p class="ajuda"><a href="{{ url }}" target="_blank" rel="noopener">Abrir em nova aba</a></p>

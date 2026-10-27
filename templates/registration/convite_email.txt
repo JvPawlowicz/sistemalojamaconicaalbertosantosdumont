@@ -1,0 +1,8 @@
+{% autoescape off %}Prezado Irmão {{ user.nome_completo }},
+
+Foi criado o seu acesso ao sistema da Loja. Para definir a sua senha, abra o link:
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+Seu usuário: {{ user.get_username }}
+No primeiro acesso você aceitará o termo de assinatura eletrônica e, se tiver perfil administrativo, configurará o 2FA.
+{% endautoescape %}

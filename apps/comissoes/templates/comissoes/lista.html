@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Comissões{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Comissões e Conselho Fiscal</h1><p>Sindicância, auditoria, eventos e demais comissões.</p></div><div class="acoes">{% if pode_gerir %}<a class="btn" href="{% url 'comissoes:nova' %}">{% icon "plus" %} Nova comissão</a>{% endif %}</div></div>
+<div class="grade">{% for c in comissoes %}<section class="card"><h2>{% icon "scale" %} {{ c.nome }}</h2><p>{{ c.get_tipo_display }} · {{ c.ano.nome }}{% if c.encerrada %} · <span class="selo selo-muted">encerrada</span>{% endif %}{% if c.prazo %} · prazo {{ c.prazo|date:"d/m/Y" }}{% endif %}</p>
+<ul>{% for m in c.membros.all %}<li>{{ m.irmao.nome_completo }} — {{ m.papel }}</li>{% endfor %}</ul>{% if c.parecer %}<h3>Parecer</h3><p style="white-space:pre-wrap">{{ c.parecer }}</p>{% endif %}
+{% if pode_gerir %}<a class="btn btn-sec btn-peq" href="{% url 'comissoes:editar' c.pk %}">{% icon "pencil" %} Editar</a>{% endif %}</section>
+{% empty %}<div class="card vazio" style="grid-column:1/-1">Nenhuma comissão.</div>{% endfor %}</div>{% endblock %}

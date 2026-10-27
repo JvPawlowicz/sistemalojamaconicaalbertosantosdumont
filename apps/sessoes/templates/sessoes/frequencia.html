@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Frequência{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Frequência</h1><p>Ano maçônico {{ ano.nome }}. Considera sessões realizadas em que o irmão era elegível (grau igual ou superior ao da sessão).</p></div>
+<form method="get"><label class="sr-only" for="ano">Ano</label><select class="input" id="ano" name="ano" onchange="this.form.submit()">{% for a in anos %}<option value="{{ a.pk }}" {% if a.pk == ano.pk %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}</select></form></div>
+<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th class="num">Presenças</th><th class="num">Justificadas</th><th class="num">Ausências</th><th class="num">Sessões</th><th class="num">Frequência</th></tr></thead><tbody>
+{% for i, f in linhas %}<tr><td>{{ i.nome_completo }}</td><td class="num">{{ f.presentes }}</td><td class="num">{{ f.justificadas }}</td><td class="num">{{ f.ausentes }}</td><td class="num">{{ f.total }}</td><td class="num">{% if f.percentual is None %}—{% else %}<strong>{{ f.percentual }}%</strong>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% endblock %}

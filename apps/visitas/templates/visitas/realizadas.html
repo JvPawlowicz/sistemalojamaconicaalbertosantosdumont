@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Visitação{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Visitas a outras lojas</h1><p>Certificados escaneados e vinculados a cada irmão.</p></div>
+<div class="acoes">{% if pode_gerir %}<a class="btn" href="{% url 'visitas:nova_realizada' %}">{% icon "upload" %} Registrar visita / enviar certificado</a>{% endif %}</div></div>
+{% include "visitas/_abas.html" with aba="realizadas" %}
+{% if pode_gerir %}<form class="filtros" method="get"><div class="campo"><label for="irmao">Irmão</label><select class="input" id="irmao" name="irmao"><option value="">Todos</option>{% for i in irmaos %}<option value="{{ i.pk }}" {% if irmao_sel == i.pk|stringformat:"s" %}selected{% endif %}>{{ i.nome_completo }}</option>{% endfor %}</select></div><button class="btn" type="submit">Filtrar</button></form>{% endif %}
+<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Data</th><th>Irmão</th><th>Loja visitada</th><th>Oriente / Potência</th><th>Certificado</th></tr></thead><tbody>
+{% for v in visitas %}<tr><td class="nowrap">{{ v.data|date:"d/m/Y" }}</td><td>{{ v.irmao.nome_completo }}</td><td>{{ v.loja_nome }} {{ v.loja_numero }}</td><td>{{ v.oriente }} {{ v.potencia }}</td>
+<td>{% if v.certificado %}<a class="btn btn-sec btn-peq" href="{% url 'visitas:certificado_recebido' v.pk %}?ver=1">{% icon "eye" %} Ver</a>{% else %}<span class="muted">—</span>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="5" class="vazio">Nenhuma visita registrada.</td></tr>{% endfor %}</tbody></table></div>{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ irmao.nome_completo }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div style="display:flex;gap:1rem;align-items:center">
+  {% if irmao.foto %}<img class="avatar avatar-lg" src="{{ irmao.foto.url }}" alt="Foto de {{ irmao.nome_completo }}">{% else %}<span class="avatar avatar-lg" aria-hidden="true">{{ irmao.iniciais }}</span>{% endif %}
+  <div><h1 class="mb0">{{ irmao.nome_completo }}</h1><p>{{ irmao.grau_nome }} · {% selo irmao.situacao irmao.get_situacao_display %}{% if irmao.matricula %} · Matrícula {{ irmao.matricula }}{% endif %}</p></div></div>
+<div class="acoes">
+ {% if pode_gerir %}<a class="btn" href="{% url 'irmaos:editar' irmao.pk %}">{% icon "pencil" %} Editar</a>
+ <form method="post" action="{% url 'irmaos:convidar' irmao.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit">{% icon "mail" %} Enviar convite de senha</button></form>{% endif %}
+ {% if proprio %}<a class="btn" href="{% url 'irmaos:meu_perfil' %}">{% icon "pencil" %} Atualizar meus dados</a>{% endif %}
+ {% if proprio or user|tem_perfil:"tesoureiro" %}<a class="btn btn-sec" href="{% url 'tesouraria:extrato_pdf' irmao.pk %}">{% icon "download" %} Extrato financeiro</a>{% endif %}
+</div></div>
+<div class="grade-2">
+<section class="card"><h2>{% icon "award" %} Vida maçônica</h2><dl class="lista-def">
+<dt>Iniciação</dt><dd>{{ irmao.data_iniciacao|date:"d/m/Y"|default:"—" }}</dd>
+<dt>Promoção</dt><dd>{{ irmao.data_promocao|date:"d/m/Y"|default:"—" }}</dd>
+<dt>Elevação</dt><dd>{{ irmao.data_elevacao|date:"d/m/Y"|default:"—" }}</dd>
+{% if completo %}<dt>Categoria</dt><dd>{{ irmao.categoria|default:"—" }}</dd>{% endif %}</dl>
+<h3 class="mt">Cargos exercidos</h3>
+{% for g in cargos %}<p>{{ g.ano.nome }} — {{ g.cargo.nome }}</p>{% empty %}<p class="muted">Nenhum cargo registrado.</p>{% endfor %}</section>
+<section class="card"><h2>{% icon "briefcase-business" %} Profissional</h2><dl class="lista-def">
+<dt>Formação</dt><dd>{{ irmao.formacao_academica|default:"—" }}</dd><dt>Profissão</dt><dd>{{ irmao.profissao|default:"—" }}</dd><dt>Empresa</dt><dd>{{ irmao.empresa|default:"—" }}</dd></dl></section>
+{% if completo %}
+<section class="card"><h2>{% icon "user" %} Dados pessoais</h2><dl class="lista-def">
+<dt>E-mail</dt><dd>{{ irmao.email|default:"—" }}</dd><dt>Telefone</dt><dd>{{ irmao.telefone|telefone }}</dd><dt>WhatsApp</dt><dd>{{ irmao.whatsapp|telefone }}</dd>
+<dt>Nascimento</dt><dd>{{ irmao.data_nascimento|date:"d/m/Y"|default:"—" }}</dd><dt>CPF</dt><dd>{{ irmao.cpf|default:"—" }}</dd><dt>RG</dt><dd>{{ irmao.rg|default:"—" }}</dd>
+<dt>Endereço</dt><dd>{{ irmao.logradouro }} {{ irmao.numero }} {{ irmao.complemento }}<br>{{ irmao.bairro }} {{ irmao.cidade }}/{{ irmao.uf }} {{ irmao.cep }}</dd>
+<dt>Emergência</dt><dd>{{ irmao.contato_emergencia_nome|default:"—" }} {{ irmao.contato_emergencia_telefone|telefone }}</dd></dl></section>
+<section class="card"><h2>{% icon "heart-pulse" %} Família, saúde e previdência</h2><dl class="lista-def">
+<dt>Plano de saúde</dt><dd>{{ irmao.plano_saude|default:"—" }}</dd><dt>Plano funeral</dt><dd>{{ irmao.plano_funeral|default:"—" }}</dd></dl>
+<h3 class="mt">Família</h3>
+{% for f in irmao.familiares.all %}<p>{{ f.get_parentesco_display }}: <strong>{{ f.nome }}</strong>{% if f.data_nascimento %} · {{ f.data_nascimento|date:"d/m/Y" }}{% endif %}</p>{% empty %}<p class="muted">Sem familiares cadastrados.</p>{% endfor %}</section>
+{% endif %}
+</div>
+{% endblock %}

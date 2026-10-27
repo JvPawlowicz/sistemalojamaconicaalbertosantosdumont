@@ -1,0 +1,2 @@
+{% load loja %}{% if form.non_field_errors %}<div class="alerta alerta-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="form-grid">{% for f in form %}{% campo f %}{% endfor %}</div>

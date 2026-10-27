@@ -1,0 +1,9 @@
+{% load loja %}<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+@page { size: A4; margin: 2cm; } body { font-family: Arial, sans-serif; font-size: 11pt; color: #111; }
+.cab { text-align: center; white-space: pre-line; font-weight: bold; border-bottom: 2px solid #1f3a5f; padding-bottom: .3cm; margin-bottom: .5cm; }
+table { width: 100%; border-collapse: collapse; } th, td { border-bottom: 1px solid #ccc; padding: 4px 6px; text-align: left; } th { background: #eef1f6; } .n { text-align: right; }
+</style></head><body><div class="cab">{{ loja.cabecalho }}</div>
+<h2>Extrato financeiro — {{ irmao.nome_completo }}</h2><p>Emitido em {{ emitido|date:"d/m/Y H:i" }}</p>
+<table><thead><tr><th>Competência</th><th>Descrição</th><th class="n">Valor</th><th>Vencimento</th><th>Situação</th><th>Pago em</th></tr></thead><tbody>
+{% for l in lancamentos %}<tr><td>{{ l.competencia|date:"m/Y" }}</td><td>{{ l.descricao }}</td><td class="n">{{ l.valor|moeda }}</td><td>{{ l.vencimento|date:"d/m/Y" }}</td><td>{{ l.get_status_display }}</td><td>{{ l.pago_em|date:"d/m/Y"|default:"—" }}</td></tr>{% endfor %}</tbody></table>
+<p><strong>Total pago:</strong> {{ pago|moeda }} · <strong>Em aberto:</strong> {{ aberto|moeda }}</p></body></html>

@@ -1,0 +1,12 @@
+{% load static %}<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+@page { size: A4; margin: 2.2cm 2cm; } body { font-family: Georgia, serif; font-size: 12pt; color: #111; }
+.cab { text-align: center; white-space: pre-line; font-weight: bold; border-bottom: 2px solid #1f3a5f; padding-bottom: .4cm; margin-bottom: .8cm; }
+h1 { text-align: center; font-size: 16pt; } .box { white-space: pre-wrap; margin-bottom: .6cm; } td { padding: 2px 8px; }
+</style></head><body>
+<div class="cab">{{ loja.cabecalho }}</div>
+<h1>CONVOCAÇÃO</h1>
+<p>Convocamos os Irmãos do quadro, de grau {{ sessao.get_grau_display }} ou superior, para a <strong>Sessão {{ sessao.titulo }}</strong>, a realizar-se em <strong>{{ sessao.data_hora|date:"d/m/Y" }}</strong>, às <strong>{{ sessao.data_hora|date:"H:i" }}</strong>{% if sessao.local %}, em {{ sessao.local }}{% endif %}.</p>
+<h3>Pauta</h3><div class="box">{{ sessao.pauta|default:"—" }}</div>
+{% if sessao.expediente %}<h3>Expediente</h3><div class="box">{{ sessao.expediente }}</div>{% endif %}
+{% if escala %}<h3>Oficiais escalados</h3><table>{% for e in escala %}<tr><td>{{ e.cargo.nome }}</td><td>{{ e.irmao.nome_completo }}</td></tr>{% endfor %}</table>{% endif %}
+<p style="margin-top:1.5cm;text-align:center">Fraterno abraço.</p></body></html>

@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% load static loja %}
+{% block titulo %}Entrar{% endblock %}
+{% block publico %}
+<div class="login-wrap"><div class="card login-card">
+  <div class="brand">{% if loja.brasao %}<img src="{{ loja.brasao.url }}" alt="" style="width:72px;height:72px">{% else %}<span class="avatar avatar-lg" aria-hidden="true">{% icon "landmark" %}</span>{% endif %}
+    <span><strong style="font-size:1.15em">{{ loja.nome }}</strong><small class="muted">{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}{{ loja.potencia }}</small></span></div>
+  <h1 style="text-align:center;font-size:1.25em">Acesso ao sistema</h1>
+  <form method="post" novalidate>{% csrf_token %}
+    {% if form.errors %}<div class="alerta alerta-error" role="alert">Usuário ou senha incorretos.</div>{% endif %}
+    <div class="campo"><label for="id_username">Usuário</label><input class="input" id="id_username" name="username" autocomplete="username" autofocus required></div>
+    <div class="campo"><label for="id_password">Senha</label><input class="input" id="id_password" type="password" name="password" autocomplete="current-password" required></div>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn" style="width:100%" type="submit">{% icon "lock" %} Entrar</button>
+  </form>
+  <p class="mt" style="text-align:center"><a href="{% url 'password_reset' %}">Esqueci minha senha</a> · <a href="{% url 'core:privacidade' %}">Privacidade</a></p>
+</div></div>
+{% endblock %}

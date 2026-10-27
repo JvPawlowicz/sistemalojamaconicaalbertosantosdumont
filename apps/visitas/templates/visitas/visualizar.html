@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Certificado{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Certificado de visita</h1><p>{{ v.irmao.nome_completo }} · {{ v.loja_nome }} {{ v.loja_numero }} · {{ v.data|date:"d/m/Y" }}</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'visitas:realizadas' %}">{% icon "arrow-left" %} Voltar</a></div></div>
+{% include "partials/viewer.html" with url=url_arquivo nome=v.certificado.name %}{% endblock %}

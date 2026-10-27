@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>{{ titulo }}</h1><p>{{ subtitulo }}</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'relatorios:indice' %}">{% icon "arrow-left" %} Relatórios</a>
+<a class="btn btn-sec" href="?{{ querystring }}{% if querystring %}&{% endif %}formato=pdf">{% icon "download" %} PDF</a>
+<a class="btn btn-sec" href="?{{ querystring }}{% if querystring %}&{% endif %}formato=xlsx">{% icon "download" %} XLSX</a>
+<a class="btn btn-sec" href="?{{ querystring }}{% if querystring %}&{% endif %}formato=csv">{% icon "download" %} CSV</a></div></div>
+{% if usa_ano %}<form class="filtros" method="get"><div class="campo"><label for="ano">Ano maçônico</label><select class="input" id="ano" name="ano" onchange="this.form.submit()"><option value="">Atual</option>{% for a in anos %}<option value="{{ a.pk }}" {% if ano_sel == a.pk|stringformat:"s" %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}</select></div></form>{% endif %}
+<div class="tabela-wrap"><table class="tabela"><thead><tr>{% for c in cabecalho %}<th scope="col">{{ c }}</th>{% endfor %}</tr></thead><tbody>
+{% for l in linhas %}<tr>{% for c in l %}<td>{{ c }}</td>{% endfor %}</tr>{% empty %}<tr><td colspan="{{ cabecalho|length }}" class="vazio">Sem dados.</td></tr>{% endfor %}</tbody></table></div>{% endblock %}

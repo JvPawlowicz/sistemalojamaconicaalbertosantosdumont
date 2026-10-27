@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Ativar 2FA{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Ativar verificação em duas etapas</h1><p>Obrigatório para perfis administrativos.</p></div></div>
+<div class="grade-2"><div class="card"><ol>
+<li>Instale um aplicativo autenticador (Google Authenticator, Aegis, FreeOTP, Authy…).</li>
+<li>Leia o QR Code ao lado ou digite a chave manualmente.</li>
+<li>Digite o código de 6 dígitos gerado para confirmar.</li></ol>
+<p><strong>Chave manual:</strong> <code>{{ chave }}</code></p>
+<form method="post">{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">{% icon "shield-check" %} Confirmar e ativar</button></form></div>
+<div class="card" style="text-align:center"><img src="{{ qr }}" alt="QR Code para o aplicativo autenticador" width="240" height="240"></div></div>
+{% endblock %}

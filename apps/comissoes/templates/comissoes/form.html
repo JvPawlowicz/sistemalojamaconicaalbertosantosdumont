@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><h1>{{ titulo }}</h1></div>
+<form method="post" novalidate>{% csrf_token %}<div class="card">{% include "partials/form.html" %}</div>
+{{ formset.management_form }}<div class="card"><h2>Membros</h2>{% for f in formset %}<div class="form-grid" style="border-top:1px solid var(--border);padding-top:.5rem">{% for h in f.hidden_fields %}{{ h }}{% endfor %}{% for c in f.visible_fields %}{% campo c %}{% endfor %}</div>{% endfor %}</div>
+<div class="acoes"><button class="btn" type="submit">{% icon "check" %} Salvar</button><a class="btn btn-sec" href="{% url 'comissoes:lista' %}">Cancelar</a></div></form>{% endblock %}

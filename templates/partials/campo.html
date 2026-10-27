@@ -1,0 +1,14 @@
+{% load loja %}{% with f=campo %}
+{% if f.is_hidden %}{{ f }}{% else %}
+<div class="campo{% if f.field.widget.input_type == 'checkbox' and not f.field.widget.allow_multiple_selected %} campo-check{% endif %}{% if f.field.widget.attrs.largo %} largo{% endif %}">
+  {% if f.field.widget.input_type == 'checkbox' and not f.field.widget.allow_multiple_selected %}
+    {{ f }}<label for="{{ f.id_for_label }}">{{ f.label }}</label>
+  {% elif f.field.widget.allow_multiple_selected and f.field.widget.input_type == 'checkbox' %}
+    <span class="rotulo-campo" id="rot-{{ f.html_name }}">{{ f.label }}</span><div class="opcoes" role="group" aria-labelledby="rot-{{ f.html_name }}">{{ f }}</div>
+  {% else %}
+    <label for="{{ f.id_for_label }}">{{ f.label }}{% if f.field.required %} <span class="obrig" aria-hidden="true">*</span>{% endif %}</label>{{ f }}
+  {% endif %}
+  {% if f.help_text %}<div class="ajuda" id="ajuda-{{ f.html_name }}">{{ f.help_text }}</div>{% endif %}
+  {% for e in f.errors %}<div class="erro" role="alert">{{ e }}</div>{% endfor %}
+</div>
+{% endif %}{% endwith %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <div><h1>{{ titulo }}</h1>{% if subtitulo %}<p>{{ subtitulo }}</p>{% endif %}</div>
+  <div class="acoes">{% if url_novo %}<a class="btn" href="{{ url_novo }}">{% icon "plus" %} {{ rotulo_novo }}</a>{% endif %}</div>
+</div>
+{% if linhas %}
+<div class="tabela-wrap"><table class="tabela">
+  <thead><tr>{% for c in cabecalho %}<th scope="col">{{ c }}</th>{% endfor %}<th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
+  <tbody>{% for cells, url in linhas %}<tr>{% for c in cells %}<td>{{ c }}</td>{% endfor %}<td class="num">{% if url %}<a class="btn btn-sec btn-peq" href="{{ url }}">{% icon "pencil" %} Abrir</a>{% endif %}</td></tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<div class="card vazio">{{ vazio }}</div>{% endif %}
+{% endblock %}

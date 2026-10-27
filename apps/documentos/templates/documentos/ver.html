@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ doc.titulo }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>{{ doc.titulo }}</h1><p>{{ doc.get_categoria_display }} · acesso a partir do grau {{ doc.get_grau_minimo_display }}</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'documentos:lista' %}">{% icon "arrow-left" %} Biblioteca</a><a class="btn btn-sec" href="{% url 'documentos:arquivo' doc.pk %}?baixar=1">{% icon "download" %} Baixar</a>
+{% if pode_gerir %}<form method="post" action="{% url 'documentos:excluir' doc.pk %}">{% csrf_token %}<button class="btn btn-perigo" type="submit" data-confirmar="Excluir este documento?">{% icon "trash-2" %} Excluir</button></form>{% endif %}</div></div>
+{% if doc.descricao %}<p>{{ doc.descricao }}</p>{% endif %}
+{% url 'documentos:arquivo' doc.pk as url_arq %}
+{% if doc.eh_pdf %}<iframe class="viewer" src="{{ url_arq }}" title="{{ doc.titulo }}"></iframe>
+{% elif doc.eh_imagem %}<img class="viewer-img" src="{{ url_arq }}" alt="{{ doc.titulo }}">
+{% else %}<div class="card">Formato sem visualização embutida. Use “Baixar”.</div>{% endif %}{% endblock %}

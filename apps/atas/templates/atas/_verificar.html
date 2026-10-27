@@ -1,0 +1,27 @@
+{% load loja %}
+<div class="cabecalho-pagina"><div><h1>{% icon "shield-check" %} Verificação de autenticidade</h1><p>{{ loja.nome }}</p></div></div>
+{% if tipo == "ata" %}
+<div class="card">
+{% if integra and vigente and documento_confere %}<div class="alerta alerta-success">{% icon "circle-check" %}<span><strong>Assinatura íntegra e válida.</strong> O hash do documento registrado confere com o texto atual da ata.</span></div>
+{% elif integra and not vigente %}<div class="alerta alerta-warning">{% icon "triangle-alert" %}<span><strong>Assinatura íntegra, porém de uma versão anterior.</strong> A ata foi revisada depois desta assinatura.</span></div>
+{% else %}<div class="alerta alerta-error">{% icon "circle-x" %}<span><strong>Atenção:</strong> a verificação de integridade falhou. O documento ou o registro pode ter sido alterado.</span></div>{% endif %}
+<dl class="lista-def">
+<dt>Documento</dt><dd>Ata {{ ass.ata.numero|default:"s/nº" }} — {{ ass.ata.sessao.titulo }} de {{ ass.ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ass.versao }})</dd>
+<dt>Assinada por</dt><dd>{{ ass.irmao.nome_completo }}</dd>
+<dt>Em</dt><dd>{{ ass.assinado_em|date:"d/m/Y H:i:s" }}</dd>
+<dt>IP</dt><dd>{{ ass.ip|default:"—" }}</dd>
+<dt>Geolocalização</dt><dd>{% if ass.latitude %}{{ ass.latitude }}, {{ ass.longitude }} (±{{ ass.precisao_m|default:"?" }} m){% else %}não informada{% endif %}</dd>
+<dt>2FA</dt><dd>{{ ass.autenticacao_2fa|yesno:"verificado,não exigido" }}</dd>
+<dt>Hash do documento</dt><dd><code>{{ ass.hash_documento }}</code></dd>
+<dt>Hash da assinatura</dt><dd><code>{{ ass.hash_assinatura }}</code></dd>
+<dt>Código</dt><dd><code>{{ ass.codigo }}</code></dd></dl>
+<p class="ajuda mt">{{ ass.texto_legal }}</p></div>
+<div class="card"><h2>Demais assinaturas desta versão</h2>{% for o in outras %}<p>{{ o.irmao.nome_completo }} — {{ o.assinado_em|date:"d/m/Y H:i" }} ({{ o.codigo }})</p>{% endfor %}</div>
+{% else %}
+<div class="card">
+{% if integras %}<div class="alerta alerta-success">{% icon "circle-check" %}<span><strong>Certificado autêntico.</strong> Assinaturas íntegras e correspondentes ao documento.</span></div>{% else %}<div class="alerta alerta-error">{% icon "circle-x" %}<span><strong>Atenção:</strong> verificação falhou.</span></div>{% endif %}
+<dl class="lista-def"><dt>Certificado</dt><dd><code>{{ cert.codigo }}</code></dd>
+<dt>Visitante</dt><dd>{{ cert.visita.visitante.nome }} — {{ cert.visita.visitante.loja_nome }}</dd>
+<dt>Sessão</dt><dd>{{ cert.visita.sessao.data_hora|date:"d/m/Y" }}</dd><dt>Hash do documento</dt><dd><code>{{ cert.hash_documento }}</code></dd></dl>
+{% for a in assinaturas %}<p>{{ a.irmao.nome_completo }} ({{ a.funcao }}) — {{ a.assinado_em|date:"d/m/Y H:i" }} · IP {{ a.ip|default:"—" }}</p>{% endfor %}</div>
+{% endif %}

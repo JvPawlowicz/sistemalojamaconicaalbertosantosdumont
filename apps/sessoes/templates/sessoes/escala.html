@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Escala da sessão{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Escala de cargos</h1><p>{{ sessao.titulo }} · {{ sessao.data_hora|date:"d/m/Y H:i" }}. Se um titular faltar, escolha o substituto apenas para esta sessão.</p></div></div>
+<form method="post" class="card">{% csrf_token %}
+<table class="tabela"><thead><tr><th>Cargo</th><th>Irmão na sessão</th></tr></thead><tbody>
+{% for cargo, e in linhas %}<tr><td><label for="cargo_{{ cargo.pk }}"><strong>{{ cargo.nome }}</strong></label></td><td>
+<select class="input" id="cargo_{{ cargo.pk }}" name="cargo_{{ cargo.pk }}"><option value="">— ninguém —</option>
+{% for i in irmaos %}<option value="{{ i.pk }}" {% if e and e.irmao_id == i.pk %}selected{% endif %}>{{ i.nome_completo }}</option>{% endfor %}</select>
+{% if e and e.substituicao %}<span class="ajuda">Substitui {{ e.titular|default:"o titular" }}.</span>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="2" class="vazio">Nenhum cargo no catálogo.</td></tr>{% endfor %}</tbody></table>
+<div class="acoes mt"><button class="btn" type="submit">{% icon "check" %} Salvar escala</button><a class="btn btn-sec" href="{% url 'sessoes:detalhe' sessao.pk %}">Voltar</a></div></form>{% endblock %}

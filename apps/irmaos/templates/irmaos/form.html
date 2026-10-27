@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><h1>{{ titulo }}</h1></div>
+<form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+<div class="card">{% include "partials/form.html" %}</div>
+{% include "irmaos/_formset.html" %}
+{% if novo %}<div class="campo campo-check"><input class="check" type="checkbox" name="enviar_convite" id="conv" checked><label for="conv">Enviar e-mail para o irmão definir a senha</label></div>{% endif %}
+<div class="acoes mt"><button class="btn" type="submit">{% icon "check" %} Salvar</button><a class="btn btn-sec" href="{% url 'irmaos:lista' %}">Cancelar</a></div>
+</form>{% endblock %}

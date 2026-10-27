@@ -1,0 +1,19 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+@page { size: A4 landscape; margin: 1.6cm; } body { font-family: Georgia, serif; color: #111; }
+.moldura { border: 3px double #1f3a5f; padding: 1.2cm 1.6cm; min-height: 15.6cm; }
+.cab { text-align: center; white-space: pre-line; font-weight: bold; }
+h1 { text-align: center; letter-spacing: .25em; margin: .6cm 0; font-size: 26pt; color: #1f3a5f; }
+.corpo { font-size: 14pt; line-height: 1.7; text-align: justify; margin: .6cm 0 1cm; }
+.ass { width: 100%; text-align: center; } .ass td { width: 50%; vertical-align: bottom; padding: 0 .6cm; }
+.ass img { max-height: 1.7cm; } .linha { border-top: 1px solid #000; padding-top: 2px; font-size: 11pt; }
+.ev { font-size: 7.5pt; color: #444; word-break: break-all; margin-top: .4cm; }
+</style></head><body><div class="moldura">
+<div class="cab">{{ loja.cabecalho }}</div>
+<h1>CERTIFICADO DE VISITA</h1>
+<div class="corpo">Certificamos que o Irmão <strong>{{ visitante.nome }}</strong>, <strong>{{ visitante.get_grau_display }} Maçom</strong>, da Loja <strong>{{ visitante.loja_nome }}{% if visitante.loja_numero %} nº {{ visitante.loja_numero }}{% endif %}</strong>{% if visitante.oriente %}, Oriente de {{ visitante.oriente }}{% endif %}{% if visitante.potencia %}, jurisdicionada à {{ visitante.potencia }}{% endif %}, visitou os nossos trabalhos na Sessão {{ sessao.titulo }}, realizada em {{ sessao.data_hora|date:"d/m/Y" }}, sendo recebido fraternalmente.</div>
+<table class="ass"><tr>
+<td>{% if ass_veneravel %}<img src="{{ ass_veneravel.imagem_src }}" alt=""><br>{% else %}<div style="height:1.7cm"></div>{% endif %}<div class="linha">{% if ass_veneravel %}{{ ass_veneravel.irmao.nome_completo }}{% else %}&nbsp;{% endif %}<br>Venerável Mestre</div></td>
+<td>{% if ass_secretario %}<img src="{{ ass_secretario.imagem_src }}" alt=""><br>{% else %}<div style="height:1.7cm"></div>{% endif %}<div class="linha">{% if ass_secretario %}{{ ass_secretario.irmao.nome_completo }}{% else %}&nbsp;{% endif %}<br>Secretário</div></td></tr></table>
+<table style="width:100%;margin-top:.5cm"><tr><td style="width:2.4cm"><img src="{{ qr }}" style="width:2.2cm" alt="QR Code de verificação"></td>
+<td class="ev">{{ texto_legal }}<br>Código: {{ cert.codigo }} · Hash SHA-256: {{ hash }}{% if ass_veneravel %}<br>Venerável: IP {{ ass_veneravel.ip|default:"—" }} em {{ ass_veneravel.assinado_em|date:"d/m/Y H:i" }}{% endif %}{% if ass_secretario %}<br>Secretário: IP {{ ass_secretario.ip|default:"—" }} em {{ ass_secretario.assinado_em|date:"d/m/Y H:i" }}{% endif %}</td></tr></table>
+</div></body></html>

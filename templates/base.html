@@ -1,0 +1,49 @@
+{% load static loja %}<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block titulo %}Painel{% endblock %} · {{ loja.nome }}</title>
+  <script>
+    (function () { try { var r = document.documentElement, g = function (k) { return localStorage.getItem(k); };
+      if (g('tema')) r.dataset.theme = g('tema'); if (g('contraste')) r.dataset.contraste = g('contraste'); if (g('fonte')) r.dataset.fonte = g('fonte'); } catch (e) {} })();
+  </script>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<a class="skip" href="#conteudo">Ir para o conteúdo</a>
+{% if user.is_authenticated %}
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+    <a class="brand" href="{% url 'core:painel' %}">
+      {% if loja.brasao %}<img src="{{ loja.brasao.url }}" alt="">{% else %}<span class="avatar" aria-hidden="true">{% icon "landmark" %}</span>{% endif %}
+      <span><strong>{{ loja.nome }}</strong><small>{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}Rito {{ loja.rito }}</small></span>
+    </a>
+    {% include "partials/menu.html" %}
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <button class="controles menu-btn" type="button" data-acao="menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar" style="border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);padding:.4rem .6rem">{% icon "menu" %}</button>
+      <span class="grow"><strong>{{ user.nome_completo|default:user.username }}</strong> <span class="muted">· {{ grau_nome|default:"Técnico" }}</span></span>
+      <span class="controles" role="group" aria-label="Acessibilidade">
+        <button type="button" data-acao="tema" aria-label="Alternar tema claro/escuro" title="Tema">{% icon "sun" %}</button>
+        <button type="button" data-acao="contraste" aria-label="Alternar alto contraste" title="Alto contraste">{% icon "contrast" %}</button>
+        <button type="button" data-acao="fonte" aria-label="Alternar tamanho da fonte" title="Tamanho da fonte">{% icon "type" %}</button>
+      </span>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit">{% icon "log-out" %} Sair</button></form>
+    </header>
+    <main class="conteudo" id="conteudo" tabindex="-1">
+      {% include "partials/mensagens.html" %}
+      {% block conteudo %}{% endblock %}
+    </main>
+    <footer class="rodape">{{ loja.nome }} · Sistema de gestão (MIT) · <a href="{% url 'core:privacidade' %}">Privacidade (LGPD)</a></footer>
+  </div>
+</div>
+{% else %}
+<main id="conteudo">{% include "partials/mensagens.html" %}{% block publico %}{% endblock %}</main>
+{% endif %}
+<script src="{% static 'js/app.js' %}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

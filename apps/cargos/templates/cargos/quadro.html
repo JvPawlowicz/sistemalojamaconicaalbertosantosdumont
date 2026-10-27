@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Cargos e gestão{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Quadro de oficiais</h1><p>Gestão do ano maçônico <strong>{{ ano.nome }}</strong> ({{ ano.inicio|date:"d/m/Y" }} – {{ ano.fim|date:"d/m/Y" }})</p></div>
+<div class="acoes"><form method="get"><label class="sr-only" for="ano">Ano</label><select class="input" id="ano" name="ano" onchange="this.form.submit()">{% for a in anos %}<option value="{{ a.pk }}" {% if a.pk == ano.pk %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}</select></form>
+{% if pode_editar %}<form method="post" action="{% url 'cargos:copiar' %}">{% csrf_token %}<input type="hidden" name="ano" value="{{ ano.pk }}"><button class="btn btn-sec" type="submit" data-confirmar="Copiar a gestão do ano anterior para {{ ano.nome }}?">Copiar do ano anterior</button></form>
+{% if user|tem_perfil:"administrador" %}<a class="btn btn-sec" href="{% url 'cargos:catalogo' %}">{% icon "settings" %} Catálogo</a>{% endif %}{% endif %}</div></div>
+<div class="tabela-wrap"><table class="tabela"><thead><tr><th scope="col">Cargo</th><th scope="col">Titular</th>{% if pode_editar %}<th scope="col">Alterar</th>{% endif %}</tr></thead><tbody>
+{% for cargo, g in linhas %}<tr><td><strong>{{ cargo.nome }}</strong></td><td>{% if g %}<a href="{% url 'irmaos:detalhe' g.irmao.pk %}">{{ g.irmao.nome_completo }}</a>{% else %}<span class="muted">Vago</span>{% endif %}</td>
+{% if pode_editar %}<td><form method="post" style="display:flex;gap:.5rem">{% csrf_token %}<input type="hidden" name="cargo" value="{{ cargo.pk }}"><label class="sr-only" for="c{{ cargo.pk }}">Titular de {{ cargo.nome }}</label>
+<select class="input" id="c{{ cargo.pk }}" name="irmao"><option value="">— vago —</option>{% for i in irmaos %}<option value="{{ i.pk }}" {% if g and g.irmao_id == i.pk %}selected{% endif %}>{{ i.nome_completo }}</option>{% endfor %}</select>
+<button class="btn btn-peq" type="submit">Salvar</button></form></td>{% endif %}</tr>
+{% empty %}<tr><td colspan="3" class="vazio">Nenhum cargo no catálogo. {% if user|tem_perfil:"administrador" %}<a href="{% url 'cargos:catalogo' %}">Cadastre os cargos da Loja.</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

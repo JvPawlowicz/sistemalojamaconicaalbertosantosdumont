@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Painel{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Olá, {{ user.first_name|default:user.username }}</h1><p>Ano maçônico <strong>{{ ano.nome }}</strong> · {{ ano.inicio|date:"d/m/Y" }} a {{ ano.fim|date:"d/m/Y" }}</p></div></div>
+
+{% if pendencias_assinatura %}
+<div class="alerta alerta-warning" role="alert">{% icon "pen-line" %}<span><strong>{{ pendencias_assinatura|length }} ata(s) aguardando a sua assinatura.</strong>
+{% for a in pendencias_assinatura %}<a href="{% url 'atas:detalhe' a.pk %}">Ata {{ a.numero|default:"s/nº" }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>
+{% endif %}
+
+<div class="grade">
+  <section class="card" aria-labelledby="h-prox"><h2 id="h-prox">{% icon "calendar-days" %} Próximas sessões</h2>
+    {% for s in proximas %}<p><a href="{% url 'sessoes:detalhe' s.pk %}"><strong>{{ s.data_hora|date:"d/m/Y H:i" }}</strong></a><br><span class="muted">{{ s.titulo }}</span></p>
+    {% empty %}<p class="muted">Nenhuma sessão agendada.</p>{% endfor %}
+  </section>
+  <section class="card" aria-labelledby="h-mens"><h2 id="h-mens">{% icon "banknote" %} Minhas mensalidades</h2>
+    {% for l in minhas_mensalidades %}<p>{{ l.competencia|date:"m/Y" }} · {{ l.valor|moeda }} {% if l.status == "vencido" %}<span class="selo selo-danger">vencida</span>{% else %}<span class="selo selo-warn">pendente</span>{% endif %}</p>
+    {% empty %}<p class="muted">Nenhuma pendência. {% icon "circle-check" %}</p>{% endfor %}
+    <a href="{% url 'tesouraria:minhas' %}">Ver todas</a>
+  </section>
+  <section class="card" aria-labelledby="h-aniv"><h2 id="h-aniv">{% icon "bell" %} Aniversariantes do mês</h2>
+    {% for i in aniversariantes %}<p>{{ i.data_nascimento|date:"d/m" }} — {{ i.nome_completo }}</p>{% empty %}<p class="muted">Nenhum aniversariante.</p>{% endfor %}
+  </section>
+  {% if saldo is not None and user|tem_perfil:"tesoureiro" %}
+  <section class="card" aria-labelledby="h-caixa"><h2 id="h-caixa">{% icon "wallet" %} Caixa</h2>
+    <div class="indicador"><span class="valor">{{ saldo|moeda }}</span><span class="rotulo">Saldo atual</span></div>
+    <p class="mt">{{ inadimplentes }} mensalidade(s) vencida(s). <a href="{% url 'tesouraria:painel' %}">Tesouraria</a></p>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

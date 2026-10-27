@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ item.nome }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><h1>{{ item.nome }}</h1></div>
+<div class="grade-2"><form method="post" class="card">{% csrf_token %}{% include "partials/form.html" %}<div class="acoes mt"><button class="btn" type="submit">{% icon "check" %} Salvar</button><a class="btn btn-sec" href="{% url 'patrimonio:lista' %}">Voltar</a></div></form>
+{% if item.emprestavel %}<section class="card"><h2>{% icon "book-open" %} Empréstimos</h2>
+{% if item.emprestado_a %}<p>Emprestado a <strong>{{ item.emprestado_a.nome_completo }}</strong>.</p>{% else %}
+<form method="post">{% csrf_token %}{% include "partials/form.html" with form=emp %}<button class="btn" type="submit">Registrar empréstimo</button></form>{% endif %}
+<h3 class="mt">Histórico</h3>{% for e in emprestimos %}<p>{{ e.irmao.nome_completo }} · {{ e.emprestado_em|date:"d/m/Y" }}{% if e.devolvido_em %} → devolvido {{ e.devolvido_em|date:"d/m/Y" }}{% else %}<form method="post" action="{% url 'patrimonio:devolver' e.pk %}" style="display:inline">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit">Registrar devolução</button></form>{% endif %}</p>{% empty %}<p class="muted">Sem empréstimos.</p>{% endfor %}</section>{% endif %}</div>{% endblock %}

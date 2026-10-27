@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% load static loja %}
+{% block titulo %}Redigir ata{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Redigir ata</h1><p>{{ sessao.titulo }} · {{ sessao.data_hora|date:"d/m/Y H:i" }}</p></div></div>
+<div class="alerta alerta-info">{% icon "bell" %}<span>Dica: digite <strong>@</strong> para inserir cabeçalhos e textos pré-cadastrados (variáveis como data e Venerável são preenchidas sozinhas). O cabeçalho oficial da Loja é aplicado automaticamente ao gerar o PDF.</span></div>
+<form method="post" class="card" novalidate>{% csrf_token %}
+  {% if form.non_field_errors %}<div class="alerta alerta-error">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="form-grid">{% campo form.numero %}{% campo form.livro %}{% campo form.folha %}</div>
+  <div class="campo"><label for="ata-conteudo">Texto da ata</label>
+  {{ form.conteudo }}
+  {% for e in form.conteudo.errors %}<div class="erro" role="alert">{{ e }}</div>{% endfor %}</div>
+  <div class="acoes"><button class="btn" type="submit">{% icon "check" %} Salvar rascunho</button><a class="btn btn-sec" href="{% if ata %}{% url 'atas:detalhe' ata.pk %}{% else %}{% url 'sessoes:detalhe' sessao.pk %}{% endif %}">Cancelar</a></div>
+</form>{% endblock %}
+{% block scripts %}<script>document.getElementById('ata-conteudo').dataset.urlModelos="{% url 'atas:modelos_buscar' %}";document.getElementById('ata-conteudo').dataset.sessao="{{ sessao.pk }}";</script><script src="{% static 'js/ata_editor.js' %}" defer></script>{% endblock %}

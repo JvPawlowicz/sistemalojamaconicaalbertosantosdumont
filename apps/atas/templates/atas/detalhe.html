@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Ata {{ ata.numero|default:"s/nº" }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Ata {{ ata.numero|default:"s/nº" }} — {{ ata.sessao.titulo }}</h1>
+<p>{{ ata.sessao.data_hora|date:"d/m/Y" }} · {% selo ata.status ata.get_status_display %} · versão {{ ata.versao }}{% if ata.livro %} · Livro {{ ata.livro }}, folha {{ ata.folha }}{% endif %}</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'atas:pdf' ata.pk %}" target="_blank" rel="noopener">{% icon "download" %} PDF</a>
+{% if minha_pendente %}<a class="btn" href="{% url 'atas:assinar' ata.pk %}">{% icon "pen-line" %} Assinar</a>{% endif %}
+{% if pode_gerir and ata.status == "rascunho" or pode_gerir and ata.status == "circulacao" %}<a class="btn btn-sec" href="{% url 'atas:editar' ata.pk %}">{% icon "pencil" %} Editar</a>{% endif %}
+{% if pode_gerir and ata.status == "aprovada" or pode_gerir and ata.status == "assinada" %}<form method="post" action="{% url 'atas:nova_versao' ata.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit" data-confirmar="Criar nova versão? As assinaturas anteriores deixarão de valer para o novo texto.">{% icon "refresh-cw" %} Nova versão</button></form>{% endif %}
+</div></div>
+
+{% if pode_gerir and ata.status == "rascunho" %}
+<form method="post" action="{% url 'atas:circular' ata.pk %}" class="card">{% csrf_token %}<h2>{% icon "send" %} Circular para aprovação</h2>
+<p>A minuta fica disponível aos irmãos autorizados no sistema para leitura e aprovação em sessão.</p>
+<div class="campo campo-check"><input class="check" type="checkbox" name="por_email" id="por_email" checked><label for="por_email">Avisar por e-mail (SMTP) com link seguro para ler no sistema</label></div>
+<button class="btn" type="submit">Colocar em circulação</button></form>
+{% endif %}
+{% if pode_gerir and ata.status == "circulacao" %}
+<form method="post" action="{% url 'atas:aprovar' ata.pk %}" class="card">{% csrf_token %}<h2>{% icon "stamp" %} Aprovada em sessão? Defina os signatários</h2>
+<div class="opcoes">{% for i, marcado in candidatos %}<label><input class="check" type="checkbox" name="signatarios" value="{{ i.pk }}" {% if marcado %}checked{% endif %}> {{ i.nome_completo }}</label>{% endfor %}</div>
+<button class="btn mt" type="submit" data-confirmar="Aprovar a ata? Depois disso o texto fica bloqueado para edição.">{% icon "check" %} Aprovar e liberar assinaturas</button></form>
+{% endif %}
+
+{% if signatarios %}<section class="card"><h2>{% icon "pen-line" %} Assinaturas</h2>
+<table class="tabela"><tbody>{% for s, a in signatarios %}<tr><td><strong>{{ s.irmao.nome_completo }}</strong> <span class="muted">{{ s.funcao }}</span></td>
+<td>{% if a %}<span class="selo selo-ok">Assinou em {{ a.assinado_em|date:"d/m/Y H:i" }}</span> <a href="{% url 'verificar' a.codigo %}" target="_blank" rel="noopener">verificar ({{ a.codigo }})</a>{% else %}<span class="selo selo-warn">Pendente</span>{% endif %}</td></tr>{% endfor %}</tbody></table>
+{% if versoes_anteriores %}<p class="ajuda">{{ versoes_anteriores }} assinatura(s) de versões anteriores foram invalidadas.</p>{% endif %}</section>{% endif %}
+
+<div class="texto-ata">{{ ata.conteudo }}</div>
+<p class="ajuda mt">Hash SHA-256 do conteúdo (versão {{ ata.versao }}): <code>{{ ata.hash_conteudo }}</code></p>
+{% endblock %}

@@ -1,0 +1,25 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+@page { size: A4; margin: 2.2cm 2cm 2.4cm; @bottom-center { content: "Página " counter(page) " de " counter(pages); font-size: 9pt; color: #555; } }
+body { font-family: Georgia, "Times New Roman", serif; font-size: 12pt; line-height: 1.55; color: #111; }
+.cab { text-align: center; white-space: pre-line; font-weight: bold; border-bottom: 2px solid #1f3a5f; padding-bottom: .4cm; margin-bottom: .6cm; }
+.tit { text-align: center; font-size: 14pt; margin: .2cm 0 .6cm; text-transform: uppercase; }
+.texto { white-space: pre-wrap; text-align: justify; }
+.assin { page-break-inside: avoid; margin-top: 1cm; }
+.ass-item { display: inline-block; width: 46%; vertical-align: top; text-align: center; margin: .3cm 1%; page-break-inside: avoid; }
+.ass-item img { max-height: 1.8cm; max-width: 100%; } .ass-item .linha { border-top: 1px solid #000; margin-top: .1cm; padding-top: .1cm; font-size: 10.5pt; }
+.ev { font-size: 8pt; color: #444; line-height: 1.3; word-break: break-all; }
+.legal { font-size: 9pt; border: 1px solid #999; padding: .25cm; margin-top: .6cm; }
+{% if minuta %}body::before { content: "MINUTA — AGUARDANDO ASSINATURAS"; position: fixed; top: 45%; left: 5%; font-size: 34pt; color: rgba(150,0,0,.12); transform: rotate(-25deg); }{% endif %}
+</style></head><body>
+<div class="cab">{{ loja.cabecalho }}</div>
+<div class="tit">Ata nº {{ ata.numero|default:"____" }}{% if ata.livro %} — Livro {{ ata.livro }}, folha {{ ata.folha }}{% endif %}<br><small>Sessão {{ ata.sessao.titulo }} — {{ ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ata.versao }})</small></div>
+<div class="texto">{{ ata.conteudo }}</div>
+<div class="assin">
+{% for a in assinaturas %}<div class="ass-item">{% if a.imagem_src %}<img src="{{ a.imagem_src }}" alt="">{% endif %}
+<div class="linha"><strong>{{ a.irmao.nome_completo }}</strong><br>assinado em {{ a.assinado_em|date:"d/m/Y H:i" }}</div>
+<div class="ev">IP {{ a.ip|default:"—" }}{% if a.latitude %} · geo {{ a.latitude }}, {{ a.longitude }}{% endif %}<br>Cód. {{ a.codigo }}</div></div>{% endfor %}
+{% for s in faltam %}<div class="ass-item"><div style="height:1.8cm"></div><div class="linha">{{ s.irmao.nome_completo }}<br><em>pendente</em></div></div>{% endfor %}
+</div>
+<div class="legal">{{ texto_legal }}<br><strong>Hash SHA-256 do conteúdo:</strong> <span class="ev">{{ hash }}</span>
+{% if qr %}<table style="margin-top:.2cm"><tr><td><img src="{{ qr }}" style="width:2.2cm" alt="QR Code de verificação"></td><td class="ev" style="padding-left:.3cm">Verifique a autenticidade escaneando o QR Code ou acessando a página de verificação com o código de uma assinatura.</td></tr></table>{% endif %}</div>
+</body></html>

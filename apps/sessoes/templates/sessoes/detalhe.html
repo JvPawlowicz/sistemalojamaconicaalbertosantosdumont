@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Sessão {{ sessao.data_hora|date:"d/m/Y" }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Sessão {{ sessao.titulo }}</h1><p>{{ sessao.data_hora|date:"l, d/m/Y \à\s H:i" }}{% if sessao.local %} · {{ sessao.local }}{% endif %} · {% selo sessao.status sessao.get_status_display %}</p></div>
+<div class="acoes">
+ <a class="btn btn-sec" href="{% url 'sessoes:convocacao_pdf' sessao.pk %}">{% icon "printer" %} Convocação (PDF)</a>
+ {% if pode_gerir %}<a class="btn btn-sec" href="{% url 'sessoes:editar' sessao.pk %}">{% icon "pencil" %} Editar</a>
+ <a class="btn btn-sec" href="{% url 'sessoes:escala' sessao.pk %}">{% icon "award" %} Escala de cargos</a>
+ <a class="btn btn-sec" href="{% url 'sessoes:presenca' sessao.pk %}">{% icon "clipboard-list" %} Presença</a>
+ <a class="btn btn-sec" href="{% url 'visitas:sessao' sessao.pk %}">{% icon "handshake" %} Visitantes</a>
+ <form method="post" action="{% url 'sessoes:enviar_convocacao' sessao.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit" data-confirmar="Enviar a convocação por e-mail aos irmãos?">{% icon "send" %} Enviar convocação</button></form>
+ {% if sessao.status == "agendada" %}<form method="post" action="{% url 'sessoes:concluir' sessao.pk %}">{% csrf_token %}<button class="btn" type="submit" data-confirmar="Marcar a sessão como realizada?">{% icon "check" %} Marcar como realizada</button></form>{% endif %}{% endif %}
+</div></div>
+<div class="grade-2">
+<section class="card"><h2>{% icon "file-text" %} Pauta</h2><div style="white-space:pre-wrap">{{ sessao.pauta|default:"Sem pauta cadastrada." }}</div>
+<h3 class="mt">Expediente do dia</h3><div style="white-space:pre-wrap">{{ sessao.expediente|default:"—" }}</div>
+{% for e in expedientes %}<p>{% icon "inbox" %} {{ e.assunto }}</p>{% endfor %}</section>
+<section class="card"><h2>{% icon "award" %} Oficiais da sessão</h2>
+<table class="tabela"><tbody>{% for e in escala %}<tr><td>{{ e.cargo.nome }}</td><td>{{ e.irmao.nome_completo }}{% if e.substituicao %} <span class="selo selo-warn" title="Titular: {{ e.titular|default:'—' }}">substituto</span>{% endif %}</td></tr>
+{% empty %}<tr><td class="vazio">Escala ainda não definida.</td></tr>{% endfor %}</tbody></table></section>
+<section class="card"><h2>{% icon "scroll-text" %} Ata</h2>
+{% if ata %}<p>{% selo ata.status ata.get_status_display %} · versão {{ ata.versao }}</p><a class="btn" href="{% url 'atas:detalhe' ata.pk %}">Abrir ata</a>
+{% elif pode_gerir %}<p class="muted">Ainda não há ata para esta sessão.</p><a class="btn" href="{% url 'atas:criar' sessao.pk %}">{% icon "plus" %} Redigir ata</a>
+{% else %}<p class="muted">Sem ata.</p>{% endif %}</section>
+{% if pode_ver_presenca %}<section class="card"><h2>{% icon "clipboard-list" %} Presença</h2>
+{% for p in presencas %}<p>{{ p.irmao.nome_completo }} — {% selo p.situacao p.get_situacao_display %}</p>{% empty %}<p class="muted">Presença ainda não registrada.</p>{% endfor %}
+{% if visitantes %}<h3 class="mt">Visitantes</h3>{% for v in visitantes %}<p>{{ v.visitante.nome }} — {{ v.visitante.loja_nome }}</p>{% endfor %}{% endif %}</section>{% endif %}
+</div>{% endblock %}

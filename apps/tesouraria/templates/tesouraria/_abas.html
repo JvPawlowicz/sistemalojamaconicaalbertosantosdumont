@@ -1,0 +1,7 @@
+{% load loja %}<nav class="tabs" aria-label="Tesouraria">
+<a href="{% url 'tesouraria:painel' %}" {% if aba == "painel" %}aria-current="page"{% endif %}>Visão geral</a>
+<a href="{% url 'tesouraria:mensalidades' %}" {% if aba == "mensalidades" %}aria-current="page"{% endif %}>Mensalidades</a>
+<a href="{% url 'tesouraria:caixa' %}" {% if aba == "caixa" %}aria-current="page"{% endif %}>Caixa</a>
+<a href="{% url 'tesouraria:orcamento' %}" {% if aba == "orcamento" %}aria-current="page"{% endif %}>Orçamento</a>
+<a href="{% url 'tesouraria:categorias' %}" {% if aba == "categorias" %}aria-current="page"{% endif %}>Categorias</a>
+<a href="{% url 'relatorios:indice' %}">Relatórios</a></nav>

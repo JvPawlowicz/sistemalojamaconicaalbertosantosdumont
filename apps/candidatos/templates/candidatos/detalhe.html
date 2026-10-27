@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ c.nome }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>{{ c.nome }}</h1><p>{% selo c.etapa c.get_etapa_display %} desde {{ c.etapa_desde|date:"d/m/Y"|default:"—" }}</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'candidatos:painel' %}">{% icon "arrow-left" %} Painel</a></div></div>
+<div class="grade-2"><section class="card"><h2>Dados</h2><dl class="lista-def"><dt>Profissão</dt><dd>{{ c.profissao|default:"—" }}</dd><dt>Nascimento</dt><dd>{{ c.data_nascimento|date:"d/m/Y"|default:"—" }}</dd><dt>Contato</dt><dd>{{ c.telefone|telefone }} {{ c.email }}</dd><dt>Proposto por</dt><dd>{{ c.proposto_por.nome_completo }}</dd><dt>Data da proposta</dt><dd>{{ c.data_proposta|date:"d/m/Y" }}</dd></dl><p class="mt" style="white-space:pre-wrap">{{ c.observacoes }}</p>
+{% if pode_gerir %}<form method="post" action="{% url 'candidatos:mover' c.pk %}" class="acoes mt">{% csrf_token %}<label class="sr-only" for="etapa">Etapa</label><select class="input" id="etapa" name="etapa" style="max-width:220px">{% for v, n in etapas %}<option value="{{ v }}" {% if c.etapa == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select><button class="btn" type="submit">Mover de etapa</button></form>{% endif %}</section>
+<section class="card"><h2>{% icon "scale" %} Pareceres da sindicância</h2>{% for p in pareceres %}<p>{% if p.favoravel %}<span class="selo selo-ok">Favorável</span>{% else %}<span class="selo selo-danger">Desfavorável</span>{% endif %} <strong>{{ p.irmao.nome_completo }}</strong> · {{ p.data|date:"d/m/Y" }}<br>{{ p.texto }}</p>{% empty %}<p class="muted">Nenhum parecer.</p>{% endfor %}
+{% if pode_gerir %}<form method="post" class="mt">{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">Registrar parecer</button></form>{% endif %}</section></div>
+<section class="card"><h2>{% icon "history" %} Histórico</h2>{% for h in historico %}<p class="mb0">{{ h.history_date|date:"d/m/Y H:i" }} — {{ h.get_etapa_display }} ({{ h.history_user|default:"sistema" }})</p>{% endfor %}</section>{% endblock %}

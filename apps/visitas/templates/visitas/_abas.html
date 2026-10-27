@@ -1,0 +1,3 @@
+{% load loja %}<nav class="tabs" aria-label="Visitação">
+<a href="{% url 'visitas:realizadas' %}" {% if aba == "realizadas" %}aria-current="page"{% endif %}>Visitas realizadas (certificados recebidos)</a>
+{% if user|tem_perfil:"secretario" %}<a href="{% url 'visitas:visitantes' %}" {% if aba == "visitantes" %}aria-current="page"{% endif %}>Banco de visitantes</a>{% endif %}</nav>

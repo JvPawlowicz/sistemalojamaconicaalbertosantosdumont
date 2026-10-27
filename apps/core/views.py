@@ -1,0 +1,175 @@
+import base64
+import io
+
+import qrcode
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_POST
+from django_otp import login as otp_login
+from django_otp.plugins.otp_static.models import StaticDevice, StaticToken
+from django_otp.plugins.otp_totp.models import TOTPDevice
+
+from . import perfis as P
+from .forms import LojaForm, TokenForm
+from .models import AceiteTermo, AnoMaconico, EmailLog, Loja, TermoAceite
+from .utils import ip_do_cliente
+
+
+def _qr_data_uri(texto):
+    img = qrcode.make(texto)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+
+
+@login_required
+def painel(request):
+    from apps.atas.models import Ata
+    from apps.sessoes.models import Sessao
+    from apps.tesouraria.models import Lancamento
+
+    user = request.user
+    hoje = timezone.localdate()
+    ctx = {"ano": AnoMaconico.atual()}
+    ctx["proximas"] = [
+        s for s in Sessao.objects.filter(data_hora__date__gte=hoje, status=Sessao.Status.AGENDADA)
+        .order_by("data_hora")[:8] if user.pode_ver_grau(s.grau)
+    ]
+    ctx["pendencias_assinatura"] = Ata.objects.pendentes_de(user)
+    ctx["minhas_mensalidades"] = Lancamento.objects.filter(
+        irmao=user, status__in=[Lancamento.Status.PENDENTE, Lancamento.Status.VENCIDO]
+    )[:6]
+    from apps.irmaos.models import Irmao
+
+    ativos = Irmao.objects.filter(is_active=True, grau__isnull=False)
+    ctx["aniversariantes"] = ativos.filter(data_nascimento__month=hoje.month).order_by("data_nascimento__day")
+    if user.tem_algum_perfil(P.TESOUREIRO):
+        from apps.tesouraria.services import saldo_caixa
+
+        ctx["saldo"] = saldo_caixa()
+        ctx["inadimplentes"] = Lancamento.objects.filter(status=Lancamento.Status.VENCIDO).count()
+    return render(request, "core/painel.html", ctx)
+
+
+@login_required
+def aceite_termo(request):
+    termo = TermoAceite.vigente()
+    if not termo or request.user.aceites.filter(termo=termo).exists():
+        return redirect("core:painel")
+    if request.method == "POST":
+        if request.POST.get("aceito") != "on":
+            messages.error(request, "Marque a caixa para confirmar o aceite do termo.")
+        else:
+            AceiteTermo.objects.create(
+                irmao=request.user, termo=termo, hash_termo=termo.hash,
+                ip=ip_do_cliente(request) or None, user_agent=request.META.get("HTTP_USER_AGENT", "")[:300],
+            )
+            messages.success(request, "Termo aceito. Obrigado!")
+            return redirect("core:painel")
+    return render(request, "core/aceite_termo.html", {"termo": termo, "loja": Loja.atual()})
+
+
+def privacidade(request):
+    return render(request, "core/privacidade.html")
+
+
+# --- 2FA (TOTP) ---
+@login_required
+def configurar_2fa(request):
+    user = request.user
+    if user.totpdevice_set.filter(confirmed=True).exists() and not user.is_verified():
+        return redirect("core:2fa_verificar")
+    device = user.totpdevice_set.filter(confirmed=False).first() or TOTPDevice.objects.create(
+        user=user, name="principal", confirmed=False
+    )
+    form = TokenForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        if device.verify_token(form.cleaned_data["token"]):
+            device.confirmed = True
+            device.save()
+            otp_login(request, device)
+            sd, _ = StaticDevice.objects.get_or_create(user=user, name="recuperacao")
+            sd.token_set.all().delete()
+            codigos = []
+            for _ in range(8):
+                t = StaticToken.random_token()
+                sd.token_set.create(token=t)
+                codigos.append(t)
+            return render(request, "core/2fa_codigos.html", {"codigos": codigos})
+        form.add_error("token", "Código inválido. Verifique o horário do celular e tente de novo.")
+    return render(request, "core/2fa_configurar.html", {"form": form, "qr": _qr_data_uri(device.config_url),
+                                                         "chave": base64.b32encode(device.bin_key).decode()})
+
+
+@login_required
+def verificar_2fa(request):
+    form = TokenForm(request.POST or None)
+    destino = request.GET.get("next") or request.POST.get("next") or reverse("core:painel")
+    if not url_has_allowed_host_and_scheme(destino, allowed_hosts={request.get_host()}):
+        destino = reverse("core:painel")
+    if request.method == "POST" and form.is_valid():
+        token = form.cleaned_data["token"]
+        for device in list(request.user.totpdevice_set.filter(confirmed=True)) + list(
+            StaticDevice.objects.filter(user=request.user)
+        ):
+            if device.verify_token(token):
+                otp_login(request, device)
+                return redirect(destino)
+        form.add_error("token", "Código inválido.")
+    return render(request, "core/2fa_verificar.html", {"form": form, "next": destino})
+
+
+# --- administração da Loja ---
+@login_required
+def configuracoes(request):
+    if not request.user.tem_perfil(P.ADMINISTRADOR):
+        raise PermissionDenied
+    loja = Loja.atual()
+    form = LojaForm(request.POST or None, request.FILES or None, instance=loja)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Configurações salvas.")
+        return redirect("core:configuracoes")
+    return render(request, "core/configuracoes.html", {"form": form, "termo": TermoAceite.vigente()})
+
+
+@login_required
+@require_POST
+def novo_termo(request):
+    """Publica uma nova versão do termo (exige novo aceite de todos)."""
+    if not request.user.tem_perfil(P.ADMINISTRADOR):
+        raise PermissionDenied
+    texto = request.POST.get("texto", "").strip()
+    if not texto:
+        messages.error(request, "Informe o texto do termo.")
+        return redirect("core:configuracoes")
+    atual = TermoAceite.vigente()
+    TermoAceite.objects.update(ativo=False)
+    TermoAceite.objects.create(versao=(atual.versao + 1) if atual else 1, texto=texto, ativo=True)
+    messages.success(request, "Nova versão do termo publicada. Todos deverão aceitar novamente.")
+    return redirect("core:configuracoes")
+
+
+@login_required
+def relatorio_aceites(request):
+    if not request.user.tem_perfil(P.ADMINISTRADOR):
+        raise PermissionDenied
+    from apps.irmaos.models import Irmao
+
+    termo = TermoAceite.vigente()
+    aceitos = set(AceiteTermo.objects.filter(termo=termo).values_list("irmao_id", flat=True)) if termo else set()
+    irmaos = Irmao.objects.filter(is_active=True, grau__isnull=False)
+    linhas = [(i, i.pk in aceitos) for i in irmaos]
+    return render(request, "core/aceites.html", {"linhas": linhas, "termo": termo})
+
+
+@login_required
+def emails_enviados(request):
+    if not request.user.tem_perfil(P.ADMINISTRADOR):
+        raise PermissionDenied
+    return render(request, "core/emails.html", {"emails": EmailLog.objects.all()[:200]})

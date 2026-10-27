@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% load static loja %}
+{% block titulo %}Assinar ata{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Assinar ata {{ ata.numero|default:"s/nº" }}</h1><p>{{ ata.sessao.titulo }} · {{ ata.sessao.data_hora|date:"d/m/Y" }} · versão {{ ata.versao }}</p></div></div>
+<details class="card"><summary><strong>Ler a ata antes de assinar</strong></summary><div class="texto-ata mt">{{ ata.conteudo }}</div></details>
+<form method="post" enctype="multipart/form-data" class="card" id="form-assinar">{% csrf_token %}
+  <h2>{% icon "pen-line" %} Sua assinatura</h2>
+  <p>Desenhe com o dedo, mouse ou caneta. Se preferir, envie uma foto da sua assinatura.</p>
+  <canvas id="assinatura-canvas" class="assinatura-box" role="img" aria-label="Área para desenhar a assinatura"></canvas>
+  <div class="acoes mt"><button type="button" class="btn btn-sec btn-peq" id="assinatura-limpar">{% icon "x" %} Limpar</button></div>
+  <input type="hidden" name="assinatura_png" id="assinatura_png">
+  <input type="hidden" name="latitude" id="latitude"><input type="hidden" name="longitude" id="longitude"><input type="hidden" name="precisao" id="precisao">
+  <div class="campo mt"><label for="foto_assinatura">Foto da assinatura (opcional)</label><input class="input" type="file" accept="image/*" name="foto_assinatura" id="foto_assinatura"></div>
+  <div class="alerta alerta-info">{% icon "shield-check" %}<span><strong>Validade jurídica:</strong> {{ texto_legal }}<br><span class="ajuda" id="geo-estado">Solicitando localização…</span></span></div>
+  <p class="ajuda">Serão registrados: seu usuário, IP, dispositivo, data/hora, localização (se autorizada) e o hash SHA-256 da ata: <code>{{ ata.hash_conteudo }}</code></p>
+  <div class="acoes"><button class="btn" type="submit">{% icon "check" %} Assinar eletronicamente</button><a class="btn btn-sec" href="{% url 'atas:detalhe' ata.pk %}">Cancelar</a></div>
+</form>{% endblock %}
+{% block scripts %}<script src="{% static 'js/assinatura.js' %}" defer></script>{% endblock %}

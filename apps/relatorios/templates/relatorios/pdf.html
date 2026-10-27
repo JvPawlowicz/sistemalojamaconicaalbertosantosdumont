@@ -1,0 +1,9 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+@page { size: A4 landscape; margin: 1.5cm; @bottom-center { content: "Página " counter(page) " de " counter(pages); font-size: 8pt; color: #555; } }
+body { font-family: Arial, sans-serif; font-size: 9.5pt; color: #111; }
+.cab { text-align: center; white-space: pre-line; font-weight: bold; border-bottom: 2px solid #1f3a5f; padding-bottom: .25cm; margin-bottom: .4cm; }
+table { width: 100%; border-collapse: collapse; } th, td { border-bottom: 1px solid #ccc; padding: 3px 5px; text-align: left; } th { background: #eef1f6; }
+.meta { color: #555; font-size: 8.5pt; }
+</style></head><body><div class="cab">{{ loja.cabecalho }}</div><h2>{{ titulo }}</h2><p>{{ subtitulo }}</p>
+<table><thead><tr>{% for c in cabecalho %}<th>{{ c }}</th>{% endfor %}</tr></thead><tbody>{% for l in linhas %}<tr>{% for c in l %}<td>{{ c }}</td>{% endfor %}</tr>{% endfor %}</tbody></table>
+<p class="meta">Emitido em {{ emitido|date:"d/m/Y H:i" }} por {{ usuario.nome_completo }}.</p></body></html>

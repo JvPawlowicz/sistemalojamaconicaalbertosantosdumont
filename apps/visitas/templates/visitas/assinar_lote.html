@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% load static loja %}
+{% block titulo %}Assinar certificados{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Assinar certificados em lote</h1><p>{{ sessao.titulo }} · {{ sessao.data_hora|date:"d/m/Y" }} · {{ certs|length }} certificado(s)</p></div></div>
+<form method="post" enctype="multipart/form-data" class="card" id="form-assinar">{% csrf_token %}
+<div class="campo"><span class="rotulo-campo">Assinar como</span><div class="opcoes">{% for f, n in funcoes %}<label><input type="radio" class="check" name="funcao" value="{{ f }}" {% if forloop.first %}checked{% endif %}> {{ n }} <span class="muted">({{ pendentes|get_item:f }} pendente(s))</span></label>{% endfor %}</div></div>
+<canvas id="assinatura-canvas" class="assinatura-box" role="img" aria-label="Área para desenhar a assinatura"></canvas>
+<div class="acoes mt"><button type="button" class="btn btn-sec btn-peq" id="assinatura-limpar">{% icon "x" %} Limpar</button></div>
+<input type="hidden" name="assinatura_png" id="assinatura_png"><input type="hidden" name="latitude" id="latitude"><input type="hidden" name="longitude" id="longitude"><input type="hidden" name="precisao" id="precisao">
+<div class="campo mt"><label for="foto_assinatura">Foto da assinatura (opcional)</label><input class="input" type="file" accept="image/*" name="foto_assinatura" id="foto_assinatura"></div>
+<div class="alerta alerta-info">{% icon "shield-check" %}<span>{{ texto_legal }}<br><span class="ajuda" id="geo-estado">Solicitando localização…</span></span></div>
+<ul>{% for c in certs %}<li>{{ c.visita.visitante.nome }} — {{ c.get_status_display }}</li>{% endfor %}</ul>
+<div class="acoes"><button class="btn" type="submit">{% icon "check" %} Assinar todos os certificados pendentes</button><a class="btn btn-sec" href="{% url 'visitas:sessao' sessao.pk %}">Voltar</a></div></form>{% endblock %}
+{% block scripts %}<script src="{% static 'js/assinatura.js' %}" defer></script>{% endblock %}
