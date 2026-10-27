@@ -64,7 +64,13 @@ class Command(BaseCommand):
             self._demo()
 
     def _demo(self):
-        senha = "demo-senha-123"
+        import os
+
+        from django.conf import settings
+
+        senha = os.environ.get("DEMO_PASSWORD") or ("demo-senha-123" if settings.DEBUG else "")
+        if len(senha) < 10:
+            raise SystemExit("Defina DEMO_PASSWORD (10+ caracteres) para criar usuários de demonstração fora do modo DEBUG.")
         integral = CategoriaIrmao.objects.get(nome="Integral")
         integral.valor_mensal = Decimal("150")
         integral.save()
@@ -84,10 +90,15 @@ class Command(BaseCommand):
             if novo:
                 i.set_password(senha)
                 i.save()
+            elif os.environ.get("DEMO_PASSWORD"):
+                i.set_password(senha)  # reaplicar a senha definida no ambiente em novos deploys
+                i.save()
             criados[username] = i
         ano = AnoMaconico.atual()
         for cargo_nome, username in (("Venerável Mestre", "veneravel"), ("Secretário", "secretario"), ("Tesoureiro", "tesoureiro")):
             Gestao.objects.get_or_create(ano=ano, cargo=Cargo.objects.get(nome=cargo_nome), defaults={"irmao": criados[username]})
         agora = timezone.now().replace(minute=0, second=0, microsecond=0)
         Sessao.objects.get_or_create(data_hora=agora + timedelta(days=7), grau=1, defaults={"tipo": "ordinaria", "local": "Templo", "pauta": "1. Abertura\n2. Expediente\n3. Ordem do dia\n4. Encerramento"})
-        self.stdout.write(self.style.WARNING(f"Usuários de demonstração criados (senha: {senha}). Não use em produção."))
+        self.stdout.write(self.style.WARNING(
+            "Usuários de demonstração criados (veneravel, secretario, tesoureiro, mestre, companheiro, aprendiz). "
+            "Não use em produção." + (f" Senha: {senha}" if settings.DEBUG else " A senha é a de DEMO_PASSWORD.")))

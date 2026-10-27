@@ -29,6 +29,12 @@ if not SECRET_KEY:
 ALLOWED_HOSTS = [h for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h]
 CSRF_TRUSTED_ORIGINS = [o for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o]
 SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")
+_host_render = os.environ.get("RENDER_EXTERNAL_HOSTNAME")  # definido automaticamente pelo Render
+if _host_render:
+    ALLOWED_HOSTS.append(_host_render)
+    CSRF_TRUSTED_ORIGINS.append(f"https://{_host_render}")
+    if not os.environ.get("SITE_URL"):
+        SITE_URL = f"https://{_host_render}"
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -94,7 +100,21 @@ TEMPLATES = [
     },
 ]
 
-if os.environ.get("DB_NAME"):
+def _database_url(url):
+    """Converte DATABASE_URL (postgres://usuario:senha@host:porta/banco) para a configuração do Django."""
+    from urllib.parse import unquote, urlparse
+
+    u = urlparse(url)
+    return {
+        "ENGINE": "django.db.backends.postgresql", "NAME": u.path.lstrip("/"), "USER": unquote(u.username or ""),
+        "PASSWORD": unquote(u.password or ""), "HOST": u.hostname or "localhost", "PORT": str(u.port or 5432),
+        "CONN_MAX_AGE": 60,
+    }
+
+
+if os.environ.get("DATABASE_URL"):
+    DATABASES = {"default": _database_url(os.environ["DATABASE_URL"])}
+elif os.environ.get("DB_NAME"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

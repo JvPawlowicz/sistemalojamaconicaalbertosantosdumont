@@ -1,0 +1,31 @@
+# Implantação de TESTE no Render (https://render.com): "New + → Blueprint" apontando para este repositório/branch.
+# Plano gratuito: o app "dorme" após inatividade e o banco gratuito expira em ~30 dias; arquivos enviados (fotos,
+# documentos) não persistem. Para uso real, troque os planos e use um disco persistente ou um VPS (docker-compose.yml).
+databases:
+  - name: loja-db
+    plan: free
+    databaseName: loja
+    user: loja
+services:
+  - type: web
+    name: sistema-da-loja
+    runtime: docker
+    plan: free
+    healthCheckPath: /entrar/
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase: { name: loja-db, property: connectionString }
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: PROXY_COUNT
+        value: "1"
+      - key: DEMO
+        value: "1"            # cria usuários fictícios (remova para uso real)
+      - key: DEMO_PASSWORD
+        generateValue: true   # senha dos usuários de demonstração: veja em Environment no painel do Render
+      - key: EXIGIR_2FA
+        value: "0"            # deixe "1" para testar o 2FA (obrigatório em produção real)
