@@ -1,7 +1,7 @@
 # Escopo do Sistema — Loja Maçônica Alberto Santos Dumont
 
-**Rito:** Schröder (alemão) · **Ano maçônico:** julho a julho
-**Status:** rascunho v0.1 — base para desenho dos fluxos
+**Rito:** Schröder (alemão, quadro de cargos reduzido) · **Potência:** Grande Loja Maçônica do Estado de São Paulo (GLESP) · **Ano maçônico:** julho a julho
+**Status:** rascunho v0.2 — base para desenho dos fluxos
 
 ## Premissas gerais
 
@@ -30,7 +30,7 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 ## 2. Quadro de Oficiais e Cargos
 
 - **Ano maçônico** como entidade: cria-se o ano (jul–jun) e dentro dele a gestão.
-- **Gestão (titulares):** cada cargo (Venerável, 1º/2º Vigilante, Orador, Secretário, Tesoureiro, Chanceler, Mestre de Cerimônias, Cobridor etc.) é atribuído a um irmão para o ano.
+- **Gestão (titulares):** cada cargo é atribuído a um irmão para o ano. O **catálogo de cargos é configurável** (o Rito Schröder tem menos cargos que o quadro padrão); a lista oficial da loja será cadastrada no início, sem alterar código.
 - **Escalação por sessão (substituição):** para cada sessão do calendário, o Venerável confirma quem ocupa cada cargo. Por padrão, o sistema pré-preenche com os titulares; se um titular faltar, o Venerável designa substituto apenas para aquela sessão.
 - Histórico completo de quem exerceu cada cargo em cada sessão (alimenta currículo maçônico e relatórios).
 
@@ -52,13 +52,28 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 ## 4. Atas
 
 - O Secretário redige a ata **dentro do sistema**; ela já é gerada com **cabeçalho da loja**.
-- Estados: rascunho → pendente de assinatura → assinada/aprovada (imutável, com versionamento).
-- Lista de signatários configurável (Secretário, Venerável e demais necessários); cada um assina no sistema.
-- Envio da ata por e-mail aos irmãos; exportação em PDF.
+- Estados: rascunho → **em circulação para aprovação** → aprovada na sessão → pendente de assinaturas → assinada (imutável, com versionamento).
+- **Circulação para aprovação:** o Secretário envia a ata (por e-mail via SMTP ou apenas dentro do sistema) aos irmãos autorizados, para que ela possa ser lida e aprovada na sessão.
+- Lista de signatários configurável (Secretário, Venerável e demais necessários).
+- **Assinatura eletrônica no sistema**, com evidências:
+  - desenho da assinatura em canvas (mouse/toque);
+  - **hash** (SHA-256) do conteúdo da ata no momento da assinatura, para provar integridade;
+  - IP, data/hora do servidor, user-agent e **geolocalização** (com consentimento do navegador);
+  - registro vinculado ao usuário autenticado (login + 2FA);
+  - **foto da assinatura opcional** (upload de imagem de assinatura de próprio punho);
+  - página de verificação: qualquer pessoa autorizada confere se o PDF corresponde ao hash registrado.
+- **Termo de aceite claramente exibido** antes de assinar, informando que a assinatura digital pelo sistema é válida para a loja e quais dados serão coletados (LGPD).
+- Qualquer alteração depois de assinada gera nova versão e invalida as assinaturas anteriores.
+- Exportação em PDF com cabeçalho da loja, assinaturas e hash no rodapé.
+
+> Nota: essa assinatura é uma assinatura eletrônica simples/avançada interna. Tem valor para uso da loja, mas não equivale a ICP-Brasil/gov.br; se a GLESP exigir isso para algum documento, tratamos como exceção.
 
 ## 5. Tesouraria
 
-- Mensalidades e contribuições: geração, baixa, quitação, inadimplência.
+- Funciona como um **ERP financeiro** da loja.
+- **Categorias de irmão** com regras de cobrança: integral, remido (isento) e outras que a loja definir; valor por categoria e por ano maçônico.
+- Mensalidades e contribuições: geração automática, baixa, quitação, inadimplência.
+- **Cobrança enviada pelo Tesoureiro dentro do sistema** (e-mail, e WhatsApp na integração), com segunda via, lembretes e histórico por irmão.
 - Caixa em tempo real (entradas e saídas).
 - Despesas, contas a pagar/receber.
 - **Orçamento (budget) por ano maçônico** com supervisão orçamentária: previsto × realizado por categoria.
@@ -68,6 +83,13 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 
 - Perfis: Administrador, Venerável, Secretário, Tesoureiro, Orador, Irmão (e outros a definir).
 - Restrição de conteúdo **por grau** (documentos, atas, biblioteca, sessões).
+- **Regra de visualização de atas:**
+
+| Grau do irmão | Atas que pode ver |
+|---|---|
+| Aprendiz | somente do grau de Aprendiz |
+| Companheiro | Aprendiz e Companheiro *(a confirmar, ver questões em aberto)* |
+| Mestre | todos os graus |
 - 2FA para cargos administrativos; auditoria de acesso e alterações.
 
 ## 7. Candidatos (Propostas)
@@ -111,11 +133,16 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 
 ## Questões em aberto
 
-1. **Potência/jurisdição:** a loja é filiada a qual (GOB, CMSB, Grande Loja estadual)? Define relatórios e nomenclatura.
-2. **Particularidades do Rito Schröder:** quais cargos, nomes de sessões, graus e rituais diferem do quadro padrão que usei acima? Lista oficial de cargos?
-3. **Assinatura da ata:** assinatura simples (login + registro) basta, ou precisa de assinatura digital (ICP-Brasil / gov.br)?
-4. **Mensalidade:** valor único ou por categoria de irmão? Há remidos/isenções? Cobrança via boleto/PIX integrada ou só controle manual?
-5. **Visibilidade entre graus:** Aprendiz vê a presença/ata de sessões de outros graus? Regras exatas por tipo de conteúdo.
-6. **Usuários:** aproximadamente quantos irmãos e quantas sessões por mês (dimensiona infraestrutura)?
-7. **WhatsApp:** já há provedor de API em mente (Meta Cloud API, Twilio, Z-API etc.)?
-8. **Stack:** confirmar a escolha (sugestão: Django + PostgreSQL).
+### Decididas
+- Potência: GLESP. Assinatura de ata: eletrônica interna com hash, canvas, IP, geolocalização e integridade; foto opcional. Mensalidade por categoria, com remidos e integral. Visibilidade de atas por grau.
+
+### Ainda abertas
+1. **Cargos do Rito Schröder:** qual a lista oficial de cargos da loja (para já cadastrar)?
+2. **Companheiro:** você escreveu que ele vê "aprendiz e mestre". Imagino que seja Aprendiz e Companheiro (seu próprio grau e o inferior), certo? Um Companheiro não deveria ver atas de Mestre.
+3. **Outros conteúdos por grau:** a regra "ver o próprio grau e os inferiores" vale também para biblioteca, documentos e presença?
+4. **Cobrança:** o Tesoureiro só envia o aviso/cobrança, ou o sistema também deve gerar PIX/boleto com baixa automática (exige integração com banco ou gateway)?
+5. **Ata por e-mail:** quem recebe a ata para aprovação, todos os irmãos do grau ou uma lista escolhida pelo Secretário? E o e-mail leva o texto no corpo, PDF anexo ou link para ler no sistema (recomendo o link, por segurança)?
+6. **"Portaria" da assinatura digital:** entendi como um termo de aceite exibido no sistema. Se for um documento formal da loja (portaria/decreto do Venerável autorizando a assinatura digital), podemos anexá-lo e linkar no termo. Qual dos dois?
+7. **Usuários:** quantos irmãos e quantas sessões por mês, aproximadamente?
+8. **WhatsApp:** já há provedor de API em mente (Meta Cloud API, Twilio, Z-API etc.)?
+9. **Stack:** confirmar Django + PostgreSQL.
