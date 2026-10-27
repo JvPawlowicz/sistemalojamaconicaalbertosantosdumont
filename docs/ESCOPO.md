@@ -1,7 +1,7 @@
 # Escopo do Sistema — Loja Maçônica Alberto Santos Dumont
 
 **Rito:** Schröder (alemão, quadro de cargos reduzido) · **Potência:** Grande Loja Maçônica do Estado de São Paulo (GLESP) · **Ano maçônico:** julho a julho
-**Status:** rascunho v0.3 — base para desenho dos fluxos
+**Status:** rascunho v0.4 — base para desenho dos fluxos
 
 ## Premissas gerais
 
@@ -10,7 +10,10 @@
 - Acesso controlado por **grau** (Aprendiz, Companheiro, Mestre) e por **cargo/perfil**.
 - Dados sensíveis (LGPD): trilha de auditoria, 2FA para cargos administrativos, backups criptografados.
 - Tudo é associado a um **Ano Maçônico** (jul–jun), que serve de eixo para gestões, presença, orçamento e relatórios.
-- Fora de escopo por ora: **Hospitalaria / Tronco de Beneficência**.
+- Fora de escopo por ora: **Hospitalaria / Tronco de Beneficência** e **votação/escrutínio no sistema**.
+- A GLESP já tem sistema próprio de presença. Este sistema **não substitui nem integra** o da Potência: serve como **registro interno** da loja (a presença aqui é espelho para consulta, relatórios e frequência; pode-se exportar planilha para facilitar o lançamento na Potência).
+- Escala: quadro de ~20 irmãos e ~4 sessões por mês.
+- Licença do projeto: **MIT**. Só usar dependências com licença permissiva compatível (MIT, BSD, Apache-2.0, ISC); evitar GPL/AGPL.
 
 ---
 
@@ -64,6 +67,23 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
   - página de verificação: qualquer pessoa autorizada confere se o PDF corresponde ao hash registrado.
 - **Termo de aceite claramente exibido** antes de assinar, informando que a assinatura digital pelo sistema é válida para a loja e quais dados serão coletados (LGPD).
 - Qualquer alteração depois de assinada gera nova versão e invalida as assinaturas anteriores.
+- **Base legal** (a ser confirmada por advogado): MP 2.200-2/2001, art. 10, §2º, e Lei 14.063/2020, art. 4º, que admitem assinatura eletrônica **avançada** por meio diferente do certificado ICP-Brasil, desde que **aceito pelas partes**. Por isso o sistema coleta o **aceite expresso de cada irmão** (registrado com data, IP e hash do termo) no primeiro acesso, e o termo cita essa legislação.
+
+**Biblioteca de modelos de texto (digitação rápida):**
+- O Secretário pré-cadastra **cabeçalhos, abertura, encerramento, fórmulas e trechos padrão**, organizados por categoria e por tipo de sessão.
+- Na digitação da ata, ao escrever `@` abre uma lista pesquisável; escolher o modelo insere o texto no ponto do cursor.
+- Modelos aceitam **variáveis** preenchidas automaticamente: `{{data}}`, `{{grau}}`, `{{venerável}}`, `{{local}}`, `{{ano_maçônico}}`, `{{presentes}}`, `{{visitantes}}` etc.
+- Cabeçalho oficial da loja (nome, número, oriente, brasão) é um modelo fixo aplicado a toda ata.
+
+**Quem recebe a ata (por grau da sessão):** a ata de uma sessão de grau X é visível apenas para irmãos de grau **igual ou superior** a X.
+
+| Ata da sessão de grau | Aprendiz | Companheiro | Mestre |
+|---|---|---|---|
+| Aprendiz | sim | sim | sim |
+| Companheiro | não | sim | sim |
+| Mestre | não | não | sim |
+
+O envio por SMTP e a visibilidade dentro do sistema obedecem à mesma regra.
 - Exportação em PDF com cabeçalho da loja, assinaturas e hash no rodapé.
 
 > Nota: essa assinatura é uma assinatura eletrônica simples/avançada interna. Tem valor para uso da loja, mas não equivale a ICP-Brasil/gov.br; se a GLESP exigir isso para algum documento, tratamos como exceção.
@@ -73,7 +93,9 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 - Funciona como um **ERP financeiro** da loja.
 - **Categorias de irmão** com regras de cobrança: integral, remido (isento) e outras que a loja definir; valor por categoria e por ano maçônico.
 - Mensalidades e contribuições: geração automática, baixa, quitação, inadimplência.
-- **Cobrança enviada pelo Tesoureiro dentro do sistema** (e-mail, e WhatsApp na integração), com segunda via, lembretes e histórico por irmão.
+- **Cobrança disparada pelo Tesoureiro dentro do sistema:** por e-mail (SMTP) e por **link `wa.me`** com a mensagem já preenchida (o Tesoureiro apenas clica e envia pelo próprio WhatsApp, sem API). Boleto: anexado ao lançamento (emitido fora do sistema). **Baixa sempre manual** pelo Tesoureiro; sem integração bancária.
+- Status do lançamento: previsto, pago, pendente, vencido, isento, dispensado; recibo e **extrato por irmão** em PDF.
+- Livro-caixa, despesas, contas a pagar e receber; relatório mensal e **pacote para a comissão de auditoria/Conselho Fiscal** no fim do ano maçônico.
 - Caixa em tempo real (entradas e saídas).
 - Despesas, contas a pagar/receber.
 - **Orçamento (budget) por ano maçônico** com supervisão orçamentária: previsto × realizado por categoria.
@@ -88,14 +110,14 @@ Observação: campos de saúde/família têm visibilidade restrita (Venerável, 
 | Grau do irmão | Atas que pode ver |
 |---|---|
 | Aprendiz | somente do grau de Aprendiz |
-| Companheiro | Aprendiz e Companheiro *(a confirmar, ver questões em aberto)* |
+| Companheiro | Aprendiz e Companheiro |
 | Mestre | todos os graus |
 - 2FA para cargos administrativos; auditoria de acesso e alterações.
 
 ## 7. Candidatos (Propostas)
 
 - Painel de acompanhamento: quem foi proposto, **por quem**, data, etapa atual.
-- Etapas: proposta → sindicância (comissão e pareceres) → escrutínio → iniciação.
+- Etapas: proposta → sindicância (comissão e pareceres) → resultado do escrutínio (apenas registrado) → iniciação.
 - Documentos do candidato (anexos).
 
 ## 8. Biblioteca e Documentos
@@ -151,8 +173,8 @@ Sequência fixa de graus: **Aprendiz → Companheiro → Mestre**.
 - **Aniversariantes e datas maçônicas** com aviso automático.
 - **Busca global** (irmãos, atas, documentos, visitantes).
 - **Importação inicial** por planilha (CSV/XLSX) para migrar o quadro atual.
-- **Sessão online/híbrida (opcional):** link de videoconferência por sessão (Jitsi Meet, open source) e presença remota registrada. Módulo desativável, pois nem toda loja admite sessão remota.
-- **Escrutínio/votação** de propostas (sigilo definido pela loja).
+- **Sessão online/híbrida (futuro, fora do MVP):** link de videoconferência por sessão (Jitsi Meet, open source) e presença remota registrada. Módulo desativável, pois nem toda loja admite sessão remota.
+- **Escrutínio/votação** de propostas (futuro; por ora fora do escopo, apenas registro do resultado).
 - **Diretório de lojas** (nome, número, oriente, potência) para alimentar visitação.
 - **Backup e exportação** completos dos dados (portabilidade e LGPD).
 - **PWA:** instalável no celular, usado principalmente para presença e leitura de atas.
@@ -168,6 +190,29 @@ Sequência fixa de graus: **Aprendiz → Companheiro → Mestre**.
 - **Escala:** ~4 sessões/mês e quadro pequeno; basta uma instância simples (Docker Compose) com backup diário.
 - **Visualizador embutido** de PDF e imagem (pdf.js) dentro da página, sem download obrigatório.
 
+## 16. Análise de mercado (referência)
+
+Levantamento web (informações de fabricantes e lojas de aplicativos, **não verificadas de forma independente**; vale pedir demonstração antes de copiar qualquer ideia):
+
+| Sistema | O que declara oferecer |
+|---|---|
+| [Architect](https://apps.apple.com/br/app/architect/id6476198100) | ERP web e mobile para lojas e potências: membros e cargos, financeiro (mensalidades, fluxo de caixa), eventos, presenças e atas |
+| [Maçonaria Virtual](https://apps.apple.com/py/app/ma%C3%A7onaria-virtual-mobile/id736701203) | chancelaria com frequência, extratos por membro, receitas e despesas, geração de boletos |
+| [LIF](https://apps.apple.com/au/app/lif/id1529007170) | tesouraria, boletos, presenças, votação, ingressos; QR Code no certificado de presença |
+| [The Working Tools](https://www.capterra.co.nz/software/1106688/The-Working-Tools) (Reino Unido) | membros, presença, geração de convocações e atas, livro-caixa, despesas, candidatos, backups em nuvem |
+| [masonicfind](https://masonicfind.com/ai-masonic-lodge-management-software) (EUA) | mensalidade automática por membro, status (pago, pendente, vencido, isento, dispensado), recibos, ata em PDF |
+
+**Funcionalidades que adotamos a partir dessa análise:**
+- Extrato por irmão e recibos em PDF (tesouraria).
+- Status financeiros detalhados, incluindo isento e dispensado.
+- **QR Code de verificação** nos certificados de visita e em PDFs de ata (leva à página de conferência de autenticidade).
+- Geração de **convocação** (summons) em PDF a partir da pauta.
+- Acompanhamento de candidatos em painel.
+- Backups automáticos.
+- Pacote de documentos para a **comissão de auditoria** no fim do ano.
+
+**Nossos diferenciais** (não aparecem de forma clara nos concorrentes encontrados): assinatura de ata com hash, evidências e verificação pública; modelos de texto com `@` na digitação; escalação de cargos por sessão com substituições; Rito Schröder e GLESP como padrão; visualizador embutido; código aberto (MIT).
+
 ## Stack proposta
 
 Django 5 + PostgreSQL; HTMX + Alpine.js; Tailwind CSS (com DaisyUI); Lucide Icons; django-allauth + django-otp (login e 2FA); django-simple-history (auditoria); WeasyPrint (PDFs com cabeçalho); django-q2 ou Celery (envios agendados); pdf.js (viewer); Evolution API (WhatsApp); Jitsi Meet (opcional); Docker Compose.
@@ -177,15 +222,14 @@ Django 5 + PostgreSQL; HTMX + Alpine.js; Tailwind CSS (com DaisyUI); Lucide Icon
 ## Questões em aberto
 
 ### Decididas
-- Potência: GLESP. Assinatura de ata: eletrônica interna com hash, canvas, IP, geolocalização e integridade; foto opcional. Mensalidade por categoria, com remidos e integral. Visibilidade de atas por grau (Aprendiz só o seu; Mestre todos). Cargos configuráveis pelo usuário. Stack Django. WhatsApp via Evolution API; SMTP como canal principal. Open source, plugins, pt-BR.
-- Volume: cerca de 4 sessões por mês.
+- Potência: GLESP (com sistema próprio de presença; o nosso é registro interno). Rito Schröder, cargos configuráveis. Graus: Aprendiz, Companheiro, Mestre (iniciação, promoção, elevação). Assinatura de ata eletrônica avançada com hash, canvas, IP, geolocalização e aceite expresso; foto opcional.
+- Atas visíveis a irmãos de grau igual ou superior ao da sessão. Companheiro vê Aprendiz e Companheiro.
+- Cobrança por e-mail e link `wa.me`, boleto externo, baixa manual. SMTP como canal principal; Evolution API só para certificados pelo WhatsApp do Secretário.
+- Sem votação no sistema por ora. Sem sessão online por ora. Licença MIT. Django. ~20 irmãos, ~4 sessões/mês.
 
 ### Ainda abertas
-1. **Portaria:** qual é a norma (número/órgão) que embasa a assinatura digital? Anexamos o PDF dela no sistema e o termo de aceite passa a citá-la. Preciso do documento ou da referência exata; não vou citar número de norma sem ter sido informado.
-2. **Companheiro e atas:** vê Aprendiz + Companheiro (próprio grau e inferior)? Mantive essa regra como padrão até a confirmação.
-3. **Outros conteúdos por grau:** a mesma regra vale para biblioteca, documentos e presença?
-4. **Cobrança:** só aviso/cobrança por e-mail, ou também PIX/boleto com baixa automática?
-5. **Ata por e-mail:** destinatários (todos do grau ou lista escolhida) e formato (recomendo link para ler no sistema, com PDF opcional).
-6. **Sessão online (Jitsi):** quer o módulo ou deixamos de fora?
-7. **Quórum e escrutínio:** a loja usa votação no sistema ou só registro do resultado?
-8. **Número de irmãos** no quadro (dimensionamento e importação inicial).
+1. **Base legal:** confirmo com você se "a portaria" é a MP 2.200-2/2001 e a Lei 14.063/2020 citadas acima, ou se há outro ato (por exemplo, norma da GLESP ou do Ministério Público) que deva ser citado no termo. Recomendo validar o texto do termo com um advogado.
+2. **Ata de Mestre:** você disse que na sessão de Mestre "todos" recebem; interpretei como slip, já que sessão de Mestre só deveria ser visível a Mestres. Confirma?
+3. **Outros conteúdos por grau:** a regra "grau igual ou superior" vale para biblioteca, documentos e presença?
+4. **Sessão online (Jitsi):** fica fora do MVP; manter como módulo futuro?
+5. **Certificado de visita:** modelo do texto, assinante (Venerável? Secretário?) e se leva assinatura desenhada.
