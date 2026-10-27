@@ -1,0 +1,16 @@
+{% load loja %}{% comment %}Formulário longo em abas (sem rolagem). Recebe: form, formset (opcional) e usa form.grupos.{% endcomment %}
+{% if form.non_field_errors %}<div class="alerta alerta-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+<div class="painel-abas" data-abas>
+  <div role="tablist" aria-label="Seções do formulário">
+    {% for titulo, campos in form.grupos %}<button type="button" role="tab" id="tab-{{ forloop.counter }}" aria-controls="painel-{{ forloop.counter }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">{{ titulo }}</button>{% endfor %}
+    {% if formset %}<button type="button" role="tab" id="tab-fam" aria-controls="painel-fam" aria-selected="false">Família</button>{% endif %}
+  </div>
+  {% for titulo, campos in form.grupos %}
+  <div role="tabpanel" id="painel-{{ forloop.counter }}" aria-labelledby="tab-{{ forloop.counter }}" {% if not forloop.first %}hidden{% endif %}>
+    <div class="form-grid">{% for nome in campos %}{% with f=form|campo_por_nome:nome %}{% if f %}{% campo f %}{% endif %}{% endwith %}{% endfor %}</div>
+  </div>{% endfor %}
+  {% if formset %}<div role="tabpanel" id="painel-fam" aria-labelledby="tab-fam" hidden>
+    {{ formset.management_form }}<p class="ajuda">Esposa (cunhada), filhos e filhas. Marque “Excluir” para remover um registro.</p>
+    {% for f in formset %}<div class="form-grid" style="border-top:1px solid var(--border);padding-top:.75rem">{% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}{% for c in f.visible_fields %}{% campo c %}{% endfor %}</div>{% endfor %}
+  </div>{% endif %}
+</div>

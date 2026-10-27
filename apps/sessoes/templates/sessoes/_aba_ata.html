@@ -1,0 +1,5 @@
+{% load loja %}<section class="card"><h2>{% icon "scroll-text" %} Ata da sessão</h2>
+{% if ata %}<p>{% selo ata.status ata.get_status_display %} · versão {{ ata.versao }}{% if ata.numero %} · nº {{ ata.numero }}{% endif %}</p>
+<div class="acoes"><a class="btn" href="{% url 'atas:detalhe' ata.pk %}">{% icon "eye" %} Abrir ata</a><a class="btn btn-sec" href="{% url 'atas:pdf' ata.pk %}" target="_blank" rel="noopener">{% icon "download" %} PDF</a>{% if pode_gerir and ata.editavel %}<a class="btn btn-sec" href="{% url 'atas:editar' ata.pk %}">{% icon "pencil" %} Editar</a>{% endif %}</div>
+{% elif pode_gerir %}<p class="muted">Ainda não há ata para esta sessão.</p><a class="btn" href="{% url 'atas:criar' sessao.pk %}">{% icon "plus" %} Redigir ata</a>
+{% else %}<p class="muted">Sem ata.</p>{% endif %}</section>

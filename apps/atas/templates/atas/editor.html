@@ -9,6 +9,6 @@
   <div class="campo"><label for="ata-conteudo">Texto da ata</label>
   {{ form.conteudo }}
   {% for e in form.conteudo.errors %}<div class="erro" role="alert">{{ e }}</div>{% endfor %}</div>
-  <div class="acoes"><button class="btn" type="submit">{% icon "check" %} Salvar rascunho</button><a class="btn btn-sec" href="{% if ata %}{% url 'atas:detalhe' ata.pk %}{% else %}{% url 'sessoes:detalhe' sessao.pk %}{% endif %}">Cancelar</a></div>
+  <div class="barra-acoes"><button class="btn" type="submit">{% icon "check" %} Salvar rascunho</button><button class="btn btn-sec" type="submit" name="continuar" value="1">Salvar e continuar editando</button><a class="btn btn-sec" href="{% if ata %}{% url 'atas:detalhe' ata.pk %}{% else %}{% url 'sessoes:detalhe' sessao.pk %}{% endif %}">Cancelar</a></div>
 </form>{% endblock %}
 {% block scripts %}<script>document.getElementById('ata-conteudo').dataset.urlModelos="{% url 'atas:modelos_buscar' %}";document.getElementById('ata-conteudo').dataset.sessao="{{ sessao.pk }}";</script><script src="{% static 'js/ata_editor.js' %}" defer></script>{% endblock %}

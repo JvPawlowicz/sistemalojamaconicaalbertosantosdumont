@@ -1,11 +1,8 @@
-{% extends "base.html" %}{% load loja %}
-{% block titulo %}Presença{% endblock %}
-{% block conteudo %}
-<div class="cabecalho-pagina"><div><h1>Registro de presença</h1><p>{{ sessao.titulo }} · {{ sessao.data_hora|date:"d/m/Y H:i" }} (irmãos de grau {{ sessao.get_grau_display }} ou superior)</p></div></div>
-<form method="post" class="card">{% csrf_token %}
+{% load loja %}<form method="post" action="{% url 'sessoes:presenca' sessao.pk %}" class="card" id="form-presenca">{% csrf_token %}
+<p class="ajuda">Irmãos de grau {{ sessao.get_grau_display }} ou superior. <button type="button" class="btn btn-sec btn-peq" data-marcar-todos="presente" data-form="form-presenca">{% icon "check" %} Marcar todos presentes</button></p>
 <div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th>Situação</th><th>Justificativa</th></tr></thead><tbody>
 {% for p in presencas %}<tr><td>{{ p.irmao.nome_completo }} <span class="muted">({{ p.irmao.grau_nome }})</span></td>
 <td><div class="opcoes" role="radiogroup" aria-label="Situação de {{ p.irmao.nome_completo }}">
 {% for v, n in p.Situacao.choices %}<label><input type="radio" class="check" name="p_{{ p.irmao_id }}" value="{{ v }}" {% if p.situacao == v %}checked{% endif %}> {{ n }}</label>{% endfor %}</div></td>
 <td><input class="input" name="j_{{ p.irmao_id }}" value="{{ p.justificativa }}" maxlength="200" aria-label="Justificativa de {{ p.irmao.nome_completo }}"></td></tr>{% endfor %}</tbody></table></div>
-<div class="acoes mt"><button class="btn" type="submit">{% icon "check" %} Salvar presença</button><a class="btn btn-sec" href="{% url 'sessoes:detalhe' sessao.pk %}">Voltar</a></div></form>{% endblock %}
+<div class="barra-acoes"><button class="btn" type="submit">{% icon "check" %} Salvar presença</button></div></form>

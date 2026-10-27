@@ -1,0 +1,8 @@
+{% load loja %}<div class="grade-2">
+<section class="card"><h2>{% icon "file-text" %} Pauta</h2><div style="white-space:pre-wrap">{{ sessao.pauta|default:"Sem pauta cadastrada." }}</div>
+<h3 class="mt">Expediente do dia</h3><div style="white-space:pre-wrap">{{ sessao.expediente|default:"—" }}</div>
+{% for e in expedientes %}<p class="mb0">{% icon "inbox" %} {{ e.assunto }}</p>{% endfor %}</section>
+<section class="card"><h2>{% icon "award" %} Oficiais da sessão</h2>
+<table class="tabela"><tbody>{% for e in escala %}<tr><td>{{ e.cargo.nome }}</td><td>{{ e.irmao.nome_completo }}{% if e.substituicao %} <span class="selo selo-warn" title="Titular: {{ e.titular|default:'—' }}">substituto</span>{% endif %}</td></tr>
+{% empty %}<tr><td class="vazio">Escala ainda não definida.</td></tr>{% endfor %}</tbody></table></section>
+</div>

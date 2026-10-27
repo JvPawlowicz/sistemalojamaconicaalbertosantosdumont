@@ -1,8 +1,7 @@
 {% extends "base.html" %}{% load loja %}
 {% block titulo %}Meu cadastro{% endblock %}
 {% block conteudo %}
-<div class="cabecalho-pagina"><div><h1>Meu cadastro</h1><p>Atualize seus dados de contato, profissionais e familiares. Grau, datas maçônicas e perfis são mantidos pela Secretaria.</p></div></div>
-<form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
-<div class="card">{% include "partials/form.html" %}</div>
-{% include "irmaos/_formset.html" %}
-<div class="acoes mt"><button class="btn" type="submit">{% icon "check" %} Salvar</button></div></form>{% endblock %}
+<div class="cabecalho-pagina"><div><h1>Meu cadastro</h1><p>Atualize seus dados. Grau, datas maçônicas e perfis são mantidos pela Secretaria.</p></div></div>
+<form method="post" enctype="multipart/form-data" novalidate class="card">{% csrf_token %}
+{% include "partials/form_abas.html" %}
+<div class="barra-acoes"><button class="btn" type="submit">{% icon "check" %} Salvar</button></div></form>{% endblock %}

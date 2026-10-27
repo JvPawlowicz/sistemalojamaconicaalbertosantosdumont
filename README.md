@@ -36,6 +36,18 @@ PDFs (WeasyPrint) exigem as bibliotecas do sistema `pango` e `harfbuzz` (no Debi
 Primeiros passos pelo navegador: entre como o usuário criado → **Configurações** (dados da Loja, termo, texto legal) →
 **Categorias de irmão** (valor das mensalidades) → **Catálogo de cargos** → cadastre os irmãos (convite de senha por e-mail).
 
+## Navegação (menos cliques e menos rolagem)
+
+- **8 seções no menu** (antes eram 22 itens): Início, Agenda, Atas, Irmãos, Acervo, Financeiro, Relatórios e Administração.
+  Cada seção tem **abas** (ex.: Irmãos → Quadro · Cargos e gestão · Candidatos · Comissões · Visitação). A definição fica
+  em um só lugar: `apps/core/navegacao.py` (um teste garante que nenhuma tela fique "órfã").
+- **Início = central de pendências**: o que precisa da sua atenção (assinar ata, redigir ata, cobrar, enviar convocação…)
+  com botão direto para a ação, mais atalhos conforme o perfil.
+- **Sessão como área de trabalho**: Resumo · Escala · Presença · Visitantes · Cerimônias · Ata em uma só página (abas).
+- **Busca rápida** (`Ctrl+K` ou `/`): irmãos, atas, sessões, documentos, visitantes e páginas, respeitando grau e perfil.
+- Formulários longos em **abas** (cadastro do irmão), **barra de salvar fixa**, filtros que aplicam sozinhos,
+  "marcar todos presentes", "salvar e continuar editando" na ata, cabeçalho de tabela fixo. Conta (cadastro, LGPD, senha, sair) no menu do usuário.
+
 ## Rotinas automáticas
 
 Agende diariamente (cron/systemd) para lembretes de sessão, marcação de mensalidades vencidas e cobrança semanal opcional:

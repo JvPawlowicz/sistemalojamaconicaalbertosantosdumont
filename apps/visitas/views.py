@@ -18,6 +18,7 @@ from apps.core.models import Loja
 from apps.core.pdf import pdf_bytes, qr_data_uri, resposta_pdf
 from apps.irmaos.models import Irmao
 from apps.sessoes.models import Sessao
+from apps.sessoes.views import render_detalhe, url_aba
 
 from .forms import VisitaRealizadaForm, VisitanteForm
 from .models import AssinaturaCertificado, CertificadoVisita, VisitaRealizada, VisitaRecebida, Visitante
@@ -76,6 +77,7 @@ class VisitantesView(ListaView):
                ("Oriente", lambda o: o.oriente), ("Visitas", lambda o: o.visitas.count())]
     url_novo = "/visitas/visitantes/novo/"
     rotulo_novo = "Novo visitante"
+    acoes_extra = [("Visitas a outras lojas", "/visitas/")]
 
     def get_objetos(self):
         return Visitante.objects.all()
@@ -103,28 +105,24 @@ class EditarVisitante(EditarView):
 # --- visitantes recebidos na sessão ---
 @login_required
 def sessao_visitantes(request, sessao_pk):
-    """Cadastro dos visitantes da sessão (Secretário ou irmão designado)."""
+    """Cadastro dos visitantes da sessão (Secretário ou irmão designado). A tela vive na aba Visitantes da sessão."""
     if not _gerir(request.user):
         raise PermissionDenied
     sessao = get_object_or_404(Sessao, pk=sessao_pk)
-    novo = VisitanteForm(prefix="novo")
     if request.method == "POST":
         if request.POST.get("existente"):
             vis = get_object_or_404(Visitante, pk=request.POST["existente"])
             VisitaRecebida.objects.get_or_create(sessao=sessao, visitante=vis, defaults={"registrada_por": request.user})
             messages.success(request, f"{vis.nome} registrado na sessão.")
-            return redirect("visitas:sessao", sessao_pk=sessao.pk)
+            return redirect(url_aba(sessao, "visitantes"))
         novo = VisitanteForm(request.POST, prefix="novo")
         if novo.is_valid():
             vis = novo.save()
             VisitaRecebida.objects.get_or_create(sessao=sessao, visitante=vis, defaults={"registrada_por": request.user})
             messages.success(request, f"{vis.nome} cadastrado e registrado na sessão.")
-            return redirect("visitas:sessao", sessao_pk=sessao.pk)
-    return render(request, "visitas/sessao.html", {
-        "sessao": sessao, "visitas": sessao.visitantes.select_related("visitante", "certificado"),
-        "existentes": Visitante.objects.exclude(visitas__sessao=sessao), "novo": novo,
-        "cert_status": {c.visita_id: c for c in CertificadoVisita.objects.filter(visita__sessao=sessao)},
-    })
+            return redirect(url_aba(sessao, "visitantes"))
+        return render_detalhe(request, sessao, "visitantes", novo=novo)
+    return redirect(url_aba(sessao, "visitantes"))
 
 
 @login_required
@@ -133,12 +131,12 @@ def remover_visita(request, pk):
     if not _gerir(request.user):
         raise PermissionDenied
     v = get_object_or_404(VisitaRecebida, pk=pk)
-    sessao_pk = v.sessao_id
+    sessao = v.sessao
     if hasattr(v, "certificado") and v.certificado.assinaturas.exists():
         messages.error(request, "Não é possível remover: o certificado já foi assinado.")
     else:
         v.delete()
-    return redirect("visitas:sessao", sessao_pk=sessao_pk)
+    return redirect(url_aba(sessao, "visitantes"))
 
 
 # --- certificados de visita (assinatura e envio em lote) ---
@@ -153,7 +151,7 @@ def gerar_certificados(request, sessao_pk):
         _, criado = CertificadoVisita.objects.get_or_create(visita=v, defaults={"codigo": novo_codigo()})
         n += criado
     messages.success(request, f"{n} certificado(s) gerado(s).")
-    return redirect("visitas:sessao", sessao_pk=sessao.pk)
+    return redirect(url_aba(sessao, "visitantes"))
 
 
 def _funcoes_do_usuario(user):
@@ -194,7 +192,7 @@ def assinar_lote(request, sessao_pk):
             messages.error(request, " ".join(exc.messages))
         else:
             messages.success(request, f"{n} certificado(s) assinado(s) como {dict(funcoes)[funcao]}.")
-            return redirect("visitas:sessao", sessao_pk=sessao.pk)
+            return redirect(url_aba(sessao, "visitantes"))
     pendentes = {f: sum(1 for c in certs if not c.assinaturas.filter(funcao=f).exists()) for f, _ in funcoes}
     return render(request, "visitas/assinar_lote.html", {
         "sessao": sessao, "funcoes": funcoes, "certs": certs, "pendentes": pendentes,
@@ -262,4 +260,4 @@ def enviar_lote(request, sessao_pk):
     if sem_assinatura:
         msg += f" {sem_assinatura} ainda sem as duas assinaturas."
     messages.success(request, msg)
-    return redirect("visitas:sessao", sessao_pk=sessao.pk)
+    return redirect(url_aba(sessao, "visitantes"))

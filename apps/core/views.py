@@ -53,6 +53,10 @@ def painel(request):
 
         ctx["saldo"] = saldo_caixa()
         ctx["inadimplentes"] = Lancamento.objects.filter(status=Lancamento.Status.VENCIDO).count()
+    from .pendencias import atalhos_do_usuario, tarefas_do_usuario
+
+    ctx["tarefas"] = tarefas_do_usuario(user)
+    ctx["atalhos"] = atalhos_do_usuario(user)
     if user.tem_algum_perfil(P.SECRETARIO, P.TESOUREIRO):
         ctx["indicadores"] = _indicadores(ctx["ano"])
     return render(request, "core/painel.html", ctx)
@@ -242,3 +246,46 @@ def solicitacoes_lgpd(request):
             messages.success(request, "Solicitação atualizada.")
         return redirect("core:solicitacoes_lgpd")
     return render(request, "core/solicitacoes_lgpd.html", {"solicitacoes": SolicitacaoLGPD.objects.select_related("irmao")})
+
+
+@login_required
+def busca(request):
+    """Busca rápida (Ctrl+K): páginas, irmãos, atas, sessões, documentos — respeitando perfil e grau."""
+    from django.db.models import Q
+    from django.http import JsonResponse
+
+    from apps.atas.models import Ata
+    from apps.documentos.models import Documento
+    from apps.irmaos.models import Irmao
+    from apps.sessoes.models import Sessao
+    from . import navegacao as nav
+
+    q = request.GET.get("q", "").strip()
+    user = request.user
+    resultados = []
+    paginas = nav.paginas_para_busca(user)
+    if not q:
+        resultados += [{"grupo": "Ir para", **p} for p in paginas[:8]]
+        return JsonResponse({"resultados": resultados})
+    ql = q.lower()
+    resultados += [{"grupo": "Ir para", **p} for p in paginas if ql in p["rotulo"].lower()][:6]
+    for i in Irmao.objects.filter(grau__isnull=False).filter(
+            Q(nome_completo__icontains=q) | Q(profissao__icontains=q) | Q(matricula__icontains=q))[:6]:
+        resultados.append({"grupo": "Irmãos", "rotulo": f"{i.nome_completo} — {i.grau_nome}", "url": reverse("irmaos:detalhe", args=[i.pk])})
+    if q.isdigit() or "ata" in ql:
+        for a in Ata.objects.visiveis_para(user).filter(numero=int(q))[:4] if q.isdigit() else \
+                Ata.objects.visiveis_para(user)[:4]:
+            resultados.append({"grupo": "Atas", "rotulo": f"Ata {a.numero or 's/nº'} — {a.sessao.data_hora:%d/%m/%Y}",
+                               "url": reverse("atas:detalhe", args=[a.pk])})
+    for d in Documento.objects.filter(titulo__icontains=q)[:8]:
+        if user.pode_ver_grau(d.grau_minimo):
+            resultados.append({"grupo": "Biblioteca", "rotulo": d.titulo, "url": reverse("documentos:ver", args=[d.pk])})
+    for s in Sessao.objects.filter(Q(local__icontains=q) | Q(pauta__icontains=q))[:6]:
+        if user.pode_ver_grau(s.grau):
+            resultados.append({"grupo": "Sessões", "rotulo": f"{s.data_hora:%d/%m/%Y} — {s.titulo}", "url": reverse("sessoes:detalhe", args=[s.pk])})
+    if user.tem_perfil(P.SECRETARIO):
+        from apps.visitas.models import Visitante
+
+        for v in Visitante.objects.filter(Q(nome__icontains=q) | Q(loja_nome__icontains=q))[:4]:
+            resultados.append({"grupo": "Visitantes", "rotulo": f"{v.nome} — {v.loja_nome}", "url": reverse("visitas:visitante_editar", args=[v.pk])})
+    return JsonResponse({"resultados": resultados[:24]})

@@ -81,7 +81,7 @@ def editar(request, pk):
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Ata salva.")
-        return redirect("atas:detalhe", pk=pk)
+        return redirect("atas:editar" if request.POST.get("continuar") else "atas:detalhe", pk=pk)
     return render(request, "atas/editor.html", {"form": form, "sessao": ata.sessao, "ata": ata})
 
 

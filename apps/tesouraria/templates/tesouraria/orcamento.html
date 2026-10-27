@@ -3,7 +3,6 @@
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Orçamento {{ ano.nome }}</h1><p>Previsto × realizado por categoria (supervisão orçamentária).</p></div>
 <form method="get"><label class="sr-only" for="ano">Ano</label><select class="input" id="ano" name="ano" onchange="this.form.submit()">{% for a in anos %}<option value="{{ a.pk }}" {% if a.pk == ano.pk %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}</select></form></div>
-{% include "tesouraria/_abas.html" with aba="orcamento" %}
 <form method="post" class="card">{% csrf_token %}<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Categoria</th><th>Tipo</th><th class="num">Previsto (R$)</th><th class="num">Realizado</th><th class="num">Diferença</th></tr></thead><tbody>
 {% for l in linhas %}<tr><td>{{ l.categoria.nome }}</td><td>{{ l.categoria.get_tipo_display }}</td>
 <td class="num"><label class="sr-only" for="cat_{{ l.categoria.pk }}">Previsto para {{ l.categoria.nome }}</label><input class="input" style="max-width:140px;text-align:right" id="cat_{{ l.categoria.pk }}" name="cat_{{ l.categoria.pk }}" value="{{ l.previsto|floatformat:2 }}" inputmode="decimal"></td>

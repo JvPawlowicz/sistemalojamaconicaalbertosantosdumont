@@ -6,9 +6,8 @@
 <a class="btn btn-sec" href="{% url 'tesouraria:avulso' %}">{% icon "plus" %} Cobrança avulsa</a>
 <form method="post" action="{% url 'tesouraria:gerar' %}">{% csrf_token %}<input type="hidden" name="mes" value="{{ mes|date:'Y-m' }}"><button class="btn" type="submit">{% icon "refresh-cw" %} Gerar mensalidades do mês</button></form>
 <form method="post" action="{% url 'tesouraria:cobrar_todos' %}">{% csrf_token %}<input type="hidden" name="mes" value="{{ mes|date:'Y-m' }}"><button class="btn btn-sec" type="submit" data-confirmar="Enviar cobrança por e-mail a todos os inadimplentes do mês?">{% icon "send" %} Cobrar inadimplentes (e-mail)</button></form></div></div>
-{% include "tesouraria/_abas.html" with aba="mensalidades" %}
-<form class="filtros" method="get"><div class="campo"><label for="mes">Mês</label><input class="input" type="month" id="mes" name="mes" value="{{ mes|date:'Y-m' }}"></div>
-<div class="campo"><label for="status">Situação</label><select class="input" id="status" name="status"><option value="">Todas</option>{% for v, n in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div><button class="btn" type="submit">Filtrar</button></form>
+<form class="filtros" data-auto method="get"><div class="campo"><label for="mes">Mês</label><input class="input" type="month" id="mes" name="mes" value="{{ mes|date:'Y-m' }}"></div>
+<div class="campo"><label for="status">Situação</label><select class="input" id="status" name="status"><option value="">Todas</option>{% for v, n in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div><button class="btn btn-filtrar" type="submit">Filtrar</button></form>
 <div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th class="num">Valor</th><th>Vencimento</th><th>Situação</th><th>Ações</th></tr></thead><tbody>
 {% for l, wa in linhas %}<tr><td>{{ l.irmao.nome_completo }}</td><td class="num">{{ l.valor|moeda }}</td><td>{{ l.vencimento|date:"d/m/Y" }}</td>
 <td>{% selo l.status l.get_status_display %}{% if l.pago_em %}<br><small class="muted">{{ l.pago_em|date:"d/m/Y" }} · {{ l.get_forma_display }}</small>{% endif %}</td>

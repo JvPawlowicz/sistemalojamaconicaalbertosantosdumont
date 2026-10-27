@@ -6,6 +6,7 @@ app_name = "core"
 
 urlpatterns = [
     path("", views.painel, name="painel"),
+    path("busca/", views.busca, name="busca"),
     path("aceite-termo/", views.aceite_termo, name="aceite_termo"),
     path("privacidade/", views.privacidade, name="privacidade"),
     path("2fa/configurar/", views.configurar_2fa, name="2fa_configurar"),

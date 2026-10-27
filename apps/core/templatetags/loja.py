@@ -73,3 +73,34 @@ def campo(bound):
     from django.template.loader import render_to_string
 
     return mark_safe(render_to_string("partials/campo.html", {"campo": bound}))
+
+
+@register.simple_tag(takes_context=True)
+def navegacao(context):
+    """Menu lateral e abas da seção atual (definidos em apps/core/navegacao.py)."""
+    from apps.core import navegacao as nav
+
+    request = context["request"]
+    user = request.user
+    view_name = request.resolver_match.view_name if request.resolver_match else ""
+    atual = nav.secao_da_view(view_name)
+    grupos = {}
+    for s in nav.secoes_visiveis(user):
+        grupos.setdefault(s.grupo, []).append({"secao": s, "url": nav.entrada(s, user), "ativa": s is atual})
+    abas = []
+    if atual is not None:
+        ativo = nav.item_ativo(atual, view_name)
+        visiveis = nav.itens_visiveis(atual, user)
+        if len(visiveis) > 1:
+            from django.urls import reverse
+
+            abas = [{"rotulo": i.rotulo, "url": reverse(i.url_name), "ativa": i is ativo} for i in visiveis]
+    return {"grupos": grupos, "abas": abas, "secao": atual}
+
+
+@register.filter
+def campo_por_nome(form, nome):
+    try:
+        return form[nome]
+    except KeyError:
+        return None

@@ -3,7 +3,7 @@
 {% block conteudo %}
 <div class="cabecalho-pagina">
   <div><h1>{{ titulo }}</h1>{% if subtitulo %}<p>{{ subtitulo }}</p>{% endif %}</div>
-  <div class="acoes">{% if url_novo %}<a class="btn" href="{{ url_novo }}">{% icon "plus" %} {{ rotulo_novo }}</a>{% endif %}</div>
+  <div class="acoes">{% for rot, url in acoes_extra %}<a class="btn btn-sec" href="{{ url }}">{{ rot }}</a>{% endfor %}{% if url_novo %}<a class="btn" href="{{ url_novo }}">{% icon "plus" %} {{ rotulo_novo }}</a>{% endif %}</div>
 </div>
 {% if linhas %}
 <div class="tabela-wrap"><table class="tabela">

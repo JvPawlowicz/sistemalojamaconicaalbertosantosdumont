@@ -1,20 +1,14 @@
-{% extends "base.html" %}{% load loja %}
-{% block titulo %}Cerimônias{% endblock %}
-{% block conteudo %}
-<div class="cabecalho-pagina"><div><h1>Cerimônias da sessão</h1><p>{{ sessao.titulo }} · {{ sessao.data_hora|date:"d/m/Y H:i" }}. Ao registrar, o grau e a data do irmão são atualizados automaticamente.</p></div>
-<div class="acoes"><a class="btn btn-sec" href="{% url 'sessoes:detalhe' sessao.pk %}">{% icon "arrow-left" %} Sessão</a></div></div>
-<section class="card"><h2>{% icon "award" %} Registradas nesta sessão</h2>
-{% for c in registradas %}<p><strong>{{ c.get_tipo_display }}</strong> — {{ c.irmao.nome_completo }} ({{ c.get_grau_resultante_display }}){% if c.forcada %} <span class="selo selo-warn">interstício dispensado</span>{% endif %}</p>{% empty %}<p class="muted">Nenhuma cerimônia registrada.</p>{% endfor %}</section>
+{% load loja %}<section class="card"><h2>{% icon "award" %} Registradas nesta sessão</h2>
+{% for c in registradas %}<p><strong>{{ c.get_tipo_display }}</strong> — {{ c.irmao.nome_completo }} ({{ c.get_grau_resultante_display }}){% if c.forcada %} <span class="selo selo-warn">interstício dispensado</span>{% endif %}</p>{% empty %}<p class="muted">Nenhuma cerimônia registrada. Ao registrar, o grau e a data do irmão são atualizados automaticamente.</p>{% endfor %}</section>
 <div class="grade-2">
-<form method="post" class="card">{% csrf_token %}<h2>Promoção (Aprendiz → Companheiro)</h2><input type="hidden" name="tipo" value="promocao">
+<form method="post" action="{% url 'sessoes:cerimonias' sessao.pk %}" class="card">{% csrf_token %}<h2>Promoção (Aprendiz → Companheiro)</h2><input type="hidden" name="tipo" value="promocao">
 <div class="campo"><label for="ir-pro">Aprendiz</label><select class="input" id="ir-pro" name="irmao" required><option value="">Selecione…</option>{% for i in aprendizes %}<option value="{{ i.pk }}">{{ i.nome_completo }}{% if i.data_iniciacao %} (iniciado em {{ i.data_iniciacao|date:"d/m/Y" }}){% endif %}</option>{% endfor %}</select></div>
 {% if pode_forcar %}<div class="campo campo-check"><input class="check" type="checkbox" name="forcar" id="f1"><label for="f1">Registrar mesmo sem cumprir o interstício mínimo</label></div>{% endif %}
 <button class="btn" type="submit">Registrar promoção</button></form>
-<form method="post" class="card">{% csrf_token %}<h2>Elevação (Companheiro → Mestre)</h2><input type="hidden" name="tipo" value="elevacao">
+<form method="post" action="{% url 'sessoes:cerimonias' sessao.pk %}" class="card">{% csrf_token %}<h2>Elevação (Companheiro → Mestre)</h2><input type="hidden" name="tipo" value="elevacao">
 <div class="campo"><label for="ir-ele">Companheiro</label><select class="input" id="ir-ele" name="irmao" required><option value="">Selecione…</option>{% for i in companheiros %}<option value="{{ i.pk }}">{{ i.nome_completo }}{% if i.data_promocao %} (promovido em {{ i.data_promocao|date:"d/m/Y" }}){% endif %}</option>{% endfor %}</select></div>
 {% if pode_forcar %}<div class="campo campo-check"><input class="check" type="checkbox" name="forcar" id="f2"><label for="f2">Registrar mesmo sem cumprir o interstício mínimo</label></div>{% endif %}
 <button class="btn" type="submit">Registrar elevação</button></form>
 <form method="post" action="{% url 'sessoes:iniciar' sessao.pk %}" class="card">{% csrf_token %}<h2>Iniciação</h2>
 <div class="campo"><label for="cand">Candidato aprovado</label><select class="input" id="cand" name="candidato" required><option value="">Selecione…</option>{% for c in aprovados %}<option value="{{ c.pk }}">{{ c.nome }}</option>{% endfor %}</select></div>
 <p class="ajuda">Cria o cadastro do irmão como Aprendiz (o candidato precisa ter e-mail).</p><button class="btn" type="submit">Registrar iniciação</button></form></div>
-{% endblock %}

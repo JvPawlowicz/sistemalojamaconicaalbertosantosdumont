@@ -16,6 +16,7 @@ class ListaView(PerfilRequeridoMixin, TemplateView):
     url_novo = None
     rotulo_novo = "Novo"
     vazio = "Nada cadastrado ainda."
+    acoes_extra: list = []
 
     def get_objetos(self):
         raise NotImplementedError
@@ -36,6 +37,7 @@ class ListaView(PerfilRequeridoMixin, TemplateView):
         ctx["url_novo"] = self.url_novo
         ctx["rotulo_novo"] = self.rotulo_novo
         ctx["vazio"] = self.vazio
+        ctx["acoes_extra"] = self.acoes_extra
         ctx.update(self.extra())
         return ctx
 

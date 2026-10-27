@@ -217,8 +217,10 @@ def test_navegacao_geral_sem_erros(cliente, usuarios, sessao, cargos):
                  "visitas:visitantes", "cargos:catalogo", "irmaos:categorias", "core:aceites", "core:emails",
                  "sessoes:frequencia"):
         assert v.get(reverse(rota)).status_code == 200, rota
-    for rota, args in (("sessoes:detalhe", [sessao.pk]), ("sessoes:escala", [sessao.pk]), ("sessoes:presenca", [sessao.pk]),
-                       ("sessoes:convocacao_pdf", [sessao.pk]), ("visitas:sessao", [sessao.pk]),
+    for aba in ("resumo", "escala", "presenca", "visitantes", "cerimonias", "ata"):
+        assert v.get(reverse("sessoes:detalhe", args=[sessao.pk]), {"aba": aba}).status_code == 200, aba
+    for rota, args in (("sessoes:detalhe", [sessao.pk]),
+                       ("sessoes:convocacao_pdf", [sessao.pk]),
                        ("irmaos:detalhe", [usuarios["mestre"].pk]), ("irmaos:editar", [usuarios["mestre"].pk]),
                        ("tesouraria:extrato_pdf", [usuarios["mestre"].pk])):
         assert v.get(reverse(rota, args=args)).status_code == 200, rota

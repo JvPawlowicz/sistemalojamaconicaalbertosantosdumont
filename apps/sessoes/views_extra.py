@@ -17,6 +17,7 @@ from apps.core.forms import ModelFormBase
 from apps.irmaos.models import Irmao
 
 from . import services
+from .views import url_aba
 from .models import Cerimonia, ConfirmacaoEvento, Evento, Sessao
 
 
@@ -40,16 +41,8 @@ def cerimonias_sessao(request, sessao_pk):
             messages.error(request, str(exc))
         else:
             messages.success(request, f"{c.get_tipo_display()} registrada: {irmao.nome_completo} agora é {irmao.grau_nome}.")
-        return redirect("sessoes:cerimonias", sessao_pk=sessao.pk)
-    from apps.candidatos.models import Candidato
-
-    return render(request, "sessoes/cerimonias.html", {
-        "sessao": sessao, "registradas": sessao.cerimonias.select_related("irmao"),
-        "aprendizes": Irmao.objects.filter(is_active=True, grau=P.APRENDIZ),
-        "companheiros": Irmao.objects.filter(is_active=True, grau=P.COMPANHEIRO),
-        "aprovados": Candidato.objects.filter(etapa=Candidato.Etapa.APROVADO),
-        "pode_forcar": request.user.tem_perfil(P.VENERAVEL),
-    })
+        return redirect(url_aba(sessao, "cerimonias"))
+    return redirect(url_aba(sessao, "cerimonias"))
 
 
 @login_required
@@ -67,7 +60,7 @@ def iniciar(request, sessao_pk):
         messages.error(request, str(exc))
     else:
         messages.success(request, f"{irmao.nome_completo} iniciado como Aprendiz. Envie o convite de senha pelo cadastro do irmão.")
-    return redirect("sessoes:cerimonias", sessao_pk=sessao.pk)
+    return redirect(url_aba(sessao, "cerimonias"))
 
 
 # --- Eventos (agenda social) ---

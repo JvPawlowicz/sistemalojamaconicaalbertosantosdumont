@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <title>{% block titulo %}Painel{% endblock %} · {{ loja.nome }}</title>
   <script>
-    (function () { try { var r = document.documentElement, g = function (k) { return localStorage.getItem(k); };
+    (function () { try { var r = document.documentElement, g = function (k) { return localStorage.getItem(k); }; r.classList.add('js');
       if (g('tema')) r.dataset.theme = g('tema'); if (g('contraste')) r.dataset.contraste = g('contraste'); if (g('fonte')) r.dataset.fonte = g('fonte'); } catch (e) {} })();
   </script>
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
@@ -14,6 +14,7 @@
 <body>
 <a class="skip" href="#conteudo">Ir para o conteúdo</a>
 {% if user.is_authenticated %}
+{% navegacao as nav %}
 <div class="app">
   <aside class="sidebar" id="sidebar" aria-label="Menu principal">
     <a class="brand" href="{% url 'core:painel' %}">
@@ -25,15 +26,25 @@
   <div class="main">
     <header class="topbar">
       <button class="controles menu-btn" type="button" data-acao="menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar" style="border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);padding:.4rem .6rem">{% icon "menu" %}</button>
-      <span class="grow"><strong>{{ user.nome_completo|default:user.username }}</strong> <span class="muted">· {{ grau_nome|default:"Técnico" }}</span></span>
+      <span class="grow"><strong>{{ user.nome_completo|default:user.username }}</strong> <span class="muted somente-largo">· {{ grau_nome|default:"Técnico" }}</span></span>
+      <button type="button" class="btn btn-sec btn-peq no-print" data-acao="buscar" aria-label="Buscar (Ctrl+K)" aria-haspopup="dialog">{% icon "search" %}<span class="somente-largo"> Buscar</span> <kbd>Ctrl K</kbd></button>
       <span class="controles" role="group" aria-label="Acessibilidade">
         <button type="button" data-acao="tema" aria-label="Alternar tema claro/escuro" title="Tema">{% icon "sun" %}</button>
         <button type="button" data-acao="contraste" aria-label="Alternar alto contraste" title="Alto contraste">{% icon "contrast" %}</button>
         <button type="button" data-acao="fonte" aria-label="Alternar tamanho da fonte" title="Tamanho da fonte">{% icon "type" %}</button>
       </span>
-      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit">{% icon "log-out" %} Sair</button></form>
+      <details class="menu-usuario">
+        <summary class="btn btn-sec btn-peq" aria-label="Minha conta">{% icon "user" %}<span class="somente-largo"> Conta</span> {% icon "chevron-down" %}</summary>
+        <div class="menu-usuario-lista" role="menu">
+          <a role="menuitem" href="{% url 'irmaos:meu_perfil' %}">{% icon "user" %} Meu cadastro</a>
+          <a role="menuitem" href="{% url 'core:meus_dados' %}">{% icon "shield-check" %} Meus dados (LGPD)</a>
+          <a role="menuitem" href="{% url 'password_change' %}">{% icon "lock" %} Alterar senha</a>
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button role="menuitem" type="submit">{% icon "log-out" %} Sair</button></form>
+        </div>
+      </details>
     </header>
     <main class="conteudo" id="conteudo" tabindex="-1">
+      {% if nav.abas %}<nav class="tabs" aria-label="{{ nav.secao.titulo }}">{% for a in nav.abas %}<a href="{{ a.url }}" {% if a.ativa %}aria-current="page"{% endif %}>{{ a.rotulo }}</a>{% endfor %}</nav>{% endif %}
       {% include "partials/mensagens.html" %}
       {% block conteudo %}{% endblock %}
     </main>
@@ -43,6 +54,11 @@
 {% else %}
 <main id="conteudo">{% include "partials/mensagens.html" %}{% block publico %}{% endblock %}</main>
 {% endif %}
+{% if user.is_authenticated %}<dialog id="busca" aria-label="Busca rápida" data-url="{% url 'core:busca' %}">
+  <form method="dialog" class="busca-cab"><label class="sr-only" for="busca-q">Buscar</label><input id="busca-q" class="input" type="search" placeholder="Buscar irmão, ata, documento, sessão ou página…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="busca-lista"><button class="btn btn-sec btn-peq" value="fechar">Esc</button></form>
+  <ul id="busca-lista" role="listbox" class="busca-lista"></ul>
+  <p class="ajuda" style="padding:0 1rem .75rem">↑↓ para navegar · Enter para abrir · Esc para fechar</p>
+</dialog>{% endif %}
 <script src="{% static 'js/app.js' %}" defer></script>
 {% block scripts %}{% endblock %}
 </body>

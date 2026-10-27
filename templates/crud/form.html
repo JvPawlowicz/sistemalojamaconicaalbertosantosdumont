@@ -5,6 +5,6 @@
 <form method="post" class="card" {% if multipart or form.is_multipart %}enctype="multipart/form-data"{% endif %} novalidate>
   {% csrf_token %}
   {% include "partials/form.html" %}
-  <div class="acoes mt"><button class="btn" type="submit">{% icon "check" %} Salvar</button>{% if cancelar_url %}<a class="btn btn-sec" href="{{ cancelar_url }}">Cancelar</a>{% endif %}</div>
+  <div class="barra-acoes"><button class="btn" type="submit">{% icon "check" %} Salvar</button>{% if cancelar_url %}<a class="btn btn-sec" href="{{ cancelar_url }}">Cancelar</a>{% endif %}</div>
 </form>
 {% endblock %}

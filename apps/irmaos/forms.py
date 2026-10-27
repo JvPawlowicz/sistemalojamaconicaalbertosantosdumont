@@ -15,8 +15,22 @@ CAMPOS_PESSOAIS = [
 DATAS = ("data_nascimento", "data_iniciacao", "data_promocao", "data_elevacao")
 
 
+GRUPOS_PESSOAIS = [
+    ("Pessoal", ["cpf", "rg", "data_nascimento", "telefone", "whatsapp", "foto", "contato_emergencia_nome",
+                 "contato_emergencia_telefone"]),
+    ("Endereço", ["cep", "logradouro", "numero", "complemento", "bairro", "cidade", "uf"]),
+    ("Profissional", ["formacao_academica", "profissao", "empresa"]),
+    ("Saúde e plano", ["plano_saude", "plano_funeral"]),
+]
+
+
 class IrmaoForm(ModelFormBase):
     """Cadastro completo (Secretário/Venerável)."""
+
+    grupos = [
+        ("Maçônico", ["nome_completo", "email", "matricula", "grau", "situacao", "categoria", "data_iniciacao",
+                      "data_promocao", "data_elevacao"]),
+    ] + GRUPOS_PESSOAIS + [("Acesso", ["username", "is_active", "perfis"])]
 
     perfis = forms.MultipleChoiceField(
         choices=P.PERFIL_CHOICES, required=False, widget=forms.CheckboxSelectMultiple, label="Perfis de acesso"
@@ -29,6 +43,7 @@ class IrmaoForm(ModelFormBase):
             "data_iniciacao", "data_promocao", "data_elevacao", "is_active",
         ] + CAMPOS_PESSOAIS
         widgets = {d: forms.DateInput() for d in DATAS}
+        labels = {"situacao": "Situação", "email": "E-mail", "username": "Usuário (login)", "grau": "Grau"}
 
     def __init__(self, *args, editor=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -80,8 +95,12 @@ class IrmaoForm(ModelFormBase):
 class MeuPerfilForm(ModelFormBase):
     """O próprio irmão atualiza seus dados de contato e pessoais."""
 
+    grupos = [("Contato", ["email", "telefone", "whatsapp", "foto", "contato_emergencia_nome",
+                           "contato_emergencia_telefone"])] + GRUPOS_PESSOAIS[1:]
+
     class Meta:
         model = Irmao
+        labels = {"email": "E-mail"}
         fields = ["email", "telefone", "whatsapp", "foto", "cep", "logradouro", "numero", "complemento", "bairro",
                   "cidade", "uf", "contato_emergencia_nome", "contato_emergencia_telefone", "formacao_academica",
                   "profissao", "empresa", "plano_saude", "plano_funeral"]

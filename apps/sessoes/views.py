@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -50,21 +51,63 @@ def lista(request):
     })
 
 
+ABAS = [("resumo", "Resumo"), ("escala", "Escala"), ("presenca", "Presença"), ("visitantes", "Visitantes"),
+        ("cerimonias", "Cerimônias"), ("ata", "Ata")]
+ABAS_DE_GESTAO = {"escala", "presenca", "visitantes", "cerimonias"}
+
+
+def url_aba(sessao, aba="resumo"):
+    return reverse("sessoes:detalhe", args=[sessao.pk]) + (f"?aba={aba}" if aba != "resumo" else "")
+
+
+def render_detalhe(request, sessao, aba, **extra):
+    """Área de trabalho da sessão: tudo em uma página, com abas (menos cliques e navegação)."""
+    from apps.atas.models import Ata
+    from apps.cargos.models import Cargo
+    from apps.candidatos.models import Candidato
+    from apps.irmaos.models import Irmao as IrmaoModel
+    from apps.visitas.forms import VisitanteForm
+    from apps.visitas.models import CertificadoVisita, Visitante
+
+    gerir = _gerir(request.user)
+    abas_ok = [(k, n) for k, n in ABAS if gerir or k not in ABAS_DE_GESTAO]
+    if aba not in dict(abas_ok):
+        aba = "resumo"
+    ata = Ata.objects.filter(sessao=sessao).first()
+    ctx = {
+        "sessao": sessao, "aba": aba, "pode_gerir": gerir, "ata": ata,
+        "escala": sessao.escala.select_related("cargo", "irmao"),
+        "expedientes": _expedientes_da_sessao(sessao),
+        "abas": [{"chave": k, "rotulo": n, "url": url_aba(sessao, k), "ativa": k == aba,
+                  "badge": {"visitantes": sessao.visitantes.count() or "", "cerimonias": sessao.cerimonias.count() or ""}.get(k, "")}
+                 for k, n in abas_ok],
+    }
+    if aba == "escala":
+        atual = {e.cargo_id: e for e in sessao.escala.all()}
+        ctx["linhas"] = [(c, atual.get(c.pk)) for c in Cargo.objects.filter(ativo=True)]
+        ctx["irmaos"] = sessao.elegiveis().filter(grau__isnull=False)
+    elif aba == "presenca":
+        services.gerar_presencas(sessao)
+        ctx["presencas"] = sessao.presencas.select_related("irmao")
+    elif aba == "visitantes":
+        ctx["visitas"] = sessao.visitantes.select_related("visitante", "certificado")
+        ctx["existentes"] = Visitante.objects.exclude(visitas__sessao=sessao)
+        ctx["novo"] = extra.pop("novo", None) or VisitanteForm(prefix="novo")
+        ctx["cert_status"] = {c.visita_id: c for c in CertificadoVisita.objects.filter(visita__sessao=sessao)}
+    elif aba == "cerimonias":
+        ctx["registradas"] = sessao.cerimonias.select_related("irmao")
+        ctx["aprendizes"] = IrmaoModel.objects.filter(is_active=True, grau=P.APRENDIZ)
+        ctx["companheiros"] = IrmaoModel.objects.filter(is_active=True, grau=P.COMPANHEIRO)
+        ctx["aprovados"] = Candidato.objects.filter(etapa=Candidato.Etapa.APROVADO)
+        ctx["pode_forcar"] = request.user.tem_perfil(P.VENERAVEL)
+    ctx.update(extra)
+    return render(request, "sessoes/detalhe.html", ctx)
+
+
 @login_required
 def detalhe(request, pk):
     sessao = _sessao_visivel(request, pk)
-    from apps.atas.models import Ata
-
-    ctx = {
-        "sessao": sessao, "pode_gerir": _gerir(request.user),
-        "escala": sessao.escala.select_related("cargo", "irmao"),
-        "presencas": sessao.presencas.select_related("irmao"),
-        "ata": Ata.objects.filter(sessao=sessao).first(),
-        "visitantes": sessao.visitantes.select_related("visitante"),
-        "pode_ver_presenca": _gerir(request.user),
-        "expedientes": _expedientes_da_sessao(sessao),
-    }
-    return render(request, "sessoes/detalhe.html", ctx)
+    return render_detalhe(request, sessao, request.GET.get("aba", "resumo"))
 
 
 @login_required
@@ -120,12 +163,7 @@ def escala(request, pk):
                           "substituicao": bool(titular_irmao and titular_irmao.pk != irmao.pk)},
             )
         messages.success(request, "Escala da sessão salva.")
-        return redirect("sessoes:detalhe", pk=pk)
-    atual = {e.cargo_id: e for e in sessao.escala.all()}
-    linhas = [(c, atual.get(c.pk)) for c in Cargo.objects.filter(ativo=True)]
-    return render(request, "sessoes/escala.html", {
-        "sessao": sessao, "linhas": linhas, "irmaos": sessao.elegiveis().filter(grau__isnull=False),
-    })
+    return redirect(url_aba(sessao, "escala"))
 
 
 @login_required
@@ -142,10 +180,7 @@ def presenca(request, pk):
                 p.justificativa = request.POST.get(f"j_{p.irmao_id}", "")[:200]
                 p.save()
         messages.success(request, "Presença registrada.")
-        return redirect("sessoes:detalhe", pk=pk)
-    return render(request, "sessoes/presenca.html", {
-        "sessao": sessao, "presencas": sessao.presencas.select_related("irmao"),
-    })
+    return redirect(url_aba(sessao, "presenca"))
 
 
 @login_required

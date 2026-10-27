@@ -3,7 +3,7 @@
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Configurações da Loja</h1><p>Cabeçalho dos documentos, fundamentação legal e dados institucionais.</p></div>
 <div class="acoes"><a class="btn btn-sec" href="{% url 'cargos:catalogo' %}">{% icon "award" %} Catálogo de cargos</a><a class="btn btn-sec" href="{% url 'irmaos:categorias' %}">{% icon "users" %} Categorias de irmão</a><a class="btn btn-sec" href="{% url 'core:aceites' %}">{% icon "stamp" %} Aceites do termo</a><a class="btn btn-sec" href="{% url 'core:emails' %}">{% icon "mail" %} E-mails enviados</a></div></div>
-<form method="post" enctype="multipart/form-data" class="card">{% csrf_token %}{% include "partials/form.html" %}<button class="btn mt" type="submit">{% icon "check" %} Salvar</button></form>
+<form method="post" enctype="multipart/form-data" class="card">{% csrf_token %}{% include "partials/form.html" %}<div class="barra-acoes"><button class="btn" type="submit">{% icon "check" %} Salvar configurações</button></div></form>
 <form method="post" action="{% url 'core:novo_termo' %}" class="card">{% csrf_token %}
 <h2>{% icon "stamp" %} Termo de assinatura eletrônica (versão {{ termo.versao|default:"—" }})</h2>
 <p class="ajuda">Ao publicar uma nova versão, todos os irmãos precisarão aceitar novamente no próximo acesso.</p>

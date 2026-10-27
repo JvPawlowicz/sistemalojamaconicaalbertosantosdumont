@@ -43,8 +43,8 @@ Os testes automáticos rodam com `python -m pytest`.
 3. *Irmãos → Importar planilha*: baixe o modelo, edite e use "Apenas validar" e depois "Importar".
 
 **B. Sessão, presença e ata** (como `secretario`, depois `veneravel`)
-1. *Sessões → Nova sessão* (grau Aprendiz). A escala é preenchida com os titulares; troque um cargo para testar a **substituição**.
-2. *Presença*: marque presentes/ausentes; *Marcar como realizada* e veja *Sessões → Frequência*.
+1. *Início → Nova sessão* (grau Aprendiz). A sessão abre como área de trabalho com abas. Em **Escala**, troque um cargo para testar a **substituição**.
+2. Aba **Presença** (use "Marcar todos presentes"); *Concluir sessão* e veja *Agenda → Frequência*.
 3. *Redigir ata*: digite `@` e escolha "Abertura dos trabalhos" (variáveis já preenchidas). Salve.
 4. *Colocar em circulação* (e-mail aparece no terminal) → *Aprovar* escolhendo os signatários.
 5. Entre como `veneravel` → *Assinar*: desenhe a assinatura (mouse/dedo), permita a localização, assine. Repita com `secretario`.
@@ -62,15 +62,19 @@ Os testes automáticos rodam com `python -m pytest`.
 4. *Caixa* (receita/despesa), *Orçamento* (previsto × realizado) e *Minhas mensalidades* como irmão comum.
 
 **E. Visitação**
-1. Na sessão: *Visitantes* → cadastre um visitante (com e-mail) → *Gerar certificados*.
+1. Na sessão, aba **Visitantes** → cadastre um visitante (com e-mail) → *Gerar certificados*.
 2. *Assinar em lote* como `secretario` e como `veneravel` → *Enviar em lote* (PDF anexado no e-mail do terminal).
 3. *Visitação → Registrar visita*: envie um PDF/imagem de certificado de outra loja e abra-o no visualizador.
 
 **F. Cerimônias e candidatos**
 1. *Candidatos → Nova proposta*; mova até **Aprovado** e use *Iniciar candidato* (cria o irmão Aprendiz).
-2. Na sessão: *Cerimônias* → promover o Aprendiz a Companheiro; em Configurações defina um interstício e veja o bloqueio.
+2. Na sessão, aba **Cerimônias** → promover o Aprendiz a Companheiro; em Configurações defina um interstício e veja o bloqueio.
 
-**G. Outros**
+**G. Navegação** (confira os atalhos)
+O **Início** lista o que precisa da sua atenção, cada item com botão direto. Pressione `Ctrl+K` (ou `/`) e busque um irmão, ata ou página.
+O menu tem 8 seções com abas; conta e sair ficam em *Conta* (canto superior direito).
+
+**H. Outros**
 *Agenda* (+ exportar .ics), *Agenda social* (confirmar presença), *Expediente*, *Comissões*, *Patrimônio*,
 *Relatórios* (PDF/XLSX/CSV), *Meus dados (LGPD)*, tema escuro / alto contraste / fonte maior (botões no topo) e a tela no celular.
 

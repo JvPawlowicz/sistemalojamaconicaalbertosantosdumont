@@ -3,7 +3,6 @@
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Caixa</h1><p>Saldo atual: <strong>{{ saldo|moeda }}</strong> · ano maçônico {{ ano.nome }}</p></div>
 <form method="get"><label class="sr-only" for="ano">Ano</label><select class="input" id="ano" name="ano" onchange="this.form.submit()">{% for a in anos %}<option value="{{ a.pk }}" {% if a.pk == ano.pk %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}</select></form></div>
-{% include "tesouraria/_abas.html" with aba="caixa" %}
 <div class="grade-2"><div class="tabela-wrap"><table class="tabela"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th class="num">Valor</th></tr></thead><tbody>
 {% for m in movs %}<tr><td class="nowrap">{{ m.data|date:"d/m/Y" }}</td><td>{{ m.descricao }}{% if m.comprovante %} <a href="{% url 'tesouraria:comprovante' m.pk %}" target="_blank" rel="noopener">{% icon "file-text" %}<span class="sr-only">Comprovante</span></a>{% endif %}</td><td>{{ m.categoria.nome }}</td>
 <td class="num" style="color:{% if m.tipo == 'receita' %}var(--ok){% else %}var(--danger){% endif %}">{% if m.tipo == 'despesa' %}−{% endif %}{{ m.valor|moeda }}</td></tr>

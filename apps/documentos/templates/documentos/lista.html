@@ -3,8 +3,8 @@
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Biblioteca e documentos</h1><p>Você vê os documentos do seu grau e dos graus inferiores.</p></div>
 <div class="acoes">{% if pode_gerir %}<a class="btn" href="{% url 'documentos:enviar' %}">{% icon "upload" %} Enviar documento</a>{% endif %}</div></div>
-<form class="filtros card" method="get" role="search"><div class="campo"><label for="q">Buscar</label><input class="input" id="q" name="q" value="{{ q }}"></div>
-<div class="campo"><label for="categoria">Categoria</label><select class="input" id="categoria" name="categoria"><option value="">Todas</option>{% for v, n in categorias %}<option value="{{ v }}" {% if categoria == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div><button class="btn" type="submit">{% icon "search" %} Filtrar</button></form>
+<form class="filtros card" data-auto method="get" role="search"><div class="campo"><label for="q">Buscar</label><input class="input" id="q" name="q" value="{{ q }}"></div>
+<div class="campo"><label for="categoria">Categoria</label><select class="input" id="categoria" name="categoria"><option value="">Todas</option>{% for v, n in categorias %}<option value="{{ v }}" {% if categoria == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div><button class="btn btn-filtrar" type="submit">{% icon "search" %} Filtrar</button></form>
 <div class="grade">{% for d in docs %}<a class="card" href="{% url 'documentos:ver' d.pk %}" style="text-decoration:none;color:inherit"><h3>{% icon "file-text" %} {{ d.titulo }}</h3>
 <p class="muted">{{ d.get_categoria_display }} · {{ d.extensao|upper }} · {{ d.get_grau_minimo_display }}+</p><p class="mb0">{{ d.descricao|truncatechars:110 }}</p></a>
 {% empty %}<div class="card vazio" style="grid-column:1/-1">Nenhum documento disponível.</div>{% endfor %}</div>{% endblock %}

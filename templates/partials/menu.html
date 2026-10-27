@@ -1,43 +1,9 @@
-{% load loja %}{% with nome=request.resolver_match.app_name %}
-<nav>
+{% load loja %}
+<nav aria-label="Menu principal">
 <ul class="nav">
-  <li><a href="{% url 'core:painel' %}" {% if nome == 'core' and request.resolver_match.url_name == 'painel' %}aria-current="page"{% endif %}>{% icon "layout-dashboard" %} Painel</a></li>
-  <li class="nav-grupo">Loja</li>
-  <li><a href="{% url 'irmaos:lista' %}" {% if nome == 'irmaos' %}aria-current="page"{% endif %}>{% icon "users" %} Irmãos</a></li>
-  <li><a href="{% url 'cargos:quadro' %}" {% if nome == 'cargos' %}aria-current="page"{% endif %}>{% icon "award" %} Cargos e gestão</a></li>
-  <li><a href="{% url 'sessoes:agenda' %}" {% if request.resolver_match.url_name == 'agenda' %}aria-current="page"{% endif %}>{% icon "calendar" %} Agenda</a></li>
-  <li><a href="{% url 'sessoes:lista' %}" {% if nome == 'sessoes' and request.resolver_match.url_name != 'agenda' %}aria-current="page"{% endif %}>{% icon "calendar-days" %} Sessões</a></li>
-  <li><a href="{% url 'atas:lista' %}" {% if nome == 'atas' %}aria-current="page"{% endif %}>{% icon "scroll-text" %} Atas</a></li>
-  <li><a href="{% url 'visitas:realizadas' %}" {% if nome == 'visitas' %}aria-current="page"{% endif %}>{% icon "handshake" %} Visitação</a></li>
-  <li><a href="{% url 'documentos:lista' %}" {% if nome == 'documentos' %}aria-current="page"{% endif %}>{% icon "book-open" %} Biblioteca</a></li>
-  {% if user|tem_perfil:"secretario" %}
-  <li><a href="{% url 'expediente:lista' %}" {% if nome == 'expediente' %}aria-current="page"{% endif %}>{% icon "inbox" %} Expediente</a></li>
-  <li><a href="{% url 'patrimonio:lista' %}" {% if nome == 'patrimonio' %}aria-current="page"{% endif %}>{% icon "package" %} Patrimônio</a></li>
-  {% endif %}
-  {% if user|pode_ver_grau:3 %}
-  <li><a href="{% url 'candidatos:painel' %}" {% if nome == 'candidatos' %}aria-current="page"{% endif %}>{% icon "user-plus" %} Candidatos</a></li>
-  <li><a href="{% url 'comissoes:lista' %}" {% if nome == 'comissoes' %}aria-current="page"{% endif %}>{% icon "scale" %} Comissões</a></li>
-  {% endif %}
-  <li class="nav-grupo">Financeiro</li>
-  {% if user|tem_perfil:"tesoureiro" %}
-  <li><a href="{% url 'tesouraria:painel' %}" {% if nome == 'tesouraria' and request.resolver_match.url_name != 'minhas' %}aria-current="page"{% endif %}>{% icon "wallet" %} Tesouraria</a></li>
-  {% endif %}
-  <li><a href="{% url 'tesouraria:minhas' %}" {% if request.resolver_match.url_name == 'minhas' %}aria-current="page"{% endif %}>{% icon "banknote" %} Minhas mensalidades</a></li>
-  {% if user|tem_perfil:"secretario" or user|tem_perfil:"tesoureiro" %}
-  <li class="nav-grupo">Gestão</li>
-  <li><a href="{% url 'relatorios:indice' %}" {% if nome == 'relatorios' %}aria-current="page"{% endif %}>{% icon "chart-column" %} Relatórios</a></li>
-  {% endif %}
-  {% if user|tem_perfil:"administrador" %}
-  <li><a href="{% url 'atas:modelos' %}">{% icon "file-text" %} Modelos de texto</a></li>
-  <li><a href="{% url 'core:solicitacoes_lgpd' %}">{% icon "stamp" %} Solicitações LGPD</a></li>
-  <li><a href="{% url 'core:configuracoes' %}" {% if request.resolver_match.url_name == 'configuracoes' %}aria-current="page"{% endif %}>{% icon "settings" %} Configurações</a></li>
-  {% endif %}
-  {% if user|tem_perfil:"desenvolvedor" %}
-  <li><a href="{% url 'admin:index' %}">{% icon "key-round" %} Painel técnico</a></li>
-  {% endif %}
-  <li class="nav-grupo">Conta</li>
-  <li><a href="{% url 'irmaos:meu_perfil' %}">{% icon "user" %} Meu cadastro</a></li>
-  <li><a href="{% url 'core:meus_dados' %}">{% icon "shield-check" %} Meus dados (LGPD)</a></li>
-  <li><a href="{% url 'password_change' %}">{% icon "lock" %} Alterar senha</a></li>
+{% for grupo, itens in nav.grupos.items %}
+  {% if grupo %}<li class="nav-grupo">{{ grupo }}</li>{% endif %}
+  {% for g in itens %}<li><a href="{{ g.url }}" {% if g.ativa %}aria-current="page"{% endif %}>{% icon g.secao.icone %} {{ g.secao.titulo }}</a></li>{% endfor %}
+{% endfor %}
 </ul>
-</nav>{% endwith %}
+</nav>

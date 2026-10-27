@@ -2,7 +2,6 @@
 {% block titulo %}Tesouraria{% endblock %}
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Tesouraria</h1><p>Caixa em tempo real · ano maçônico {{ ano.nome }}</p></div></div>
-{% include "tesouraria/_abas.html" with aba="painel" %}
 <div class="grade">
 <div class="card indicador"><span class="rotulo">Saldo em caixa</span><span class="valor">{{ saldo|moeda }}</span></div>
 <div class="card indicador"><span class="rotulo">Receitas no ano</span><span class="valor" style="color:var(--ok)">{{ receitas|moeda }}</span></div>

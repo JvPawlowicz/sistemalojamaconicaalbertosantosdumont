@@ -3,11 +3,11 @@
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Irmãos do quadro</h1><p>{{ irmaos|length }} resultado(s)</p></div>
 <div class="acoes">{% if pode_gerir %}<a class="btn btn-sec" href="{% url 'irmaos:importar' %}">{% icon "upload" %} Importar planilha</a><a class="btn" href="{% url 'irmaos:criar' %}">{% icon "user-plus" %} Novo irmão</a>{% endif %}</div></div>
-<form class="filtros card" method="get" role="search">
+<form class="filtros card" data-auto method="get" role="search">
   <div class="campo"><label for="q">Buscar</label><input class="input" id="q" name="q" value="{{ q }}" placeholder="Nome, profissão ou matrícula"></div>
   <div class="campo"><label for="grau">Grau</label><select class="input" id="grau" name="grau"><option value="">Todos</option>{% for v, n in graus %}<option value="{{ v }}" {% if grau == v|stringformat:"s" %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
   <div class="campo"><label for="situacao">Situação</label><select class="input" id="situacao" name="situacao"><option value="">Todas</option>{% for v, n in situacoes %}<option value="{{ v }}" {% if situacao == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
-  <button class="btn" type="submit">{% icon "search" %} Filtrar</button>
+  <button class="btn btn-filtrar" type="submit">{% icon "search" %} Filtrar</button>
 </form>
 <div class="tabela-wrap"><table class="tabela">
 <thead><tr><th scope="col">Irmão</th><th scope="col">Grau</th><th scope="col">Situação</th><th scope="col">Profissão</th>{% if pode_gerir %}<th scope="col">Contato</th>{% endif %}</tr></thead>
