@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% load loja %}{% block titulo %}PDF indisponível{% endblock %}
+{% block conteudo %}<div class="card" style="max-width:720px;margin:2rem auto"><h1>{% icon "triangle-alert" %} Geração de PDF indisponível neste computador</h1>
+<p>O restante do sistema funciona normalmente. Para gerar PDFs (atas, certificados, convocações, extratos e relatórios) é preciso instalar as bibliotecas gráficas do WeasyPrint:</p>
+<ul><li><strong>Windows:</strong> instale o <em>GTK for Windows Runtime</em> (GTK3) e reinicie o sistema; ou use o <strong>WSL</strong>/<strong>Docker</strong>.</li>
+<li><strong>macOS:</strong> <code>brew install pango</code></li><li><strong>Ubuntu/Debian:</strong> <code>sudo apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0</code></li></ul>
+<p class="ajuda">Detalhe técnico: {{ detalhe }}</p><a class="btn" href="javascript:history.back()">{% icon "arrow-left" %} Voltar</a></div>{% endblock %}
+{% block publico %}<div class="login-wrap"><div class="card login-card"><h1>PDF indisponível</h1><p>Instale as bibliotecas do WeasyPrint (veja o README).</p></div></div>{% endblock %}

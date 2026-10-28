@@ -75,6 +75,7 @@ MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
     "apps.core.middleware.AceiteTermoMiddleware",
     "apps.core.middleware.Exigir2FAMiddleware",
+    "apps.core.middleware.PDFIndisponivelMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
@@ -126,7 +127,8 @@ elif os.environ.get("DB_NAME"):
         }
     }
 else:
-    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3",
+                             "NAME": os.environ.get("SQLITE_PATH") or BASE_DIR / "db.sqlite3"}}
 
 AUTH_USER_MODEL = "irmaos.Irmao"
 AUTHENTICATION_BACKENDS = ["axes.backends.AxesStandaloneBackend", "django.contrib.auth.backends.ModelBackend"]

@@ -15,8 +15,15 @@ def qr_data_uri(texto):
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
+class PDFIndisponivel(Exception):
+    """As bibliotecas do WeasyPrint (Pango/GTK) não estão instaladas neste computador."""
+
+
 def pdf_bytes(template, contexto, request=None):
-    from weasyprint import HTML
+    try:
+        from weasyprint import HTML
+    except (ImportError, OSError) as exc:  # bibliotecas nativas ausentes (comum no Windows)
+        raise PDFIndisponivel(str(exc)) from exc
 
     contexto = {"loja": Loja.atual(), **contexto}
     html = render_to_string(template, contexto, request=request)

@@ -1,0 +1,17 @@
+# Teste local com Docker (sem instalar Python): docker compose -f docker-compose.demo.yml up --build
+# Depois abra http://localhost:8000  — usuários: veneravel, secretario, tesoureiro, mestre, companheiro, aprendiz
+# Senha de todos: demo-teste-local   (dados de demonstração; NÃO use para dados reais)
+services:
+  loja:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_SECRET_KEY: "chave-local-de-teste-nao-usar-em-producao"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1"
+      EXIGIR_2FA: "0"
+      DEMO: "1"
+      DEMO_PASSWORD: "demo-teste-local"
+      SQLITE_PATH: "/data/db.sqlite3"
+    volumes: [dados:/data]
+volumes: {dados: {}}

@@ -389,3 +389,20 @@ def test_assinaturas_continuam_integras_apos_backup_e_restauracao(tmp_path, monk
     assert {a.codigo: a.hash_assinatura for a in depois} == antes
     assert all(assinatura_integra(a) for a in depois) and len(depois) == 2
     assert Ata.objects.get().hash_conteudo == hash_ata
+
+
+def test_sem_bibliotecas_de_pdf_o_sistema_avisa_sem_quebrar(cliente, usuarios, sessao, cargos, monkeypatch):
+    """No Windows sem GTK o WeasyPrint não carrega: a página explica em vez de dar erro 500."""
+    import builtins
+    real = builtins.__import__
+
+    def falso(nome, *a, **k):
+        if nome == "weasyprint":
+            raise OSError("cannot load library 'libgobject-2.0-0'")
+        return real(nome, *a, **k)
+
+    monkeypatch.setattr(builtins, "__import__", falso)
+    r = cliente("mestre").get(reverse("sessoes:convocacao_pdf", args=[sessao.pk]))
+    assert r.status_code == 503 and "PDF indisponível" in r.content.decode() or "Geração de PDF indisponível" in r.content.decode()
+    # o resto do sistema continua funcionando
+    assert cliente("mestre").get(reverse("sessoes:detalhe", args=[sessao.pk])).status_code == 200

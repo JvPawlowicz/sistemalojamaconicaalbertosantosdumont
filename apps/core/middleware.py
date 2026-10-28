@@ -45,3 +45,22 @@ class Exigir2FAMiddleware:
                 return redirect(f"{reverse('core:2fa_verificar')}?next={request.path}")
             return redirect(reverse("core:2fa_configurar"))
         return self.get_response(request)
+
+
+class PDFIndisponivelMiddleware:
+    """Mostra uma página explicativa (em vez de erro) quando o computador não tem as bibliotecas de PDF."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_exception(self, request, exception):
+        from django.shortcuts import render
+
+        from .pdf import PDFIndisponivel
+
+        if isinstance(exception, PDFIndisponivel):
+            return render(request, "erro_pdf.html", {"detalhe": str(exception)[:300]}, status=503)
+        return None

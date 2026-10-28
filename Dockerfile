@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-RUN useradd -r -u 1001 app && mkdir -p /app/media /app/staticfiles && chown -R app /app/media /app/staticfiles
+RUN useradd -r -u 1001 app && mkdir -p /app/media /app/staticfiles /data && chown -R app /app/media /app/staticfiles /data
 USER app
 RUN DJANGO_SECRET_KEY=build python manage.py collectstatic --noinput
 EXPOSE 8000
