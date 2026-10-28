@@ -2,21 +2,37 @@
 
 ## 1. Subir o sistema no seu computador (≈5 minutos)
 
-Requisitos: Python 3.11+ e, para gerar PDFs, as bibliotecas `pango`/`harfbuzz`
-(Ubuntu/Debian: `sudo apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0`;
-macOS: `brew install pango`; Windows: use o WSL).
+**Passo 1 — baixar.** No GitHub, abra o repositório, escolha a branch `claude/loving-dirac-ot2k5c`, clique em **Code → Download ZIP** e
+extraia a pasta. (Quem usa git: `git clone -b claude/loving-dirac-ot2k5c https://github.com/JvPawlowicz/sistemalojamaconicaalbertosantosdumont.git`.)
+
+**Passo 2 — instalar o Python** (só uma vez), versão 3.11 ou mais nova: <https://www.python.org/downloads/>
+(no Windows, marque **"Add python.exe to PATH"**).
+
+**Passo 3 — iniciar** (o script cria tudo sozinho: ambiente, dependências, banco e dados de demonstração):
+
+| Sistema | Como |
+|---|---|
+| **Windows** | dê **duplo clique** em `iniciar.bat` |
+| **macOS / Linux / WSL** | no terminal, dentro da pasta: `bash iniciar.sh` |
+| **Com Docker** (sem instalar Python) | `docker compose -f docker-compose.demo.yml up --build` (senha: `demo-teste-local`) |
+
+Na primeira vez leva cerca de 1 minuto (instala as dependências). O navegador abre sozinho; se não abrir, acesse o endereço abaixo.
+Para parar: `Ctrl+C` (ou feche a janela).
+
+> **PDFs no Windows:** precisam do *GTK for Windows Runtime*. Sem ele, todo o resto funciona e as telas de PDF mostram um aviso explicando.
+> No macOS: `brew install pango`. No Ubuntu/Debian: `sudo apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0`.
+
+<details><summary>Instalação manual (sem o script)</summary>
 
 ```bash
-git clone https://github.com/JvPawlowicz/sistemalojamaconicaalbertosantosdumont.git
-cd sistemalojamaconicaalbertosantosdumont
-git checkout claude/loving-dirac-ot2k5c
-python3 -m venv .venv && . .venv/bin/activate        # Windows/WSL: igual
+python3 -m venv .venv && . .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements-dev.txt
 printf 'DJANGO_DEBUG=1\nEXIGIR_2FA=0\n' > .env          # modo de teste (sem 2FA)
 python manage.py migrate
 python manage.py seed_inicial --demo                    # cria usuários e dados fictícios
 python manage.py runserver
 ```
+</details>
 
 Abra <http://127.0.0.1:8000/> e entre com um dos usuários abaixo (senha de todos: `demo-senha-123`).
 
