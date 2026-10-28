@@ -76,7 +76,8 @@ SECOES = (
     ), namespaces=("documentos", "expediente", "patrimonio"), grupo="Loja"),
     Secao("financeiro", "Financeiro", "wallet", (
         Item("Visão geral", "tesouraria:painel", _perfil(P.TESOUREIRO)),
-        Item("Mensalidades", "tesouraria:mensalidades", _perfil(P.TESOUREIRO), extras=("tesouraria:avulso",)),
+        Item("Mensalidades", "tesouraria:mensalidades", _perfil(P.TESOUREIRO), extras=("tesouraria:avulso", "tesouraria:pix")),
+        Item("Conciliação", "tesouraria:conciliar", _perfil(P.TESOUREIRO)),
         Item("Caixa", "tesouraria:caixa", _perfil(P.TESOUREIRO)),
         Item("Orçamento", "tesouraria:orcamento", _perfil(P.TESOUREIRO)),
         Item("Categorias", "tesouraria:categorias", _perfil(P.TESOUREIRO)),

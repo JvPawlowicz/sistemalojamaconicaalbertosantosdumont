@@ -102,3 +102,14 @@ class Orcamento(models.Model):
     class Meta:
         unique_together = [("ano", "categoria")]
         verbose_name = "Orçamento"
+
+
+class ExtratoImportado(models.Model):
+    """Transações de extrato já conciliadas (evita dar baixa duas vezes no mesmo crédito)."""
+
+    fitid = models.CharField(max_length=120, unique=True)
+    data = models.DateField()
+    valor = models.DecimalField(max_digits=12, decimal_places=2)
+    descricao = models.CharField(max_length=250, blank=True)
+    lancamento = models.ForeignKey(Lancamento, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    importado_em = models.DateTimeField(auto_now_add=True)

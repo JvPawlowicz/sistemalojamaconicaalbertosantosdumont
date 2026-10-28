@@ -52,3 +52,7 @@ class BoletoForm(ModelFormBase):
 
     def clean_boleto(self):
         return validar_arquivo(self.cleaned_data.get("boleto"), {"pdf", "png", "jpg", "jpeg"})
+
+
+class ExtratoForm(forms.Form):
+    arquivo = forms.FileField(label="Extrato bancário (OFX)", help_text="Baixe o OFX no internet banking (extrato do mês).")

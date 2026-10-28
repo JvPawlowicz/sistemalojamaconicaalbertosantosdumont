@@ -18,8 +18,8 @@ from apps.core.pdf import pdf_bytes, resposta_pdf
 from apps.irmaos.models import Irmao
 
 from . import services
-from .forms import BaixaForm, BoletoForm, CategoriaFinanceiraForm, LancamentoAvulsoForm, MovimentoForm
-from .models import CategoriaFinanceira, Lancamento, MovimentoCaixa, Orcamento
+from .forms import ExtratoForm, BaixaForm, BoletoForm, CategoriaFinanceiraForm, LancamentoAvulsoForm, MovimentoForm
+from .models import CategoriaFinanceira, ExtratoImportado, Lancamento, MovimentoCaixa, Orcamento
 
 
 def _tesoureiro(user):
@@ -278,3 +278,63 @@ def lancamento_avulso(request):
         return redirect(f"{reverse('tesouraria:mensalidades')}?mes={l.competencia:%Y-%m}")
     return render(request, "crud/form.html", {"form": form, "titulo": "Cobrança avulsa",
                                               "cancelar_url": reverse("tesouraria:mensalidades")})
+
+
+@login_required
+def pix(request, pk):
+    """PIX copia-e-cola e QR Code da mensalidade (o próprio irmão ou o Tesoureiro)."""
+    from apps.core.models import Loja
+    from apps.core.pdf import qr_data_uri
+
+    from .pix import br_code, txid_da_mensalidade
+
+    l = get_object_or_404(Lancamento.objects.select_related("irmao"), pk=pk)
+    if l.irmao_id != request.user.pk and not request.user.tem_perfil(P.TESOUREIRO):
+        raise PermissionDenied
+    loja = Loja.atual()
+    if not loja.chave_pix:
+        messages.error(request, "A Loja ainda não cadastrou a chave PIX (Configurações).")
+        return redirect("tesouraria:minhas")
+    valor = services.valor_atualizado(l)
+    codigo = br_code(loja.chave_pix, loja.nome, loja.oriente, valor["total"], txid_da_mensalidade(l.pk))
+    return render(request, "tesouraria/pix.html", {"l": l, "valor": valor, "codigo": codigo, "qr": qr_data_uri(codigo),
+                                                  "txid": txid_da_mensalidade(l.pk)})
+
+
+@login_required
+def conciliar(request):
+    """Concilia o extrato OFX: sugere a mensalidade de cada crédito e dá baixa nas confirmadas."""
+    from .pix import lancamentos_ofx, sugerir_lancamento
+
+    _tesoureiro(request.user)
+    abertos = list(Lancamento.objects.filter(status__in=["pendente", "vencido"]).select_related("irmao"))
+    if request.method == "POST" and request.POST.get("acao") == "confirmar":
+        n = 0
+        for chave in request.POST.getlist("baixar"):
+            fitid, _, pk = chave.rpartition("|")
+            l = next((x for x in abertos if str(x.pk) == pk), None)
+            if not l or ExtratoImportado.objects.filter(fitid=fitid).exists():
+                continue
+            valor = Decimal(request.POST.get(f"valor_{fitid}", "0").replace(",", "."))
+            data = date.fromisoformat(request.POST.get(f"data_{fitid}"))
+            services.dar_baixa(l, request.user, data, valor, "pix", "Conciliação de extrato bancário")
+            ExtratoImportado.objects.create(fitid=fitid, data=data, valor=valor, lancamento=l, descricao=request.POST.get(f"desc_{fitid}", "")[:250])
+            n += 1
+        messages.success(request, f"{n} mensalidade(s) baixada(s) pela conciliação.")
+        return redirect("tesouraria:conciliar")
+    linhas = []
+    form = ExtratoForm(request.POST or None, request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            transacoes = lancamentos_ofx(form.cleaned_data["arquivo"].read())
+        except Exception:  # noqa: BLE001
+            transacoes = []
+        if not transacoes:
+            messages.error(request, "Não encontrei transações nesse arquivo. Envie o extrato em formato OFX.")
+        ja = set(ExtratoImportado.objects.values_list("fitid", flat=True))
+        for t in transacoes:
+            if t["valor"] <= 0 or t["fitid"] in ja:
+                continue
+            l, motivo = sugerir_lancamento(t, abertos)
+            linhas.append({"t": t, "l": l, "motivo": motivo})
+    return render(request, "tesouraria/conciliar.html", {"form": form, "linhas": linhas, "abertos": abertos})

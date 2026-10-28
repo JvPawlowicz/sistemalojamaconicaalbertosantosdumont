@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Conciliação bancária{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Conciliação bancária</h1><p>Envie o extrato OFX do banco: o sistema sugere a mensalidade de cada crédito (pelo identificador do PIX ou por nome e valor).</p></div></div>
+<form method="post" enctype="multipart/form-data" class="card">{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">{% icon "upload" %} Ler extrato</button></form>
+{% if linhas %}<form method="post">{% csrf_token %}<input type="hidden" name="acao" value="confirmar">
+<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Baixar</th><th>Data</th><th>Descrição do banco</th><th class="num">Valor</th><th>Mensalidade sugerida</th></tr></thead><tbody>
+{% for x in linhas %}<tr><td>{% if x.l %}<input type="checkbox" name="baixar" value="{{ x.t.fitid }}|{{ x.l.pk }}" checked aria-label="Baixar {{ x.l.irmao.nome_completo }}">{% else %}—{% endif %}
+<input type="hidden" name="valor_{{ x.t.fitid }}" value="{{ x.t.valor }}"><input type="hidden" name="data_{{ x.t.fitid }}" value="{{ x.t.data|date:'Y-m-d' }}"><input type="hidden" name="desc_{{ x.t.fitid }}" value="{{ x.t.descricao }}"></td>
+<td class="nowrap">{{ x.t.data|date:"d/m/Y" }}</td><td>{{ x.t.descricao }}</td><td class="num">{{ x.t.valor|moeda }}</td>
+<td>{% if x.l %}{{ x.l.irmao.nome_completo }} · {{ x.l.competencia|date:"m/Y" }} <span class="selo selo-ok">{{ x.motivo }}</span>{% else %}<span class="muted">sem correspondência — dê baixa manualmente</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+<div class="acoes mt"><button class="btn" type="submit">{% icon "check" %} Dar baixa nas marcadas</button></div></form>{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Pagar por PIX{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Pagar por PIX</h1><p>{{ l.descricao }} {{ l.competencia|date:"m/Y" }} — {{ l.irmao.nome_completo }}</p></div></div>
+<div class="grade-2"><div class="card" style="text-align:center"><img src="{{ qr }}" alt="QR Code PIX no valor de {{ valor.total|moeda }}" width="240" height="240">
+<p class="ajuda">Abra o app do seu banco › PIX › Ler QR Code.</p></div>
+<div class="card"><h2>{% icon "wallet" %} Copia e cola</h2><p><strong style="font-size:1.4em">{{ valor.total|moeda }}</strong>{% if valor.total != valor.base %} <small class="muted">(com multa e juros de {{ valor.dias }} dia(s))</small>{% endif %}</p>
+<textarea class="input" id="pix-codigo" rows="5" readonly>{{ codigo }}</textarea>
+<div class="acoes mt"><button class="btn" type="button" onclick="navigator.clipboard.writeText(document.getElementById('pix-codigo').value).then(function(){this.textContent='Copiado!'}.bind(this))">{% icon "check" %} Copiar código</button></div>
+<p class="ajuda mt">Identificador do pagamento: <code>{{ txid }}</code>. A Tesouraria dá baixa após conferir o extrato.</p></div></div>
+{% endblock %}

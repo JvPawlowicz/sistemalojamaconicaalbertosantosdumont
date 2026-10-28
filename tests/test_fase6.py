@@ -157,3 +157,56 @@ def test_secretario_salva_trecho_como_texto_padrao_e_lista_todos(cliente, usuari
     s.post(reverse("atas:modelos_padroes"))
     todos = s.get(reverse("atas:modelos_buscar"), {"sessao": sessao.pk, "q": "", "todos": 1}).json()["itens"]
     assert len(todos) > 10
+
+
+# --- PIX e conciliação ---
+def test_br_code_tem_crc_valido_e_campos_do_pix():
+    from apps.tesouraria.pix import br_code, crc16
+
+    c = br_code("loja@exemplo.com", "Loja Maçônica Alberto Santos Dumont", "São Paulo", Decimal("150.00"), "L42")
+    assert c.startswith("000201") and "br.gov.bcb.pix" in c and "5406150.00" in c and "0503L42" in c
+    assert c[-4:] == crc16(c[:-4])
+    assert crc16("123456789") == "29B1"  # vetor de teste padrão CRC16/CCITT-FALSE
+
+
+OFX = """OFXHEADER:100
+<OFX><BANKMSGSRSV1><STMTTRNRS><STMTRS><BANKTRANLIST>
+<STMTTRN><TRNTYPE>CREDIT<DTPOSTED>20261005120000<TRNAMT>150.00<FITID>A1<MEMO>PIX RECEBIDO L{pk} JOAO
+<STMTTRN><TRNTYPE>CREDIT<DTPOSTED>20261006120000<TRNAMT>150,00<FITID>A2<NAME>CARLOS SECRETARIO SOUZA<MEMO>PIX
+<STMTTRN><TRNTYPE>DEBIT<DTPOSTED>20261007<TRNAMT>-40.00<FITID>A3<MEMO>TARIFA
+</BANKTRANLIST></STMTRS></STMTTRNRS></BANKMSGSRSV1></OFX>"""
+
+
+def test_conciliacao_ofx_sugere_por_txid_e_por_nome_e_da_baixa_sem_duplicar(cliente, usuarios):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    from apps.tesouraria.models import ExtratoImportado, Lancamento
+
+    hoje = timezone.localdate()
+    l1 = Lancamento.objects.create(irmao=usuarios["mestre"], competencia=hoje.replace(day=1), valor=Decimal("150"), vencimento=hoje, status="pendente")
+    l2 = Lancamento.objects.create(irmao=usuarios["secretario"], competencia=hoje.replace(day=1), valor=Decimal("150"), vencimento=hoje, status="pendente")
+    t = cliente("tesoureiro")
+    arq = SimpleUploadedFile("extrato.ofx", OFX.format(pk=l1.pk).encode())
+    html = t.post(reverse("tesouraria:conciliar"), {"arquivo": arq}).content.decode()
+    assert "txid" in html and "nome e valor" in html and "TARIFA" not in html
+    dados = {"acao": "confirmar", "baixar": [f"A1|{l1.pk}", f"A2|{l2.pk}"], "valor_A1": "150.00", "data_A1": "2026-10-05",
+             "valor_A2": "150.00", "data_A2": "2026-10-06"}
+    t.post(reverse("tesouraria:conciliar"), dados)
+    t.post(reverse("tesouraria:conciliar"), dados)  # repetir não duplica
+    l1.refresh_from_db(); l2.refresh_from_db()
+    assert l1.status == "pago" and l2.status == "pago" and ExtratoImportado.objects.count() == 2
+    assert MovimentoCaixa.objects.filter(tipo="receita").count() == 2
+    assert cliente("mestre").get(reverse("tesouraria:conciliar")).status_code == 403
+
+
+def test_pix_da_mensalidade_so_para_o_dono_ou_tesoureiro(cliente, usuarios):
+    from apps.tesouraria.models import Lancamento
+
+    loja = Loja.atual()
+    loja.chave_pix = "loja@exemplo.com"
+    loja.save()
+    hoje = timezone.localdate()
+    l = Lancamento.objects.create(irmao=usuarios["mestre"], competencia=hoje.replace(day=1), valor=Decimal("150"), vencimento=hoje, status="pendente")
+    assert "PIX" in cliente("mestre").get(reverse("tesouraria:pix", args=[l.pk])).content.decode()
+    assert cliente("tesoureiro").get(reverse("tesouraria:pix", args=[l.pk])).status_code == 200
+    assert cliente("aprendiz").get(reverse("tesouraria:pix", args=[l.pk])).status_code == 403

@@ -111,7 +111,9 @@ def mensagem_cobranca(lancamento):
     if v["total"] != v["base"]:
         texto += f" Com multa e juros ({v['dias']} dia(s) de atraso), o valor atualizado é R$ {fmt(v['total'])}."
     if loja.chave_pix:
-        texto += f" PIX: {loja.chave_pix}."
+        from .pix import br_code, txid_da_mensalidade
+
+        texto += (f" PIX copia e cola: {br_code(loja.chave_pix, loja.nome, loja.oriente, v['total'], txid_da_mensalidade(lancamento.pk))}")
     return texto + f" Fraterno abraço, Tesouraria — {loja.nome}."
 
 
