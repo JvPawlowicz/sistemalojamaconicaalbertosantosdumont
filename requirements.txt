@@ -12,3 +12,4 @@ gunicorn>=22.0
 django-axes>=6.4
 cryptography>=42.0
 nh3>=0.2.18
+pypdf>=5.0

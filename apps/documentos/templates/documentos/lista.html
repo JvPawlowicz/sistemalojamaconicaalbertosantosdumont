@@ -6,5 +6,5 @@
 <form class="filtros card" data-auto method="get" role="search"><div class="campo"><label for="q">Buscar</label><input class="input" id="q" name="q" value="{{ q }}"></div>
 <div class="campo"><label for="categoria">Categoria</label><select class="input" id="categoria" name="categoria"><option value="">Todas</option>{% for v, n in categorias %}<option value="{{ v }}" {% if categoria == v %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div><button class="btn btn-filtrar" type="submit">{% icon "search" %} Filtrar</button></form>
 <div class="grade">{% for d in docs %}<a class="card" href="{% url 'documentos:ver' d.pk %}" style="text-decoration:none;color:inherit"><h2>{% icon "file-text" %} {{ d.titulo }}</h2>
-<p class="muted">{{ d.get_categoria_display }} · {{ d.extensao|upper }} · {{ d.get_grau_minimo_display }}+</p><p class="mb0">{{ d.descricao|truncatechars:110 }}</p></a>
+<p class="muted">{{ d.get_categoria_display }} · {{ d.extensao|upper }} · {{ d.get_grau_minimo_display }}+</p><p class="mb0">{{ d.descricao|truncatechars:110 }}</p>{% if d.achado %}<p class="ajuda mb0">{% icon "file-search" %} no texto: “{{ d.achado }}”</p>{% endif %}</a>
 {% empty %}<div class="card vazio" style="grid-column:1/-1">Nenhum documento disponível.</div>{% endfor %}</div>{% endblock %}

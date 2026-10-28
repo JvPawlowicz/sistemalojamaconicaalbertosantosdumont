@@ -321,7 +321,7 @@ def busca(request):
                 Ata.objects.visiveis_para(user)[:4]:
             resultados.append({"grupo": "Atas", "rotulo": f"Ata {a.numero or 's/nº'} — {a.sessao.data_hora:%d/%m/%Y}",
                                "url": reverse("atas:detalhe", args=[a.pk])})
-    for d in Documento.objects.filter(titulo__icontains=q)[:8]:
+    for d in Documento.objects.filter(Q(titulo__icontains=q) | Q(texto_extraido__icontains=q))[:8]:
         if user.pode_ver_grau(d.grau_minimo):
             resultados.append({"grupo": "Biblioteca", "rotulo": d.titulo, "url": reverse("documentos:ver", args=[d.pk])})
     for s in Sessao.objects.filter(Q(local__icontains=q) | Q(pauta__icontains=q))[:6]:

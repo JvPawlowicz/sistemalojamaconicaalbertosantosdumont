@@ -24,8 +24,12 @@ def lista(request):
     if categoria in Documento.Categoria.values:
         docs = docs.filter(categoria=categoria)
     if q:
-        docs = docs.filter(titulo__icontains=q)
+        from django.db.models import Q
+
+        docs = docs.filter(Q(titulo__icontains=q) | Q(descricao__icontains=q) | Q(texto_extraido__icontains=q))
     docs = [d for d in docs if request.user.pode_ver_grau(d.grau_minimo)]
+    for d in docs:
+        d.achado = d.trecho(q) if q and q.lower() not in d.titulo.lower() else ""
     return render(request, "documentos/lista.html", {
         "docs": docs, "categoria": categoria, "q": q, "categorias": Documento.Categoria.choices,
         "pode_gerir": request.user.tem_perfil(P.SECRETARIO),

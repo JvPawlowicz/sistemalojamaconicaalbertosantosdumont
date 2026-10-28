@@ -238,3 +238,22 @@ def test_aniversarios_de_vida_e_macônicos_no_painel_e_email_sem_duplicar(client
     call_command("enviar_lembretes", verbosity=0)  # segunda execução no mesmo dia não repete
     assert AniversarioEnviado.objects.filter(irmao=m).count() == 2
     assert len([x for x in mailoutbox if "Parabéns" in x.subject]) == 2
+
+
+# --- busca dentro de PDFs ---
+def test_busca_no_texto_dos_pdfs_respeita_o_grau(cliente, usuarios, settings, tmp_path):
+    from django.core.files.base import ContentFile
+    from weasyprint import HTML
+
+    from apps.documentos.models import Documento
+
+    settings.MEDIA_ROOT = tmp_path
+    pdf = HTML(string="<p>O Landmark da reverência ao Grande Arquiteto do Universo é antigo.</p>").write_pdf()
+    d = Documento(titulo="Prancha X", categoria="prancha", grau_minimo=3, enviado_por=usuarios["secretario"])
+    d.arquivo.save("p.pdf", ContentFile(pdf))
+    assert "reverência" in d.texto_extraido
+    html = cliente("mestre").get(reverse("documentos:lista"), {"q": "reverência"}).content.decode()
+    assert "Prancha X" in html and "no texto" in html
+    assert "Prancha X" not in cliente("aprendiz").get(reverse("documentos:lista"), {"q": "reverência"}).content.decode()
+    busca = cliente("mestre").get(reverse("core:busca"), {"q": "reverência"}).json()["resultados"]
+    assert any(r["rotulo"] == "Prancha X" for r in busca)
