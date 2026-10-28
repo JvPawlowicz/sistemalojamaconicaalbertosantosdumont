@@ -444,3 +444,17 @@ self.addEventListener('fetch', (e) => {
 
 def offline(request):
     return render(request, "core/offline.html")
+
+
+def saude(request):
+    from django.http import JsonResponse
+
+    """Verificação de saúde para monitoramento (Uptime Kuma, Docker, balanceador). Pública e sem dados sensíveis."""
+    from django.db import connection
+
+    try:
+        with connection.cursor() as c:
+            c.execute("SELECT 1")
+        return JsonResponse({"status": "ok"})
+    except Exception:  # noqa: BLE001
+        return JsonResponse({"status": "erro", "banco": "indisponível"}, status=503)

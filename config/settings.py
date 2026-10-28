@@ -216,6 +216,14 @@ EVOLUTION_API_URL = os.environ.get("EVOLUTION_API_URL", "")
 EVOLUTION_API_KEY = os.environ.get("EVOLUTION_API_KEY", "")
 EVOLUTION_INSTANCE = os.environ.get("EVOLUTION_INSTANCE", "")
 
+if os.environ.get("SENTRY_DSN"):  # monitoramento de erros opcional (Sentry ou GlitchTip, ambos compatíveis)
+    try:
+        import sentry_sdk
+
+        sentry_sdk.init(dsn=os.environ["SENTRY_DSN"], send_default_pii=False, traces_sample_rate=0.0)
+    except ImportError:
+        pass
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

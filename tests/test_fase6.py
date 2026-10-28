@@ -257,3 +257,8 @@ def test_busca_no_texto_dos_pdfs_respeita_o_grau(cliente, usuarios, settings, tm
     assert "Prancha X" not in cliente("aprendiz").get(reverse("documentos:lista"), {"q": "reverência"}).content.decode()
     busca = cliente("mestre").get(reverse("core:busca"), {"q": "reverência"}).json()["resultados"]
     assert any(r["rotulo"] == "Prancha X" for r in busca)
+
+
+def test_saude_publica_sem_login(client, db):
+    r = client.get(reverse("core:saude"))
+    assert r.status_code == 200 and r.json() == {"status": "ok"}
