@@ -2,8 +2,9 @@
 {% block titulo %}Entrar{% endblock %}
 {% block publico %}
 <div class="login-wrap"><div class="card login-card">
-  <div class="brand">{% if loja.brasao %}<img src="{% url 'core:brasao' %}" alt="" style="width:72px;height:72px">{% else %}<span class="avatar avatar-lg" aria-hidden="true">{% icon "landmark" %}</span>{% endif %}
+  <div class="brand">{% if loja.brasao %}<img src="{% url 'core:brasao' %}" alt="" style="width:96px;height:96px">{% else %}{% include "partials/emblema.html" %}{% endif %}
     <span><strong style="font-size:1.15em">{{ loja.nome }}</strong><small class="muted">{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}{{ loja.potencia }}</small></span></div>
+  <p class="login-lema">Força · Sabedoria · Beleza</p>
   <h1 style="text-align:center;font-size:1.25em">Acesso ao sistema</h1>
   <form method="post" novalidate>{% csrf_token %}
     {% if form.errors %}<div class="alerta alerta-error" role="alert">Usuário ou senha incorretos.</div>{% endif %}

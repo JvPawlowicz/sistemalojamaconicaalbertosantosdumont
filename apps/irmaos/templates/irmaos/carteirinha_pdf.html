@@ -1,0 +1,13 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+@page { size: 9.6cm 6.2cm; margin: 0; } body { margin: 0; font-family: Arial, sans-serif; color: #0b3a58; }
+.f { width: 9.6cm; height: 6.2cm; box-sizing: border-box; padding: .5cm; background: linear-gradient(135deg, #d9eefa, #bde1f5); border-top: .18cm solid #4fb3e8; page-break-after: always; position: relative; }
+.topo { display: flex; align-items: center; gap: .3cm; } .topo img { width: 1.4cm; } .topo b { font-size: 8pt; display: block; } .topo small { font-size: 6pt; }
+.nome { font-size: 12pt; font-weight: bold; margin: .5cm 0 .25cm; } .d { font-size: 7pt; display: flex; gap: .6cm; } .d small { display: block; color: #2c5a78; font-size: 5.5pt; text-transform: uppercase; }
+.r { position: absolute; bottom: .3cm; left: .5cm; font-size: 6pt; color: #2c5a78; }
+.v { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; } .v img { width: 3.6cm; } .v small { font-size: 6pt; margin-top: .15cm; }
+</style></head><body>
+<div class="f"><div class="topo"><img src="{{ emblema }}" alt=""><span><b>{{ loja.nome }}</b><small>{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}{{ loja.potencia }}</small></span></div>
+<div class="nome">{{ irmao.nome_completo }}</div><div class="d"><span><small>Grau</small>{{ irmao.grau_nome }}</span><span><small>Matrícula</small>{{ irmao.matricula|default:"—" }}</span><span><small>Iniciação</small>{{ irmao.data_iniciacao|date:"m/Y"|default:"—" }}</span></div>
+<div class="r">Rito {{ loja.rito }}</div></div>
+<div class="f v"><img src="{{ qr }}" alt=""><small>Verificação pública · {{ irmao.codigo_carteirinha }}</small></div>
+</body></html>

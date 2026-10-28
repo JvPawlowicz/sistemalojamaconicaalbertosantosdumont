@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, views_avisos
 
 app_name = "core"
 
@@ -8,6 +8,13 @@ urlpatterns = [
     path("", views.painel, name="painel"),
     path("midia/brasao/", views.brasao, name="brasao"),
     path("midia/irmao/<int:pk>/foto/", views.foto_irmao, name="foto_irmao"),
+    path("manifest.webmanifest", views.manifest, name="manifest"),
+    path("sw.js", views.service_worker, name="service_worker"),
+    path("offline/", views.offline, name="offline"),
+    path("avisos/", views_avisos.avisos, name="avisos"),
+    path("avisos/novo/", views_avisos.aviso_form, name="aviso_novo"),
+    path("avisos/<int:pk>/", views_avisos.aviso_form, name="aviso_editar"),
+    path("avisos/<int:pk>/excluir/", views_avisos.aviso_excluir, name="aviso_excluir"),
     path("busca/", views.busca, name="busca"),
     path("aceite-termo/", views.aceite_termo, name="aceite_termo"),
     path("privacidade/", views.privacidade, name="privacidade"),

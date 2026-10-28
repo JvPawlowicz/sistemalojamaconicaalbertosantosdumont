@@ -1,9 +1,10 @@
 {% extends "base.html" %}{% load loja %}
 {% block titulo %}Painel{% endblock %}
 {% block conteudo %}
-<div class="cabecalho-pagina"><div><h1>Olá, {{ user.first_name|default:user.username }}</h1><p>Ano maçônico <strong>{{ ano.nome }}</strong> · {{ ano.inicio|date:"d/m/Y" }} a {{ ano.fim|date:"d/m/Y" }}</p></div></div>
+<div class="cabecalho-pagina"><div class="saudacao">{% include "partials/emblema.html" %}<div><h1>Olá, {{ user.first_name|default:user.username }}</h1><p>Ano maçônico <strong>{{ ano.nome }}</strong> · {{ ano.inicio|date:"d/m/Y" }} a {{ ano.fim|date:"d/m/Y" }}</p></div></div></div>
 <div class="atalhos" aria-label="Atalhos">{% for rot, url, ico in atalhos %}<a class="btn btn-sec btn-peq" href="{{ url }}">{% icon ico %} {{ rot }}</a>{% endfor %}</div>
 
+{% for a in avisos %}<article class="card aviso {% if a.fixado %}aviso-fixado{% endif %}"><h2>{% icon "megaphone" %} {{ a.titulo }}</h2><div style="white-space:pre-wrap">{{ a.texto|truncatechars:280 }}</div><a href="{% url 'core:avisos' %}">Ver mural</a></article>{% endfor %}
 <section class="card" aria-labelledby="h-tarefas"><h2 id="h-tarefas">{% icon "circle-check" %} O que precisa da sua atenção</h2>
 <div class="painel-tarefas">{% for t in tarefas %}<div class="tarefa {{ t.nivel }}"><span class="texto">{% icon t.icone %}<span>{{ t.texto }}</span></span><a class="btn btn-peq" href="{{ t.url }}">{{ t.acao }}</a></div>
 {% empty %}<p class="muted mb0">Tudo em dia. {% icon "circle-check" %}</p>{% endfor %}</div></section>

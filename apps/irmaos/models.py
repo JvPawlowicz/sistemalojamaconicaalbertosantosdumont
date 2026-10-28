@@ -55,6 +55,8 @@ class Irmao(AbstractUser):
     data_promocao = models.DateField("Data de promoção (a Companheiro)", null=True, blank=True)
     data_elevacao = models.DateField("Data de elevação (a Mestre)", null=True, blank=True)
     perfis = models.JSONField("Perfis", default=list, blank=True)
+    codigo_carteirinha = models.CharField(max_length=16, blank=True, editable=False, db_index=True)
+    aceita_whatsapp = models.BooleanField("Aceita receber avisos por WhatsApp", default=True)
 
     # Pessoais
     cpf = models.CharField("CPF", max_length=14, blank=True, validators=[cpf_validator])
@@ -139,6 +141,10 @@ class Irmao(AbstractUser):
         return "".join(p[0] for p in partes[:2]).upper()
 
     def save(self, *args, **kwargs):
+        if not self.codigo_carteirinha:
+            import secrets
+
+            self.codigo_carteirinha = secrets.token_hex(6).upper()
         if not self.first_name and self.nome_completo:
             self.first_name = self.nome_completo.split()[0][:150]
         super().save(*args, **kwargs)

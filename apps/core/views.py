@@ -16,7 +16,7 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from . import perfis as P
 from .forms import LojaForm, TokenForm
-from .models import AceiteTermo, AnoMaconico, EmailLog, Loja, SolicitacaoLGPD, TermoAceite
+from .models import AceiteTermo, AnoMaconico, Aviso, EmailLog, Loja, SolicitacaoLGPD, TermoAceite
 from .utils import ip_do_cliente
 
 
@@ -27,8 +27,46 @@ def _qr_data_uri(texto):
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-@login_required
+RECURSOS = [
+    ("users", "Quadro de irmãos", "Cadastro completo, graus, cargos por ano maçônico, família e dados profissionais, com importação por planilha."),
+    ("calendar-days", "Sessões e presença", "Agenda, pauta, escala de cargos com substituições, presença por QR Code e frequência automática."),
+    ("scroll-text", "Atas e assinaturas", "Redação com textos pré-cadastrados, circulação, aprovação e assinatura eletrônica verificável."),
+    ("wallet", "Tesouraria", "Mensalidades por categoria, caixa em tempo real, orçamento, PIX copia e cola e conciliação do extrato."),
+    ("handshake", "Visitação", "Banco de visitantes, certificados em PDF assinados em lote e certificados recebidos de outras lojas."),
+    ("book-open", "Biblioteca", "Documentos por grau, visualizador embutido e busca dentro do texto dos PDFs."),
+    ("user-plus", "Candidatos e escrutínio", "Painel da sindicância, pareceres e votação sigilosa com resultado só no encerramento."),
+    ("id-card", "Carteirinha digital", "Identificação do irmão com QR Code de verificação, direto no celular."),
+    ("megaphone", "Mural de avisos", "Comunicados por grau, fixados no Início e por e-mail."),
+    ("heart-handshake", "Hospitalaria e Tronco", "Acompanhamento sigiloso de irmãos enfermos e controle do Tronco de Beneficência."),
+    ("chart-column", "Relatórios", "Frequência, financeiro, orçamento e prestação de contas do Conselho Fiscal em PDF, XLSX e CSV."),
+    ("smartphone", "No celular", "Aplicativo instalável (PWA) para presença, atas e avisos."),
+]
+SEGURANCA = [
+    ("shield-check", "Verificação em duas etapas", "Obrigatória para perfis administrativos, com códigos de recuperação."),
+    ("lock", "Acesso por grau e perfil", "Cada irmão vê apenas o que o seu grau e a sua função permitem."),
+    ("history", "Trilha de auditoria", "Quem alterou o quê e quando, com histórico das versões das atas."),
+    ("file-check", "LGPD", "Termo de aceite, exportação dos próprios dados e canal de solicitações."),
+    ("archive", "Backup criptografado", "Cópia completa com senha e restauração testada."),
+]
+PASSOS = [
+    ("Convocação", "O Secretário agenda a sessão, define a pauta e envia a convocação por e-mail."),
+    ("Presença", "Os irmãos registram a presença pelo QR Code ou o Secretário marca na lista."),
+    ("Ata", "A ata é redigida com os textos pré-cadastrados e circula para aprovação."),
+    ("Assinatura", "Cada signatário assina no próprio dispositivo; a ata recebe hash e QR de verificação."),
+    ("Arquivo", "A ata assinada entra no livro de atas, e a frequência e os relatórios se atualizam sozinhos."),
+]
+
+
 def painel(request):
+    if not request.user.is_authenticated:
+        from .models import Loja
+
+        return render(request, "core/landing.html", {"loja": Loja.atual(), "recursos": RECURSOS, "seguranca": SEGURANCA, "passos": PASSOS})
+    return _painel_logado(request)
+
+
+@login_required
+def _painel_logado(request):
     from apps.atas.models import Ata
     from apps.sessoes.models import Sessao
     from apps.tesouraria.models import Lancamento
@@ -55,6 +93,7 @@ def painel(request):
         ctx["inadimplentes"] = Lancamento.objects.filter(status=Lancamento.Status.VENCIDO).count()
     from .pendencias import atalhos_do_usuario, tarefas_do_usuario
 
+    ctx["avisos"] = Aviso.vigentes_para(user)[:3]
     ctx["tarefas"] = tarefas_do_usuario(user)
     ctx["atalhos"] = atalhos_do_usuario(user)
     if user.tem_algum_perfil(P.SECRETARIO, P.TESOUREIRO):
@@ -343,3 +382,56 @@ def testar_whatsapp(request):
     ok, texto = whatsapp_status()
     (messages.success if ok else messages.warning)(request, texto)
     return redirect("core:configuracoes")
+
+
+def manifest(request):
+    """Manifesto do aplicativo instalável (PWA)."""
+    from django.http import JsonResponse
+    from django.templatetags.static import static
+
+    loja = Loja.atual()
+    dados = {
+        "name": f"{loja.nome} — Sistema", "short_name": "Loja", "lang": "pt-BR", "start_url": reverse("core:painel"),
+        "scope": "/", "display": "standalone", "background_color": "#f1f8fd", "theme_color": "#4fb3e8",
+        "description": "Gestão da Loja: sessões, atas, tesouraria e muito mais.",
+        "icons": [
+            {"src": static("icons/icon-192.png"), "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": static("icons/icon-512.png"), "sizes": "512x512", "type": "image/png", "purpose": "any"},
+            {"src": static("icons/icon-maskable-512.png"), "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
+        "shortcuts": [
+            {"name": "Agenda", "url": reverse("sessoes:agenda")},
+            {"name": "Atas", "url": reverse("atas:lista")},
+            {"name": "Carteirinha", "url": "/carteirinha/"},
+        ],
+    }
+    return JsonResponse(dados, content_type="application/manifest+json")
+
+
+def service_worker(request):
+    """Service worker na raiz (escopo total). Só guarda arquivos estáticos; páginas autenticadas nunca são armazenadas."""
+    from django.http import HttpResponse
+
+    js = """
+const VERSAO = 'loja-v1';
+const ESTATICOS = ['/offline/'];
+self.addEventListener('install', (e) => { e.waitUntil(caches.open(VERSAO).then((c) => c.addAll(ESTATICOS))); self.skipWaiting(); });
+self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== VERSAO).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener('fetch', (e) => {
+  const req = e.request; if (req.method !== 'GET') return;
+  const url = new URL(req.url); if (url.origin !== location.origin) return;
+  if (url.pathname.startsWith('/static/')) {
+    e.respondWith(caches.open(VERSAO).then((c) => c.match(req).then((hit) => hit || fetch(req).then((r) => { if (r.ok) c.put(req, r.clone()); return r; }))));
+    return;
+  }
+  if (req.mode === 'navigate') { e.respondWith(fetch(req).catch(() => caches.match('/offline/'))); }
+});
+"""
+    resp = HttpResponse(js, content_type="application/javascript")
+    resp["Service-Worker-Allowed"] = "/"
+    resp["Cache-Control"] = "no-cache"
+    return resp
+
+
+def offline(request):
+    return render(request, "core/offline.html")

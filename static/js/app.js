@@ -142,3 +142,25 @@
     }
   });
 })();
+
+
+/* PWA: registra o service worker (só em HTTPS ou localhost) */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
+
+/* Movimento: sombra da barra superior ao rolar e contagem animada dos indicadores */
+(function () {
+  const reduz = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const topo = document.querySelector('.topbar');
+  if (topo) { const f = () => topo.classList.toggle('rolou', window.scrollY > 4); window.addEventListener('scroll', f, { passive: true }); f(); }
+  if (reduz) return;
+  document.querySelectorAll('.indicador .valor').forEach((el) => {
+    const m = el.textContent.trim().match(/^(\d+)(%?)$/); if (!m) return;
+    const fim = parseInt(m[1], 10), suf = m[2], t0 = performance.now();
+    (function passo(t) { const p = Math.min((t - t0) / 900, 1); el.textContent = Math.round(fim * (1 - Math.pow(1 - p, 3))) + suf; if (p < 1) requestAnimationFrame(passo); })(t0);
+  });
+})();
+
+/* Carteirinha: vira ao clicar */
+document.querySelectorAll('.cartao').forEach((c) => c.addEventListener('click', () => c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true')));

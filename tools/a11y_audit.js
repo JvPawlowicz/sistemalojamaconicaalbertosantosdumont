@@ -20,6 +20,7 @@ const modos = [['claro', {}], ['escuro', { theme: 'escuro' }], ['contraste', { c
   const b = await chromium.launch(); const falhas = [];
   for (const [nome, cfg] of modos) {
     const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } }); const p = await ctx.newPage();
+    for (const pub of ['/', '/entrar/']) { if (nome !== 'claro' && pub === '/entrar/') continue; const rp = await p.goto(base + pub); await p.evaluate((c) => { if (c.theme) document.documentElement.dataset.theme = c.theme; if (c.contraste) document.documentElement.dataset.contraste = c.contraste; }, cfg); await p.waitForTimeout(1500); await p.evaluate(axeSrc); const vp = await p.evaluate(async () => (await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } })).violations.map((x) => `${x.id} [${x.impact}] ${x.nodes[0].target.join(' ').slice(0, 80)}`)); vp.forEach((x) => falhas.push(`${nome} (público) ${pub}: ${x}`)); }
     await p.goto(base + '/entrar/'); await p.fill('#id_username', usuario); await p.fill('#id_password', senha);
     await p.click('form button:has-text("Entrar")'); await p.waitForLoadState();
     if (p.url().includes('aceite-termo')) { await p.check('#aceito'); await p.click('text=Aceitar e continuar'); await p.waitForLoadState(); }
@@ -27,6 +28,7 @@ const modos = [['claro', {}], ['escuro', { theme: 'escuro' }], ['contraste', { c
       if (pg === '/entrar/' && nome !== 'claro') continue;
       const r = await p.goto(base + pg); if (!r || r.status() >= 400) { falhas.push(`${nome} ${pg}: HTTP ${r && r.status()}`); continue; }
       await p.evaluate((c) => { if (c.theme) document.documentElement.dataset.theme = c.theme; if (c.contraste) document.documentElement.dataset.contraste = c.contraste; }, cfg);
+      await p.waitForTimeout(900); // espera as animações de entrada terminarem
       await p.evaluate(axeSrc);
       const v = await p.evaluate(async () => (await axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] } })).violations.map((x) => `${x.id} [${x.impact}] ${x.nodes[0].target.join(' ').slice(0, 80)}`));
       v.forEach((x) => falhas.push(`${nome} ${pg}: ${x}`));

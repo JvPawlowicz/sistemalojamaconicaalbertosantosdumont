@@ -1,0 +1,6 @@
+{% load loja %}<div class="card login-card" style="text-align:center">
+{% include "partials/emblema.html" %}<h1>Verificação de carteirinha</h1><p class="muted">{{ loja.nome }}{% if loja.numero %} nº {{ loja.numero }}{% endif %} · {{ loja.potencia }}</p>
+{% if irmao %}{% if regular %}<div class="alerta alerta-success" style="justify-content:center">{% icon "badge-check" %}<span><strong>Irmão em situação regular</strong></span></div>{% else %}<div class="alerta alerta-warning" style="justify-content:center">{% icon "triangle-alert" %}<span><strong>Sem situação regular nesta Loja</strong></span></div>{% endif %}
+<dl class="lista-def" style="text-align:left;max-width:20rem;margin:1rem auto"><dt>Nome</dt><dd>{{ irmao.nome_completo }}</dd><dt>Grau</dt><dd>{{ irmao.grau_nome }}</dd>{% if irmao.matricula %}<dt>Matrícula</dt><dd>{{ irmao.matricula }}</dd>{% endif %}</dl>
+{% else %}<div class="alerta alerta-error" style="justify-content:center">{% icon "circle-x" %}<span><strong>Carteirinha não encontrada</strong></span></div>{% endif %}
+<p class="ajuda">Consulta em {% now "d/m/Y H:i" %}.</p></div>

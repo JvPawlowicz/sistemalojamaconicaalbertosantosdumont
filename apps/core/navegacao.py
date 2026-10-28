@@ -44,7 +44,10 @@ class Secao:
 
 
 SECOES = (
-    Secao("inicio", "Início", "layout-dashboard", (Item("Painel", "core:painel"),), nomes=("core:painel",)),
+    Secao("inicio", "Início", "layout-dashboard", (
+        Item("Painel", "core:painel"),
+        Item("Mural de avisos", "core:avisos", extras=("core:aviso_novo", "core:aviso_editar", "core:aviso_excluir")),
+    ), nomes=("core:painel", "core:avisos", "core:aviso_novo", "core:aviso_editar", "core:aviso_excluir")),
     Secao("agenda", "Agenda", "calendar-days", (
         Item("Calendário", "sessoes:agenda"),
         Item("Sessões", "sessoes:lista", extras=("sessoes:detalhe", "sessoes:criar", "sessoes:editar")),
@@ -61,7 +64,7 @@ SECOES = (
         Item("Candidatos", "candidatos:painel", _mestre, extras=("candidatos:detalhe", "candidatos:criar")),
         Item("Comissões", "comissoes:lista", _mestre, extras=("comissoes:nova", "comissoes:editar")),
         Item("Visitação", "visitas:realizadas", extras=("visitas:nova_realizada", "visitas:visitantes",
-                                                       "visitas:visitante_novo", "visitas:visitante_editar",
+                                                       "visitas:visitante_novo", "visitas:visitante_editar", "visitas:lojas", "visitas:loja_nova", "visitas:loja_editar",
                                                        "visitas:certificado_recebido")),
     ), namespaces=("irmaos", "cargos", "candidatos", "comissoes", "visitas"), grupo="Loja"),
     Secao("acervo", "Acervo", "book-open", (

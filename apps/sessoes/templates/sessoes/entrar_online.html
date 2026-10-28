@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Sessão online{% endblock %}
+{% block conteudo %}<div class="card" style="max-width:560px;margin:2rem auto">
+<h1>{% icon "video" %} Sessão online</h1><p>{{ sessao.titulo }} · {{ sessao.data_hora|date:"d/m/Y H:i" }}</p>
+{% if pode %}<div class="alerta alerta-info">{% icon "shield-check" %}<span>Ao entrar, a sua presença é registrada como <strong>online</strong>. Use fones e um local reservado: o conteúdo das sessões é sigiloso. Não compartilhe este link.</span></div>
+<form method="post">{% csrf_token %}<button class="btn btn-grande" type="submit">{% icon "video" %} Entrar na videoconferência</button></form>
+{% else %}<div class="alerta alerta-warning">{% icon "triangle-alert" %}<span>{{ motivo }}</span></div>{% endif %}</div>{% endblock %}

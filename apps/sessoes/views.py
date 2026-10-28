@@ -89,6 +89,10 @@ def render_detalhe(request, sessao, aba, **extra):
     elif aba == "presenca":
         services.gerar_presencas(sessao)
         ctx["presencas"] = sessao.presencas.select_related("irmao")
+        from apps.core.pdf import qr_data_uri
+
+        ctx["url_qr"] = request.build_absolute_uri(reverse("sessoes:presenca_qr", args=[sessao.token_presenca]))
+        ctx["qr"] = qr_data_uri(ctx["url_qr"])
         from apps.core.regimento import quorum
 
         ctx["quorum"] = quorum(sessao)

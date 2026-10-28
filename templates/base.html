@@ -4,12 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#4fb3e8">
+  <link rel="manifest" href="{% url 'core:manifest' %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/emblema.svg' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}">
   <title>{% block titulo %}Painel{% endblock %} · {{ loja.nome }}</title>
   <script>
     (function () { try { var r = document.documentElement, g = function (k) { return localStorage.getItem(k); }; r.classList.add('js');
       if (g('tema')) r.dataset.theme = g('tema'); if (g('contraste')) r.dataset.contraste = g('contraste'); if (g('fonte')) r.dataset.fonte = g('fonte'); } catch (e) {} })();
   </script>
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tema.css' %}">
 </head>
 <body>
 <a class="skip" href="#conteudo">Ir para o conteúdo</a>
@@ -18,7 +24,7 @@
 <div class="app">
   <aside class="sidebar" id="sidebar" aria-label="Menu principal">
     <a class="brand" href="{% url 'core:painel' %}">
-      {% if loja.brasao %}<img src="{% url 'core:brasao' %}" alt="">{% else %}<span class="avatar" aria-hidden="true">{% icon "landmark" %}</span>{% endif %}
+      {% if loja.brasao %}<img src="{% url 'core:brasao' %}" alt="">{% else %}{% include "partials/emblema.html" %}{% endif %}
       <span><strong>{{ loja.nome }}</strong><small>{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}Rito {{ loja.rito }}</small></span>
     </a>
     {% include "partials/menu.html" %}
@@ -37,6 +43,7 @@
         <summary class="btn btn-sec btn-peq" aria-label="Minha conta">{% icon "user" %}<span class="somente-largo"> Conta</span> {% icon "chevron-down" %}</summary>
         <div class="menu-usuario-lista" role="menu">
           <a role="menuitem" href="{% url 'irmaos:meu_perfil' %}">{% icon "user" %} Meu cadastro</a>
+          <a role="menuitem" href="{% url 'irmaos:carteirinha' %}">{% icon "id-card" %} Carteirinha digital</a>
           <a role="menuitem" href="{% url 'core:meus_dados' %}">{% icon "shield-check" %} Meus dados (LGPD)</a>
           <a role="menuitem" href="{% url 'password_change' %}">{% icon "lock" %} Alterar senha</a>
           <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button role="menuitem" type="submit">{% icon "log-out" %} Sair</button></form>

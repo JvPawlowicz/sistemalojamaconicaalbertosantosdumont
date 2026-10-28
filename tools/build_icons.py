@@ -11,7 +11,9 @@ award clipboard-list chart-column settings log-out plus search check x pen-line 
 download upload landmark package scale bell menu sun moon contrast house folder user-plus map-pin qr-code
 archive briefcase-business handshake inbox send printer trash-2 pencil circle-alert triangle-alert lock
 key-round history baby heart-pulse graduation-cap gavel file-check clock circle-check circle-x type
-chevron-right chevron-down arrow-left external-link refresh-cw layout-dashboard scroll-text stamp""".split()
+chevron-right chevron-down arrow-left external-link refresh-cw layout-dashboard scroll-text stamp
+id-card megaphone heart-handshake smartphone vote scan-line file-search video hand-heart ruler compass bell-ring hospital
+stethoscope piggy-bank badge-check ticket sparkles""".split()
 
 
 def main(origem: Path) -> None:

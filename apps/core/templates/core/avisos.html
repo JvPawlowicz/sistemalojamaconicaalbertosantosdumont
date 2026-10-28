@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Mural de avisos{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Mural de avisos</h1><p>Comunicados da Loja para o seu grau.</p></div><div class="acoes">{% if pode_gerir %}<a class="btn" href="{% url 'core:aviso_novo' %}">{% icon "plus" %} Novo aviso</a>{% endif %}</div></div>
+{% for a in avisos %}<article class="card aviso {% if a.fixado %}aviso-fixado{% endif %}"><h2>{% icon "megaphone" %} {{ a.titulo }}{% if a.fixado %} <span class="selo selo-info">fixado</span>{% endif %}</h2>
+<p class="muted">{{ a.publicar_em|date:"d/m/Y H:i" }} · {{ a.criado_por.nome_completo }}</p><div style="white-space:pre-wrap">{{ a.texto }}</div>
+{% if pode_gerir %}<div class="acoes mt"><a class="btn btn-sec btn-peq" href="{% url 'core:aviso_editar' a.pk %}">{% icon "pencil" %} Editar</a><form method="post" action="{% url 'core:aviso_excluir' a.pk %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit" data-confirmar="Excluir este aviso?">{% icon "trash-2" %} Excluir</button></form></div>{% endif %}</article>
+{% empty %}<div class="card vazio">Nenhum aviso no momento.</div>{% endfor %}{% endblock %}

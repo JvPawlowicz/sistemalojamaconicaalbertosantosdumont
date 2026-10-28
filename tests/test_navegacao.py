@@ -24,7 +24,7 @@ def test_toda_url_nomeada_pertence_a_uma_secao_ou_a_conta():
     from django.urls import get_resolver
 
     livres = {"core:aceite_termo", "core:privacidade", "core:2fa_configurar", "core:2fa_verificar", "core:meus_dados",
-              "core:exportar_meus_dados", "core:busca", "core:brasao", "core:foto_irmao", "core:testar_email", "core:testar_whatsapp", "irmaos:meu_perfil", "irmaos:modelo_importacao", "irmaos:convidar",
+              "core:exportar_meus_dados", "core:busca", "core:brasao", "core:foto_irmao", "core:manifest", "core:service_worker", "core:offline", "core:testar_email", "core:testar_whatsapp", "irmaos:carteirinha", "irmaos:carteirinha_pdf", "sessoes:presenca_qr", "sessoes:qr_tela", "sessoes:renovar_qr", "sessoes:entrar_online", "irmaos:meu_perfil", "irmaos:modelo_importacao", "irmaos:convidar",
               "irmaos:resetar_2fa", "irmaos:alternar_acesso"}
     nomes = []
     for ns, (_, resolver) in get_resolver().namespace_dict.items():
@@ -132,3 +132,31 @@ def test_formulario_do_irmao_em_abas(cliente, usuarios):
     # perfis não aparecem no "meu cadastro" (cadastro próprio não altera perfil/grau)
     meu = cliente("mestre").get(reverse("irmaos:meu_perfil")).content.decode()
     assert 'name="perfis"' not in meu and 'name="grau"' not in meu
+
+
+def test_landing_publica_e_pwa(cliente, usuarios):
+    from django.test import Client
+    anon = Client().get("/")
+    html = anon.content.decode()
+    assert anon.status_code == 200 and "Tradição e tecnologia" in html and reverse("login") in html
+    assert "Esquadro e compasso" in html and "data-tilt" in html and "prefers-reduced-motion" not in html  # css fica no arquivo
+    # logado, a mesma URL mostra o painel
+    assert "O que precisa da sua atenção" in cliente("mestre").get("/").content.decode()
+    # PWA
+    m = Client().get(reverse("core:manifest"))
+    dados = m.json()
+    assert m["Content-Type"].startswith("application/manifest+json") and dados["display"] == "standalone"
+    assert {i["purpose"] for i in dados["icons"]} == {"any", "maskable"} and dados["theme_color"] == "#4fb3e8"
+    sw = Client().get(reverse("core:service_worker"))
+    assert sw["Content-Type"].startswith("application/javascript") and sw["Service-Worker-Allowed"] == "/"
+    assert b"/static/" in sw.content and b"navigate" in sw.content
+    assert b"/api/" not in sw.content  # nenhuma rota autenticada é guardada em cache
+    assert Client().get(reverse("core:offline")).status_code == 200
+
+
+def test_arquivos_de_icones_existem():
+    from pathlib import Path
+    base = Path(__file__).resolve().parent.parent / "static"
+    for nome in ("icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "favicon-32.png"):
+        assert (base / "icons" / nome).stat().st_size > 500, nome
+    assert "G" in (base / "img" / "emblema.svg").read_text()

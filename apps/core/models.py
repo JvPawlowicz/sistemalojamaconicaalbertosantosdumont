@@ -259,3 +259,29 @@ class SolicitacaoLGPD(models.Model):
         ordering = ["-criada_em"]
         verbose_name = "Solicitação LGPD"
         verbose_name_plural = "Solicitações LGPD"
+
+
+class Aviso(models.Model):
+    """Mural de avisos da Loja, por grau, com opção de fixar e de expirar."""
+
+    titulo = models.CharField(max_length=150)
+    texto = models.TextField()
+    grau_minimo = models.PositiveSmallIntegerField("Visível a partir do grau", default=1,
+                                                   choices=[(1, "Aprendiz"), (2, "Companheiro"), (3, "Mestre")])
+    fixado = models.BooleanField(default=False)
+    publicar_em = models.DateTimeField(default=timezone.now)
+    expira_em = models.DateTimeField(null=True, blank=True)
+    criado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
+    enviado_por_email_em = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-fixado", "-publicar_em"]
+
+    def __str__(self):
+        return self.titulo
+
+    @classmethod
+    def vigentes_para(cls, user):
+        agora = timezone.now()
+        qs = cls.objects.filter(publicar_em__lte=agora).filter(models.Q(expira_em__isnull=True) | models.Q(expira_em__gt=agora))
+        return [a for a in qs if user.pode_ver_grau(a.grau_minimo)]

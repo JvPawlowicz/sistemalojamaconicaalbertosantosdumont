@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Carteirinha digital{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Carteirinha digital</h1><p>Toque ou clique no cartão para virar. O QR Code confirma a sua regularidade a quem o ler.</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'irmaos:carteirinha_pdf' %}" target="_blank" rel="noopener">{% icon "download" %} Baixar PDF</a></div></div>
+<div class="cartao-cena"><button class="cartao" type="button" aria-label="Virar a carteirinha" aria-pressed="false">
+  <span class="face frente">
+    <span class="cartao-topo">{% include "partials/emblema.html" with classe="emb-cartao" %}<span><strong>{{ loja.nome }}</strong><small>{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}{{ loja.potencia }}</small></span></span>
+    <span class="cartao-nome">{{ irmao.nome_completo }}</span>
+    <span class="cartao-dados"><span><small>Grau</small><strong>{{ irmao.grau_nome }}</strong></span><span><small>Matrícula</small><strong>{{ irmao.matricula|default:"—" }}</strong></span><span><small>Iniciação</small><strong>{{ irmao.data_iniciacao|date:"m/Y"|default:"—" }}</strong></span></span>
+    <span class="cartao-rodape">Rito {{ loja.rito }} · {{ irmao.get_situacao_display }}</span>
+  </span>
+  <span class="face verso"><img src="{{ qr }}" alt="QR Code de verificação da carteirinha" width="170" height="170"><small>Verificação pública<br>{{ irmao.codigo_carteirinha }}</small></span>
+</button></div>
+<p class="ajuda" style="text-align:center">A página de verificação mostra apenas nome, grau e se a situação está regular. Não exibe dados financeiros nem pessoais.</p>
+{% endblock %}

@@ -4,6 +4,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
 from apps.atas import views as atas_views
+from apps.irmaos import views_extra as irmaos_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -21,6 +22,8 @@ urlpatterns = [
     path("senha/redefinida/", auth_views.PasswordResetCompleteView.as_view(
         template_name="registration/password_reset_complete.html"), name="password_reset_complete"),
     path("verificar/<str:codigo>/", atas_views.verificar, name="verificar"),
+    path("carteirinha/", irmaos_views.carteirinha, name="carteirinha_atalho"),
+    path("carteirinha/verificar/<str:codigo>/", irmaos_views.verificar_carteirinha, name="verificar_carteirinha_publica"),
     path("irmaos/", include("apps.irmaos.urls")),
     path("cargos/", include("apps.cargos.urls")),
     path("sessoes/", include("apps.sessoes.urls")),

@@ -6,11 +6,37 @@ from apps.core.models import AssinaturaBase
 from apps.sessoes.models import Sessao
 
 
+class LojaCoirma(models.Model):
+    """Diretório de lojas co-irmãs (para visitação)."""
+
+    nome = models.CharField(max_length=150)
+    numero = models.CharField("Nº", max_length=20, blank=True)
+    oriente = models.CharField(max_length=100, blank=True)
+    potencia = models.CharField("Potência", max_length=150, blank=True)
+    rito = models.CharField(max_length=60, blank=True)
+    endereco = models.CharField("Endereço do templo", max_length=255, blank=True)
+    dia_sessoes = models.CharField("Dia e hora das sessões", max_length=120, blank=True, help_text="Ex.: 2ªs e 4ªs terças, 20h")
+    contato_nome = models.CharField("Contato (Secretário)", max_length=120, blank=True)
+    contato_telefone = models.CharField(max_length=20, blank=True)
+    contato_email = models.EmailField(blank=True)
+    observacao = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        ordering = ["nome"]
+        verbose_name = "Loja co-irmã"
+        verbose_name_plural = "Lojas co-irmãs"
+
+    def __str__(self):
+        return f"{self.nome}{' nº ' + self.numero if self.numero else ''}{' — ' + self.oriente if self.oriente else ''}"
+
+
 class VisitaRealizada(models.Model):
     """Visita de um irmão nosso a outra loja (certificado escaneado e vinculado)."""
 
     irmao = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="visitas")
-    loja_nome = models.CharField("Loja visitada", max_length=150)
+    loja = models.ForeignKey("LojaCoirma", null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                             verbose_name="Loja do diretório")
+    loja_nome = models.CharField("Loja visitada", max_length=150, blank=True)
     loja_numero = models.CharField("Nº", max_length=20, blank=True)
     oriente = models.CharField(max_length=100, blank=True)
     potencia = models.CharField("Potência", max_length=150, blank=True)

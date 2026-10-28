@@ -21,10 +21,10 @@ from apps.irmaos.models import Irmao
 from apps.sessoes.models import Sessao
 from apps.sessoes.views import render_detalhe, url_aba
 
-from .forms import VisitaRealizadaForm, VisitanteForm
+from .forms import LojaCoirmaForm, VisitaRealizadaForm, VisitanteForm
 from . import services
-from .models import (AssinaturaCertificado, AutorizacaoAssinaturaLote, CertificadoVisita, VisitaRealizada, VisitaRecebida,
-                     Visitante)
+from .models import (AssinaturaCertificado, AutorizacaoAssinaturaLote, CertificadoVisita, LojaCoirma, VisitaRealizada,
+                     VisitaRecebida, Visitante)
 
 
 def _gerir(user):
@@ -298,3 +298,37 @@ def preautorizar(request, sessao_pk):
         "texto_legal": Loja.atual().texto_legal, "modo": "preautorizar",
         "validade": AutorizacaoAssinaturaLote.VALIDADE_DIAS,
     })
+
+
+# --- Diretório de lojas co-irmãs ---
+class LojasView(ListaView):
+    perfis_permitidos = (P.SECRETARIO,)
+    titulo = "Diretório de lojas co-irmãs"
+    subtitulo = "Cadastre as lojas visitadas e as que nos visitam; elas podem ser escolhidas ao registrar visitas."
+    colunas = [("Loja", lambda o: f"{o.nome} {o.numero}".strip()), ("Oriente", lambda o: o.oriente), ("Potência", lambda o: o.potencia),
+               ("Sessões", lambda o: o.dia_sessoes), ("Contato", lambda o: o.contato_nome)]
+    url_novo = "/visitas/lojas/nova/"
+    rotulo_novo = "Nova loja"
+    acoes_extra = [("Visitas a outras lojas", "/visitas/")]
+
+    def get_objetos(self):
+        return LojaCoirma.objects.all()
+
+    def url_de(self, obj):
+        return reverse("visitas:loja_editar", args=[obj.pk])
+
+
+class NovaLoja(CriarView):
+    perfis_permitidos = (P.SECRETARIO,)
+    model = LojaCoirma
+    form_class = LojaCoirmaForm
+    titulo = "Nova loja co-irmã"
+    success_url = "/visitas/lojas/"
+
+
+class EditarLoja(EditarView):
+    perfis_permitidos = (P.SECRETARIO,)
+    model = LojaCoirma
+    form_class = LojaCoirmaForm
+    titulo = "Editar loja co-irmã"
+    success_url = "/visitas/lojas/"

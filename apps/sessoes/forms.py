@@ -8,7 +8,7 @@ from .models import Sessao
 class SessaoForm(ModelFormBase):
     class Meta:
         model = Sessao
-        fields = ["data_hora", "tipo", "grau", "local", "pauta", "expediente", "status", "observacoes"]
+        fields = ["data_hora", "tipo", "grau", "local", "online", "pauta", "expediente", "status", "observacoes"]
         widgets = {
             "data_hora": forms.DateTimeInput(),
             "pauta": forms.Textarea(attrs={"rows": 6}),

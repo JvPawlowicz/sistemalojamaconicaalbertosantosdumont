@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Registrar presença{% endblock %}
+{% block conteudo %}
+<div class="card" style="max-width:520px;margin:2rem auto;text-align:center">
+  {% include "partials/emblema.html" %}
+  <h1>Registrar presença</h1><p>{{ sessao.titulo }}<br><strong>{{ sessao.data_hora|date:"d/m/Y \à\s H:i" }}</strong>{% if sessao.local %} · {{ sessao.local }}{% endif %}</p>
+  {% if ja %}<div class="alerta alerta-success">{% icon "circle-check" %}<span>Sua presença já está registrada{% if ja.registrada_em %} ({{ ja.registrada_em|date:"H:i" }}){% endif %}.</span></div>
+  {% elif pode %}<form method="post">{% csrf_token %}<p>Confirma a sua presença, {{ user.first_name|default:user.username }}?</p><button class="btn btn-grande" type="submit">{% icon "check" %} Confirmar presença</button></form>
+  {% else %}<div class="alerta alerta-warning">{% icon "triangle-alert" %}<span>{{ motivo }}</span></div>{% endif %}
+  <p class="mt"><a href="{% url 'core:painel' %}">Ir para o Início</a></p>
+</div>{% endblock %}

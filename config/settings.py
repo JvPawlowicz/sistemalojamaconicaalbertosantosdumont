@@ -205,6 +205,9 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "secretaria@localhost")
 
+# Videoconferência das sessões online (Jitsi Meet). Use uma instância própria se quiser sigilo total.
+JITSI_URL = os.environ.get("JITSI_URL", "https://meet.jit.si")
+
 # WhatsApp (Evolution API) — opcional
 EVOLUTION_API_URL = os.environ.get("EVOLUTION_API_URL", "")
 EVOLUTION_API_KEY = os.environ.get("EVOLUTION_API_KEY", "")

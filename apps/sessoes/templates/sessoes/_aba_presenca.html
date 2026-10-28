@@ -1,8 +1,12 @@
-{% load loja %}<form method="post" action="{% url 'sessoes:presenca' sessao.pk %}" class="card" id="form-presenca">{% csrf_token %}
+{% load loja %}<section class="card qr-presenca"><div class="qr-box"><img src="{{ qr }}" alt="QR Code para registrar presença" width="150" height="150"></div>
+<div><h2>{% icon "qr-code" %} Presença por QR Code</h2><p>Cada irmão aponta a câmera do celular, confirma e a presença é registrada (vale de 2 h antes a 8 h depois do início da sessão).</p>
+<div class="acoes"><a class="btn btn-sec btn-peq" href="{% url 'sessoes:qr_tela' sessao.pk %}" target="_blank" rel="noopener">{% icon "scan-line" %} Abrir em tela cheia</a>
+<form method="post" action="{% url 'sessoes:renovar_qr' sessao.pk %}">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit" data-confirmar="Gerar um novo QR Code? O atual deixará de valer.">{% icon "refresh-cw" %} Renovar QR</button></form></div></div></section>
+<form method="post" action="{% url 'sessoes:presenca' sessao.pk %}" class="card" id="form-presenca">{% csrf_token %}
 {% if quorum.1 %}<p class="selo {% if quorum.2 %}selo-ok{% else %}selo-danger{% endif %}">Quórum: {{ quorum.0 }} presente(s) / mínimo {{ quorum.1 }}{% if not quorum.2 %} — não atingido{% endif %}</p>{% endif %}
 <p class="ajuda">Irmãos de grau {{ sessao.get_grau_display }} ou superior. <button type="button" class="btn btn-sec btn-peq" data-marcar-todos="presente" data-form="form-presenca">{% icon "check" %} Marcar todos presentes</button></p>
 <div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th>Situação</th><th>Justificativa</th></tr></thead><tbody>
-{% for p in presencas %}<tr><td>{{ p.irmao.nome_completo }} <span class="muted">({{ p.irmao.grau_nome }})</span></td>
+{% for p in presencas %}<tr><td>{{ p.irmao.nome_completo }} <span class="muted">({{ p.irmao.grau_nome }})</span>{% if p.origem == "qr" and p.situacao == "presente" %} <span class="selo selo-info" title="{{ p.registrada_em|date:"d/m H:i" }}">{% if p.remota %}online{% else %}QR{% endif %}</span>{% endif %}</td>
 <td><div class="opcoes" role="radiogroup" aria-label="Situação de {{ p.irmao.nome_completo }}">
 {% for v, n in p.Situacao.choices %}<label><input type="radio" class="check" name="p_{{ p.irmao_id }}" value="{{ v }}" {% if p.situacao == v %}checked{% endif %}> {{ n }}</label>{% endfor %}</div></td>
 <td><input class="input" name="j_{{ p.irmao_id }}" value="{{ p.justificativa }}" maxlength="200" aria-label="Justificativa de {{ p.irmao.nome_completo }}"></td></tr>{% endfor %}</tbody></table></div>

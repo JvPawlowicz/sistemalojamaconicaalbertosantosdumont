@@ -1,0 +1,4 @@
+{% load static %}<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QR de presença</title>
+<link rel="stylesheet" href="{% static 'css/app.css' %}"><link rel="stylesheet" href="{% static 'css/tema.css' %}"></head>
+<body><main class="qr-tela"><div>{% include "partials/emblema.html" %}<h1>Registre a sua presença</h1><p style="font-size:1.2rem">{{ sessao.titulo }} · {{ sessao.data_hora|date:"d/m/Y H:i" }}</p>
+<img src="{{ qr }}" alt="QR Code de presença"><p class="ajuda">Aponte a câmera do celular · {{ url }}</p></div></main></body></html>

@@ -34,6 +34,9 @@ class Sessao(models.Model):
     observacoes = models.TextField(blank=True)
     convocacao_enviada_em = models.DateTimeField(null=True, blank=True)
     lembrete_enviado_em = models.DateTimeField(null=True, blank=True)
+    token_presenca = models.CharField(max_length=32, blank=True, editable=False, db_index=True)
+    online = models.BooleanField("Sessão também online (videoconferência)", default=False)
+    sala_online = models.CharField(max_length=40, blank=True, editable=False)
     history = HistoricalRecords()
 
     class Meta:
@@ -45,8 +48,32 @@ class Sessao(models.Model):
         return f"Sessão {self.get_tipo_display()} de {self.get_grau_display()} — {self.data_hora:%d/%m/%Y}"
 
     def save(self, *args, **kwargs):
+        import secrets
+
         self.ano = AnoMaconico.para_data(self.data_hora.date())
+        if not self.token_presenca:
+            self.token_presenca = secrets.token_urlsafe(18)
+        if self.online and not self.sala_online:
+            self.sala_online = "Loja-" + secrets.token_urlsafe(12).replace("_", "x").replace("-", "y")
         super().save(*args, **kwargs)
+
+    def novo_token_presenca(self):
+        import secrets
+
+        self.token_presenca = secrets.token_urlsafe(18)
+        self.save(update_fields=["token_presenca"])
+
+    def janela_presenca(self):
+        """Período em que o QR Code de presença vale: 2 h antes até 8 h depois do início."""
+        from datetime import timedelta
+
+        return self.data_hora - timedelta(hours=2), self.data_hora + timedelta(hours=8)
+
+    @property
+    def link_online(self):
+        from django.conf import settings
+
+        return f"{settings.JITSI_URL.rstrip('/')}/{self.sala_online}" if self.online and self.sala_online else ""
 
     @property
     def titulo(self):
@@ -87,6 +114,10 @@ class Presenca(models.Model):
     irmao = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="presencas")
     situacao = models.CharField(max_length=12, choices=Situacao.choices, default=Situacao.AUSENTE)
     justificativa = models.CharField(max_length=200, blank=True)
+    origem = models.CharField(max_length=10, default="manual", choices=[("manual", "Secretaria"), ("qr", "QR Code")])
+    remota = models.BooleanField("Presença online", default=False)
+    registrada_em = models.DateTimeField(null=True, blank=True)
+    ip = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
         unique_together = [("sessao", "irmao")]

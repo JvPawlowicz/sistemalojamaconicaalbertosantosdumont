@@ -1,0 +1,93 @@
+{% load static loja %}<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark"><meta name="theme-color" content="#4fb3e8">
+  <title>{{ loja.nome }} · Sistema de gestão</title>
+  <meta name="description" content="Sistema de gestão da {{ loja.nome }}: irmãos, sessões, atas com assinatura eletrônica, tesouraria, visitação e muito mais.">
+  <link rel="manifest" href="{% url 'core:manifest' %}"><link rel="icon" type="image/svg+xml" href="{% static 'img/emblema.svg' %}">
+  <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}">
+  <script>(function(){try{var r=document.documentElement,g=function(k){return localStorage.getItem(k)};r.classList.add('js');if(g('tema'))r.dataset.theme=g('tema');if(g('contraste'))r.dataset.contraste=g('contraste');}catch(e){}})();</script>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}"><link rel="stylesheet" href="{% static 'css/tema.css' %}"><link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body class="landing">
+<a class="skip" href="#principal">Ir para o conteúdo</a>
+<div class="progresso" aria-hidden="true"><span id="progresso-barra"></span></div>
+<header class="l-topo" id="topo">
+  <a class="l-marca" href="#inicio" aria-label="{{ loja.nome }} — início">{% include "partials/emblema.html" %}<span><strong>{{ loja.nome }}</strong>{% if loja.numero %}<small>Nº {{ loja.numero }}{% if loja.oriente %} · Oriente de {{ loja.oriente }}{% endif %}</small>{% endif %}</span></a>
+  <nav class="l-nav" aria-label="Seções da página">
+    <a href="#recursos">Recursos</a><a href="#atas">Atas</a><a href="#seguranca">Segurança</a><a href="#passos">Como funciona</a>
+  </nav>
+  <a class="btn" href="{% url 'login' %}">{% icon "lock" %} Entrar</a>
+</header>
+
+<main id="principal">
+<section class="hero" id="inicio" aria-labelledby="h-hero">
+  <div class="hero-fundo" aria-hidden="true"><span class="orbe o1"></span><span class="orbe o2"></span><span class="grade-fundo"></span></div>
+  <div class="hero-texto">
+    <p class="etiqueta">{{ loja.potencia }} · Rito {{ loja.rito }}</p>
+    <h1 id="h-hero">Tradição e tecnologia<br>a serviço da <em>Loja</em></h1>
+    <p class="lead">Irmãos, sessões, atas com assinatura eletrônica, tesouraria, visitação e muito mais — tudo integrado, seguro e simples de usar, no computador ou no celular.</p>
+    <div class="acoes-hero"><a class="btn btn-grande" href="{% url 'login' %}">{% icon "lock" %} Entrar no sistema</a><a class="btn btn-sec btn-grande" href="#recursos">{% icon "chevron-down" %} Conhecer os recursos</a></div>
+    <ul class="selos-hero" aria-label="Destaques"><li>{% icon "shield-check" %} 2FA e LGPD</li><li>{% icon "pen-line" %} Assinatura eletrônica</li><li>{% icon "smartphone" %} Funciona no celular</li></ul>
+  </div>
+  <div class="cena3d" id="cena" aria-hidden="true">
+    <div class="anel a1"></div><div class="anel a2"></div><div class="anel a3"></div>
+    <div class="camada c-base">{% include "partials/emblema.html" with classe="emb-grande" %}</div>
+    <div class="vidro v1"><span class="v-icone">{% icon "circle-check" %}</span><span><strong>Ata assinada</strong><small>hash e QR verificados</small></span></div>
+    <div class="vidro v2"><span class="v-icone">{% icon "users" %}</span><span><strong>Frequência</strong><small>92% no ano maçônico</small></span></div>
+    <div class="vidro v3"><span class="v-icone">{% icon "wallet" %}</span><span><strong>Caixa em dia</strong><small>mensalidades conciliadas</small></span></div>
+  </div>
+  <a class="rolar" href="#recursos" aria-label="Rolar para os recursos">{% icon "chevron-down" %}</a>
+</section>
+
+<section class="faixa-numeros" aria-label="O sistema em números">
+  <div class="numero" data-revelar><strong data-contar="14">14</strong><span>módulos integrados</span></div>
+  <div class="numero" data-revelar><strong data-contar="3">3</strong><span>graus, com acesso por grau</span></div>
+  <div class="numero" data-revelar><strong data-contar="8">8</strong><span>seções, poucos cliques</span></div>
+  <div class="numero" data-revelar><strong data-contar="100" data-sufixo="%">100%</strong><span>em português do Brasil</span></div>
+</section>
+
+<section class="secao" id="recursos" aria-labelledby="h-rec">
+  <div class="secao-cab" data-revelar><p class="etiqueta">Recursos</p><h2 id="h-rec">Tudo da Loja em um só lugar</h2><p>Cada rotina da Secretaria, da Tesouraria e do Venerável, pensada para economizar tempo.</p></div>
+  <div class="grade-recursos">
+    {% for ico, tit, txt in recursos %}<article class="recurso" data-revelar data-tilt style="--i:{{ forloop.counter0 }}"><span class="recurso-icone">{% icon ico %}</span><h3>{{ tit }}</h3><p>{{ txt }}</p></article>{% endfor %}
+  </div>
+</section>
+
+<section class="secao secao-atas" id="atas" aria-labelledby="h-atas">
+  <div class="atas-texto" data-revelar>
+    <p class="etiqueta">Atas</p><h2 id="h-atas">Assinatura eletrônica com prova de autoria e integridade</h2>
+    <p>O Secretário redige com textos pré-cadastrados (digite <kbd>@</kbd>), a ata circula para aprovação e cada signatário assina no próprio dispositivo. Tudo fica registrado e verificável.</p>
+    <ul class="lista-check"><li>{% icon "check" %} Desenho da assinatura, IP, data/hora e geolocalização</li><li>{% icon "check" %} Hash SHA-256 e QR Code de verificação pública</li><li>{% icon "check" %} Versões arquivadas e comparáveis</li><li>{% icon "check" %} Base legal impressa em cada documento</li></ul>
+  </div>
+  <figure class="ata-demo" data-revelar aria-label="Exemplo ilustrativo de ata assinada">
+    <div class="ata-folha" data-tilt><div class="ata-cab"><strong>{{ loja.nome }}</strong><small>Ata nº 12 · Sessão Ordinária</small></div>
+      <div class="ata-linhas"><i></i><i></i><i class="curta"></i><i></i><i class="curta"></i></div>
+      <svg class="ata-assinatura" viewBox="0 0 220 70" aria-hidden="true"><path pathLength="1" d="M8 48 C 22 8, 38 8, 42 40 S 62 62, 74 28 S 100 6, 112 40 S 140 60, 152 30 C 160 12, 176 14, 180 36 L 212 24"/></svg>
+      <div class="ata-selo">{% icon "shield-check" %}<span><strong>Assinada eletronicamente</strong><small>hash 9F2C…A71B · verificável</small></span></div></div>
+    <figcaption>Ilustração</figcaption>
+  </figure>
+</section>
+
+<section class="secao secao-escura" id="seguranca" aria-labelledby="h-seg">
+  <div class="secao-cab" data-revelar><p class="etiqueta">Segurança</p><h2 id="h-seg">Dados sensíveis tratados com o cuidado que merecem</h2></div>
+  <div class="grade-seg">
+    {% for ico, tit, txt in seguranca %}<article class="seg" data-revelar style="--i:{{ forloop.counter0 }}"><span class="recurso-icone">{% icon ico %}</span><h3>{{ tit }}</h3><p>{{ txt }}</p></article>{% endfor %}
+  </div>
+</section>
+
+<section class="secao" id="passos" aria-labelledby="h-pas">
+  <div class="secao-cab" data-revelar><p class="etiqueta">Como funciona</p><h2 id="h-pas">Da convocação ao arquivo, sem papel perdido</h2></div>
+  <ol class="passos">
+    {% for tit, txt in passos %}<li data-passo data-revelar><span class="passo-n">{{ forloop.counter }}</span><div><h3>{{ tit }}</h3><p>{{ txt }}</p></div></li>{% endfor %}
+  </ol>
+</section>
+
+<section class="cta" aria-labelledby="h-cta"><div data-revelar>{% include "partials/emblema.html" with classe="emb-cta" %}<h2 id="h-cta">Pronto para começar?</h2><p>Entre com o seu usuário. Em caso de dúvida, procure o Secretário da Loja.</p><a class="btn btn-grande" href="{% url 'login' %}">{% icon "lock" %} Entrar no sistema</a></div></section>
+</main>
+
+<footer class="l-rodape"><span>{{ loja.nome }} · {{ loja.potencia }}</span><span><a href="{% url 'core:privacidade' %}">Privacidade (LGPD)</a> · Código aberto (MIT)</span>
+  <span class="controles" role="group" aria-label="Aparência"><button type="button" data-acao="tema" aria-label="Alternar tema claro/escuro">{% icon "sun" %}</button><button type="button" data-acao="contraste" aria-label="Alternar alto contraste">{% icon "contrast" %}</button></span></footer>
+<script src="{% static 'js/app.js' %}" defer></script><script src="{% static 'js/landing.js' %}" defer></script>
+</body></html>

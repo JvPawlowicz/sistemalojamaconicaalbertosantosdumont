@@ -1,4 +1,5 @@
-{% load loja %}<div class="grade-2">
+{% load loja %}{% if sessao.online %}<div class="alerta alerta-info">{% icon "video" %}<span>Esta sessão também acontece <strong>online</strong>. <a class="btn btn-sm btn-peq" href="{% url 'sessoes:entrar_online' sessao.pk %}">Entrar na videoconferência</a></span></div>{% endif %}
+<div class="grade-2">
 <section class="card"><h2>{% icon "file-text" %} Pauta</h2><div style="white-space:pre-wrap">{{ sessao.pauta|default:"Sem pauta cadastrada." }}</div>
 <h3 class="mt">Expediente do dia</h3><div style="white-space:pre-wrap">{{ sessao.expediente|default:"—" }}</div>
 {% for e in expedientes %}<p class="mb0">{% icon "inbox" %} {{ e.assunto }}</p>{% endfor %}</section>

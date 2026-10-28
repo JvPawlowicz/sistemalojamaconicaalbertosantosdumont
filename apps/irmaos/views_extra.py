@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django_otp.plugins.otp_static.models import StaticDevice
 from django_otp.plugins.otp_totp.models import TOTPDevice
@@ -71,3 +72,41 @@ def alternar_acesso(request, pk):
         irmao.save()
         messages.success(request, f"Acesso de {irmao.nome_completo} {'reativado' if irmao.is_active else 'desativado'}.")
     return redirect("irmaos:detalhe", pk=pk)
+
+
+# --- Carteirinha digital ---
+def _dados_carteirinha(request, irmao):
+    from apps.core.models import Loja
+    from apps.core.pdf import qr_data_uri
+
+    if not irmao.codigo_carteirinha:
+        irmao.save()
+    url = request.build_absolute_uri(reverse("verificar_carteirinha_publica", args=[irmao.codigo_carteirinha]))
+    return {"irmao": irmao, "loja": Loja.atual(), "qr": qr_data_uri(url), "url": url}
+
+
+@login_required
+def carteirinha(request):
+    if request.user.grau is None:
+        raise PermissionDenied
+    return render(request, "irmaos/carteirinha.html", _dados_carteirinha(request, request.user))
+
+
+@login_required
+def carteirinha_pdf(request):
+    from apps.core.pdf import pdf_bytes, resposta_pdf
+
+    if request.user.grau is None:
+        raise PermissionDenied
+    dados = pdf_bytes("irmaos/carteirinha_pdf.html", _dados_carteirinha(request, request.user), request)
+    return resposta_pdf("carteirinha.pdf", dados)
+
+
+def verificar_carteirinha(request, codigo):
+    """Página pública (QR Code): confirma a regularidade sem expor dados pessoais."""
+    from apps.core.models import Loja
+
+    irmao = Irmao.objects.filter(codigo_carteirinha=codigo.upper(), grau__isnull=False).first()
+    regular = bool(irmao and irmao.is_active and irmao.situacao in (Irmao.Situacao.ATIVO, Irmao.Situacao.REMIDO))
+    return render(request, "irmaos/verificar_carteirinha.html", {"irmao": irmao, "regular": regular, "loja": Loja.atual()},
+                  status=200 if irmao else 404)
