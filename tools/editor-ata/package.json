@@ -1,0 +1,21 @@
+{
+  "name": "editor-ata",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Editor de atas (Tiptap/ProseMirror, MIT) empacotado em um \u00fanico arquivo para o Sistema da Loja",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@tiptap/core": "2.27.3",
+    "@tiptap/extension-character-count": "2.27.3",
+    "@tiptap/extension-placeholder": "2.27.3",
+    "@tiptap/extension-text-align": "2.27.3",
+    "@tiptap/extension-underline": "2.27.3",
+    "@tiptap/starter-kit": "2.27.3",
+    "@tiptap/suggestion": "2.27.3"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2"
+  }
+}

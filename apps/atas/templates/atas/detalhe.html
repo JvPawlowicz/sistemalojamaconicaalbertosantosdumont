@@ -27,6 +27,6 @@
 <td>{% if a %}<span class="selo selo-ok">Assinou em {{ a.assinado_em|date:"d/m/Y H:i" }}</span> <a href="{% url 'verificar' a.codigo %}" target="_blank" rel="noopener">verificar ({{ a.codigo }})</a>{% else %}<span class="selo selo-warn">Pendente</span>{% endif %}</td></tr>{% endfor %}</tbody></table>
 {% if versoes_anteriores %}<p class="ajuda">{{ versoes_anteriores }} assinatura(s) de versões anteriores foram invalidadas.</p>{% endif %}</section>{% endif %}
 
-<div class="texto-ata">{{ ata.conteudo }}</div>
+<div class="texto-ata ata-rich">{{ ata.conteudo_html }}</div>
 <p class="ajuda mt">Hash SHA-256 do conteúdo (versão {{ ata.versao }}): <code>{{ ata.hash_conteudo }}</code></p>
 {% endblock %}

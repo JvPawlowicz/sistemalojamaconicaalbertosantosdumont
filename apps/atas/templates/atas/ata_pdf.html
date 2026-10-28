@@ -3,7 +3,7 @@
 body { font-family: Georgia, "Times New Roman", serif; font-size: 12pt; line-height: 1.55; color: #111; }
 .cab { text-align: center; white-space: pre-line; font-weight: bold; border-bottom: 2px solid #1f3a5f; padding-bottom: .4cm; margin-bottom: .6cm; }
 .tit { text-align: center; font-size: 14pt; margin: .2cm 0 .6cm; text-transform: uppercase; }
-.texto { white-space: pre-wrap; text-align: justify; }
+.texto { text-align: justify; } .texto p { margin: 0 0 .5em; } .texto h2, .texto h3 { font-size: 12.5pt; margin: .9em 0 .3em; } .texto h2 { text-align: center; text-transform: uppercase; } .texto blockquote { margin: .5em 1.2cm; font-style: italic; } .texto ul, .texto ol { margin: .3em 0 .6em 1em; }
 .assin { page-break-inside: avoid; margin-top: 1cm; }
 .ass-item { display: inline-block; width: 46%; vertical-align: top; text-align: center; margin: .3cm 1%; page-break-inside: avoid; }
 .ass-item img { max-height: 1.8cm; max-width: 100%; } .ass-item .linha { border-top: 1px solid #000; margin-top: .1cm; padding-top: .1cm; font-size: 10.5pt; }
@@ -13,7 +13,7 @@ body { font-family: Georgia, "Times New Roman", serif; font-size: 12pt; line-hei
 </style></head><body>
 <div class="cab">{{ loja.cabecalho }}</div>
 <div class="tit">Ata nº {{ ata.numero|default:"____" }}{% if ata.livro %} — Livro {{ ata.livro }}, folha {{ ata.folha }}{% endif %}<br><small>Sessão {{ ata.sessao.titulo }} — {{ ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ata.versao }})</small></div>
-<div class="texto">{{ ata.conteudo }}</div>
+<div class="texto rico">{{ ata.conteudo_html }}</div>
 <div class="assin">
 {% for a in assinaturas %}<div class="ass-item">{% if a.imagem_src %}<img src="{{ a.imagem_src }}" alt="">{% endif %}
 <div class="linha"><strong>{{ a.irmao.nome_completo }}</strong><br>assinado em {{ a.assinado_em|date:"d/m/Y H:i" }}</div>

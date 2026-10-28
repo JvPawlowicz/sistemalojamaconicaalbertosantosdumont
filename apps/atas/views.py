@@ -60,7 +60,9 @@ def criar(request, sessao_pk):
     inicial = {"numero": services.proximo_numero()}
     cab = ModeloTexto.objects.filter(categoria=ModeloTexto.Categoria.CABECALHO, ativo=True).first()
     if cab:
-        inicial["conteudo"] = services.renderizar_modelo(cab.texto, sessao) + "\n\n"
+        from .sanitizar import texto_para_html
+
+        inicial["conteudo"] = texto_para_html(services.renderizar_modelo(cab.texto, sessao)) + "<p></p>"
     form = AtaForm(request.POST or None, initial=inicial)
     if request.method == "POST" and form.is_valid():
         ata = form.save(commit=False)
@@ -259,7 +261,7 @@ class EditarModelo(EditarView):
 
 @login_required
 def buscar_modelos(request):
-    """API do @ no editor: devolve os modelos já com as variáveis da sessão preenchidas."""
+    """API do @ no editor: textos prontos (com as variáveis da sessão preenchidas) e nomes de irmãos."""
     if not _gerir(request.user):
         raise PermissionDenied
     sessao = get_object_or_404(Sessao, pk=request.GET.get("sessao"))
@@ -267,9 +269,25 @@ def buscar_modelos(request):
     itens = []
     for m in ModeloTexto.objects.filter(ativo=True):
         if q in m.titulo.lower() or q in m.atalho.lower() or q in m.get_categoria_display().lower():
-            itens.append({"titulo": m.titulo, "atalho": m.atalho, "categoria": m.get_categoria_display(),
+            itens.append({"tipo": "modelo", "grupo": "Textos prontos", "titulo": m.titulo, "atalho": m.atalho,
+                          "detalhe": f"@{m.atalho} · {m.get_categoria_display()}", "categoria": m.get_categoria_display(),
                           "texto": services.renderizar_modelo(m.texto, sessao)})
-    return JsonResponse({"itens": itens[:15]})
+    itens = itens[:10]
+    if q:
+        for i in sessao.elegiveis().filter(nome_completo__icontains=q, grau__isnull=False)[:6]:
+            titulo = "Ir∴ " + i.nome_completo
+            itens.append({"tipo": "irmao", "grupo": "Irmãos", "titulo": i.nome_completo, "detalhe": i.grau_nome,
+                          "texto": f"Ir∴ {i.nome_completo}"})
+    return JsonResponse({"itens": itens})
+
+
+@login_required
+def renderizar_texto(request):
+    """Preenche as variáveis de um trecho ({{data}}, {{veneravel}}…) para uma sessão."""
+    if not _gerir(request.user):
+        raise PermissionDenied
+    sessao = get_object_or_404(Sessao, pk=request.GET.get("sessao"))
+    return JsonResponse({"texto": services.renderizar_modelo(request.GET.get("texto", "")[:2000], sessao)})
 
 
 def verificar(request, codigo):
@@ -340,8 +358,10 @@ def versoes(request, pk):
     ata = _ata_visivel(request, pk)
     snaps = {v.versao: v for v in ata.versoes.all()}
     snaps.setdefault(ata.versao, None)
-    textos = {v.versao: v.conteudo for v in ata.versoes.all()}
-    textos[ata.versao] = ata.conteudo if ata.editavel or ata.versao not in textos else textos[ata.versao]
+    from .sanitizar import texto_simples
+
+    textos = {v.versao: (texto_simples(v.conteudo) if v.formato == "html" else v.conteudo) for v in ata.versoes.all()}
+    textos[ata.versao] = ata.texto if ata.editavel or ata.versao not in textos else textos[ata.versao]
     numeros = sorted(textos)
     try:
         a = int(request.GET.get("a", numeros[-2] if len(numeros) > 1 else numeros[-1]))

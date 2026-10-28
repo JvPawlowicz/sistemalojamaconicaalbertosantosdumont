@@ -2,13 +2,20 @@
 {% block titulo %}Redigir ata{% endblock %}
 {% block conteudo %}
 <div class="cabecalho-pagina"><div><h1>Redigir ata</h1><p>{{ sessao.titulo }} · {{ sessao.data_hora|date:"d/m/Y H:i" }}</p></div></div>
-<div class="alerta alerta-info">{% icon "bell" %}<span>Dica: digite <strong>@</strong> para inserir cabeçalhos e textos pré-cadastrados (variáveis como data e Venerável são preenchidas sozinhas). O cabeçalho oficial da Loja é aplicado automaticamente ao gerar o PDF.</span></div>
-<form method="post" class="card" novalidate>{% csrf_token %}
+<form method="post" class="card" novalidate id="form-ata">{% csrf_token %}
   {% if form.non_field_errors %}<div class="alerta alerta-error">{{ form.non_field_errors }}</div>{% endif %}
   <div class="form-grid">{% campo form.numero %}{% campo form.livro %}{% campo form.folha %}</div>
-  <div class="campo"><label for="ata-conteudo">Texto da ata</label>
-  {{ form.conteudo }}
-  {% for e in form.conteudo.errors %}<div class="erro" role="alert">{{ e }}</div>{% endfor %}</div>
-  <div class="barra-acoes"><button class="btn" type="submit">{% icon "check" %} Salvar rascunho</button><button class="btn btn-sec" type="submit" name="continuar" value="1">Salvar e continuar editando</button><a class="btn btn-sec" href="{% if ata %}{% url 'atas:detalhe' ata.pk %}{% else %}{% url 'sessoes:detalhe' sessao.pk %}{% endif %}">Cancelar</a></div>
+  <div class="campo"><span class="rotulo-campo" id="rot-ata">Texto da ata</span>
+    <div id="editor-ata" aria-labelledby="rot-ata"></div>
+    <textarea name="conteudo" id="ata-conteudo" hidden>{{ form.conteudo.value|default:"" }}</textarea>
+    <noscript><p class="alerta alerta-error">O editor da ata precisa de JavaScript.</p></noscript>
+    {% for e in form.conteudo.errors %}<div class="erro" role="alert">{{ e }}</div>{% endfor %}</div>
+  <div class="barra-acoes"><button class="btn" type="submit">{% icon "check" %} Salvar rascunho</button><button class="btn btn-sec" type="submit" name="continuar" value="1">Salvar e continuar editando</button><a class="btn btn-sec" href="{% if ata %}{% url 'atas:detalhe' ata.pk %}{% else %}{% url 'sessoes:detalhe' sessao.pk %}{% endif %}">Cancelar</a>
+    <span class="ajuda" style="margin-left:auto">Dica: digite <kbd>@</kbd> para textos prontos e nomes de irmãos · <kbd>Ctrl</kbd>+<kbd>S</kbd> salva</span></div>
 </form>{% endblock %}
-{% block scripts %}<script>document.getElementById('ata-conteudo').dataset.urlModelos="{% url 'atas:modelos_buscar' %}";document.getElementById('ata-conteudo').dataset.sessao="{{ sessao.pk }}";</script><script src="{% static 'js/ata_editor.js' %}" defer></script>{% endblock %}
+{% block scripts %}<link rel="stylesheet" href="{% static 'css/editor.css' %}"><script src="{% static 'vendor/editor-ata.js' %}"></script>
+<script>
+  var ed = EditorAta.init({ raiz: 'editor-ata', campo: 'ata-conteudo', sessao: '{{ sessao.pk }}', chave: 'ata-{{ ata.pk|default:"nova" }}-{{ sessao.pk }}',
+    urlBusca: "{% url 'atas:modelos_buscar' %}", urlRender: "{% url 'atas:modelos_renderizar' %}", salvoEm: {{ ata.atualizada_em|date:"U"|default:"0" }} });
+  document.addEventListener('keydown', function (e) { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); document.getElementById('form-ata').requestSubmit(); } });
+</script>{% endblock %}

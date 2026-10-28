@@ -34,6 +34,7 @@ class Ata(models.Model):
     livro = models.CharField("Livro", max_length=20, blank=True)
     folha = models.CharField("Folha", max_length=20, blank=True)
     conteudo = models.TextField("Texto da ata")
+    formato = models.CharField(max_length=5, choices=[("texto", "Texto simples"), ("html", "Texto formatado")], default="html")
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.RASCUNHO)
     versao = models.PositiveIntegerField(default=1)
     autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="+")
@@ -49,6 +50,19 @@ class Ata(models.Model):
 
     def __str__(self):
         return f"Ata {self.numero or 's/nº'} — {self.sessao}"
+
+    @property
+    def conteudo_html(self):
+        from .sanitizar import renderizar
+
+        return renderizar(self)
+
+    @property
+    def texto(self):
+        """Conteúdo como texto puro (comparação de versões, busca, e-mails)."""
+        from .sanitizar import texto_simples
+
+        return texto_simples(self.conteudo) if self.formato == "html" else self.conteudo
 
     @property
     def editavel(self):
@@ -73,7 +87,8 @@ class Ata(models.Model):
     def arquivar_versao(self, usuario=None):
         """Guarda o retrato da versão atual (idempotente)."""
         return AtaVersao.objects.get_or_create(ata=self, versao=self.versao, defaults={
-            "conteudo": self.conteudo, "texto_canonico": self.texto_canonico(), "hash": self.hash_conteudo,
+            "conteudo": self.conteudo, "formato": self.formato, "texto_canonico": self.texto_canonico(),
+            "hash": self.hash_conteudo,
             "criada_por": usuario})[0]
 
     def faltam_assinar(self):
@@ -87,6 +102,7 @@ class AtaVersao(models.Model):
     ata = models.ForeignKey(Ata, on_delete=models.CASCADE, related_name="versoes")
     versao = models.PositiveIntegerField()
     conteudo = models.TextField()
+    formato = models.CharField(max_length=5, default="texto")
     texto_canonico = models.TextField()
     hash = models.CharField(max_length=64)
     criada_em = models.DateTimeField(auto_now_add=True)

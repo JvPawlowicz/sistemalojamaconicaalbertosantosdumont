@@ -1,0 +1,8 @@
+Componentes de terceiros empacotados em static/vendor/editor-ata.js (todos licença MIT):
+- Tiptap (@tiptap/*) — © Tiptap GmbH — https://tiptap.dev
+- ProseMirror (prosemirror-*) — © Marijn Haverbeke — https://prosemirror.net
+- Dependências: orderedmap, w3c-keyname, rope-sequence, linkifyjs, tippy-less, entre outras (MIT)
+
+Permissão é concedida, sem custos, a qualquer pessoa que obtenha uma cópia deste software, para usá-lo, copiá-lo,
+modificá-lo e distribuí-lo, desde que o aviso de copyright e esta permissão sejam incluídos nas cópias. O software é
+fornecido "como está", sem garantias. O texto integral das licenças acompanha cada pacote em node_modules/<pacote>/LICENSE.
