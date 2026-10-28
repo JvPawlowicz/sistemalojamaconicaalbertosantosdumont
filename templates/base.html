@@ -42,6 +42,7 @@
           <p class="menu-usuario-nome"><strong>{{ user.nome_completo|default:user.username }}</strong><small>{{ grau_nome|default:"Técnico" }}</small></p>
           <a role="menuitem" href="{% url 'irmaos:meu_perfil' %}">{% icon "user" %} Meu cadastro</a>
           <a role="menuitem" href="{% url 'irmaos:carteirinha' %}">{% icon "id-card" %} Carteirinha digital</a>
+          <a role="menuitem" href="{% url 'core:ajuda' %}">{% icon "book-open" %} Ajuda e manuais</a>
           <a role="menuitem" href="{% url 'core:meus_dados' %}">{% icon "shield-check" %} Meus dados (LGPD)</a>
           <a role="menuitem" href="{% url 'password_change' %}">{% icon "lock" %} Alterar senha</a>
           <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button role="menuitem" type="submit">{% icon "log-out" %} Sair</button></form>

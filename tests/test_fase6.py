@@ -262,3 +262,10 @@ def test_busca_no_texto_dos_pdfs_respeita_o_grau(cliente, usuarios, settings, tm
 def test_saude_publica_sem_login(client, db):
     r = client.get(reverse("core:saude"))
     assert r.status_code == 200 and r.json() == {"status": "ok"}
+
+
+def test_ajuda_mostra_manual_conforme_o_perfil(cliente, usuarios):
+    t = cliente("tesoureiro").get(reverse("core:ajuda")).content.decode()
+    assert "Manual do Tesoureiro" in t and "Manual do Secretário" not in t
+    a = cliente("aprendiz").get(reverse("core:ajuda")).content.decode()
+    assert "Para todos os irmãos" in a and "Manual do Tesoureiro" not in a

@@ -113,4 +113,4 @@ WhatsApp (certificados) é opcional via Evolution API (`EVOLUTION_*`); o canal p
 
 ## Fora do escopo atual
 
-Integração bancária automática (PIX/boleto com baixa automática).
+Integração bancária direta (API do banco). A conciliação é feita por extrato OFX; o PIX é gerado como copia e cola/QR Code.

@@ -108,6 +108,13 @@ O menu é uma **barra superior** com 8 seções (no celular vira botão ☰) e a
 **G4. Identidade visual e textos padrão**
 *Configurações*: envie o **brasão/logo** (cabeçalho dos PDFs), a **marca d'água** (fundo de atas, certificados e convocações; ajuste a intensidade) e a **imagem de identidade** (ex.: busto de Santos Dumont, usada na entrada e na página inicial). Em *Atas › Modelos de texto* use **Carregar textos padrão** (28 textos prontos para o Secretário; digite `@` na ata).
 
+**G5. PIX, conciliação, aniversários, busca em PDF e ajuda**
+1. *Configurações*: informe a chave PIX. Em *Financeiro › Minhas mensalidades* clique em **PIX** (QR Code e copia e cola).
+2. *Financeiro › Conciliação*: envie um extrato **OFX**; confira as sugestões e dê baixa nas marcadas (repetir o arquivo não duplica).
+3. Ative o e-mail de parabéns em *Configurações* e rode `python manage.py enviar_lembretes`; o painel e a agenda mostram aniversários de vida e maçônicos.
+4. *Biblioteca*: envie um PDF e busque por uma palavra do texto (o trecho aparece no cartão). `python manage.py extrair_textos` indexa PDFs antigos.
+5. `GET /saude/` deve responder `{"status":"ok"}`. Menu da conta › **Ajuda e manuais** mostra o guia do seu perfil.
+
 **H. Outros**
 *Agenda* (+ exportar .ics), *Agenda social* (confirmar presença), *Expediente*, *Comissões*, *Patrimônio*,
 *Relatórios* (PDF/XLSX/CSV), *Meus dados (LGPD)*, tema escuro / alto contraste / fonte maior (botões no topo) e a tela no celular.

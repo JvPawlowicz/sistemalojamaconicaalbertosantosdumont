@@ -458,3 +458,13 @@ def saude(request):
         return JsonResponse({"status": "ok"})
     except Exception:  # noqa: BLE001
         return JsonResponse({"status": "erro", "banco": "indisponível"}, status=503)
+
+
+@login_required
+def ajuda(request):
+    """Guias de uso por perfil (Irmão, Secretário, Tesoureiro e manutenção)."""
+    u = request.user
+    return render(request, "core/ajuda.html", {
+        "sec": u.tem_perfil(P.SECRETARIO), "tes": u.tem_perfil(P.TESOUREIRO), "adm": u.tem_perfil(P.ADMINISTRADOR),
+        "hosp": u.tem_perfil(P.HOSPITALEIRO), "dev": u.tem_perfil(P.DESENVOLVEDOR),
+    })

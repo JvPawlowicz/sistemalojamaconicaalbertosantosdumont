@@ -1,0 +1,42 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Ajuda e manuais{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Ajuda e manuais</h1><p>Guias rápidos do seu perfil. Dúvidas? Procure o Secretário da Loja.</p></div></div>
+<div class="card"><h2>{% icon "users" %} Para todos os irmãos</h2><ol>
+<li><strong>Entrar:</strong> use seu usuário e senha. No primeiro acesso, aceite o termo de uso e troque a senha (menu da conta, canto superior direito).</li>
+<li><strong>Presença:</strong> na sessão, leia o QR Code exibido no Templo ou use o link da sessão online. Justifique ausências com o Secretário.</li>
+<li><strong>Ata:</strong> quando houver ata para assinar, ela aparece no Início. Abra, confira o texto, desenhe a assinatura e confirme (com código 2FA, se exigido).</li>
+<li><strong>Ágape:</strong> em <em>Financeiro › Ágape</em>, marque <em>Vou</em> ou <em>Não vou</em>.</li>
+<li><strong>Mensalidades:</strong> em <em>Financeiro › Minhas mensalidades</em> veja o extrato e pague por PIX (QR Code ou copia e cola).</li>
+<li><strong>Carteirinha digital</strong> e <strong>Meus dados (LGPD)</strong>: menu da conta.</li>
+<li><strong>Celular:</strong> abra o endereço no navegador e escolha “Adicionar à tela inicial” para instalar como aplicativo. <kbd>Ctrl</kbd>+<kbd>K</kbd> abre a busca.</li></ol></div>
+{% if sec %}<div class="card"><h2>{% icon "scroll-text" %} Manual do Secretário</h2><ol>
+<li><strong>Quadro e cargos:</strong> <em>Irmãos › Quadro</em> (cadastro, importação por planilha) e <em>Cargos e gestão</em> (oficiais do ano maçônico).</li>
+<li><strong>Sessões:</strong> <em>Agenda › Sessões › Nova</em>. Dentro da sessão: escala de cargos, presença (manual ou QR Code), visitantes, cerimônias e Tronco.</li>
+<li><strong>Convocação:</strong> envie por e-mail pela própria sessão; o lembrete automático sai antes da data.</li>
+<li><strong>Ata:</strong> <em>Redigir ata</em> abre o esqueleto do tipo da sessão. Digite <kbd>@</kbd> para textos prontos, use <strong>★ Textos padrão</strong> e <strong>★+</strong> para guardar um trecho seu. Salve, envie para aprovação e acompanhe as assinaturas.</li>
+<li><strong>Textos padrão:</strong> <em>Atas › Modelos de texto › Carregar textos padrão</em> traz os 35 de fábrica; edite ao costume da Loja.</li>
+<li><strong>Numeração:</strong> em <em>Configurações</em>, informe o nº da primeira ata no sistema (loja que já existe).</li>
+<li><strong>Livro de atas:</strong> gere o PDF do ano em <em>Atas</em>. Cada ata assinada traz a base legal e o código de verificação.</li>
+<li><strong>Visitação:</strong> cadastre lojas e visitantes, registre as visitas e assine os certificados em lote.</li>
+<li><strong>Biblioteca:</strong> envie PDFs por grau; o texto dos PDFs fica pesquisável.</li>
+<li><strong>Identidade:</strong> em <em>Configurações</em>, envie brasão, marca d'água e imagem de identidade.</li></ol></div>{% endif %}
+{% if tes %}<div class="card"><h2>{% icon "wallet" %} Manual do Tesoureiro</h2><ol>
+<li><strong>Categorias de irmão:</strong> defina valores (integral, remido…). <em>Mensalidades › Gerar</em> cria o mês para todos.</li>
+<li><strong>Cobrança:</strong> informe a chave PIX em <em>Configurações</em>. O irmão vê o QR Code; a cobrança por e-mail leva o PIX copia e cola. O botão do WhatsApp abre a conversa do próprio Tesoureiro.</li>
+<li><strong>Baixa:</strong> manual na linha da mensalidade, ou em <em>Conciliação</em>: envie o extrato OFX do banco, confira as sugestões (pelo identificador do PIX ou por nome e valor) e confirme.</li>
+<li><strong>Caixa e orçamento:</strong> lance receitas e despesas da loja; compare previsto × realizado por categoria.</li>
+<li><strong>Ágape:</strong> caixa próprio. Crie o Ágape da sessão, ajuste quem vai, dê baixa nos rateios, adicione visitantes e <em>Repasse</em> (a loja paga os visitantes). Controle o estoque de bebidas em <em>Inventário</em>.</li>
+<li><strong>Tronco:</strong> consulta e relatório; a arrecadação é lançada pelo Hospitaleiro.</li>
+<li><strong>Prestação de contas:</strong> <em>Relatórios</em> gera o pacote fiscal em PDF.</li></ol></div>{% endif %}
+{% if hosp %}<div class="card"><h2>{% icon "heart-handshake" %} Manual do Hospitaleiro</h2><ol>
+<li><em>Irmãos › Hospitalaria</em> lista os casos (sigilosos). Registre visitas e ajudas; o sistema avisa quando passam 15 dias sem contato.</li>
+<li>A arrecadação do Tronco é lançada na sessão (aba Resumo) e as destinações em <em>Financeiro › Tronco</em>.</li></ol></div>{% endif %}
+{% if adm %}<div class="card"><h2>{% icon "settings" %} Manutenção (Administrador)</h2><ol>
+<li><strong>E-mail (SMTP):</strong> configure as variáveis de e-mail no servidor e use <em>Configurações › Testar e-mail</em>. É o canal principal (atas, convocações, cobranças, parabéns).</li>
+<li><strong>Rotinas diárias:</strong> agende <code>python manage.py enviar_lembretes</code> e <code>deploy/backup.sh</code> (cron).</li>
+<li><strong>Segurança:</strong> perfis administrativos exigem 2FA. Para redefinir o 2FA de alguém, use a ficha do irmão.</li>
+<li><strong>Monitoramento:</strong> aponte o Uptime Kuma para <code>/saude/</code> (guia em <code>docs/MONITORAMENTO.md</code>).</li>
+<li><strong>Backup:</strong> testado com restauração; guarde a senha do backup fora do servidor.</li>
+<li><strong>LGPD:</strong> responda solicitações em <em>Administração › Solicitações LGPD</em>.</li></ol></div>{% endif %}
+{% endblock %}

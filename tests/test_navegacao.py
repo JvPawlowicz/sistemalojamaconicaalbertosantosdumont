@@ -24,7 +24,7 @@ def test_toda_url_nomeada_pertence_a_uma_secao_ou_a_conta():
     from django.urls import get_resolver
 
     livres = {"core:aceite_termo", "core:privacidade", "core:2fa_configurar", "core:2fa_verificar", "core:meus_dados",
-              "core:exportar_meus_dados", "core:busca", "core:brasao", "core:identidade", "core:foto_irmao", "core:manifest", "core:service_worker", "core:offline", "core:saude", "core:testar_email", "core:testar_whatsapp", "irmaos:carteirinha", "irmaos:carteirinha_pdf", "sessoes:presenca_qr", "sessoes:qr_tela", "sessoes:renovar_qr", "sessoes:entrar_online", "irmaos:meu_perfil", "irmaos:modelo_importacao", "irmaos:convidar",
+              "core:exportar_meus_dados", "core:busca", "core:brasao", "core:identidade", "core:foto_irmao", "core:manifest", "core:service_worker", "core:offline", "core:ajuda", "core:saude", "core:testar_email", "core:testar_whatsapp", "irmaos:carteirinha", "irmaos:carteirinha_pdf", "sessoes:presenca_qr", "sessoes:qr_tela", "sessoes:renovar_qr", "sessoes:entrar_online", "irmaos:meu_perfil", "irmaos:modelo_importacao", "irmaos:convidar",
               "irmaos:resetar_2fa", "irmaos:alternar_acesso"}
     nomes = []
     for ns, (_, resolver) in get_resolver().namespace_dict.items():

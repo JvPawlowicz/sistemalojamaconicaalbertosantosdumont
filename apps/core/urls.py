@@ -12,6 +12,7 @@ urlpatterns = [
     path("manifest.webmanifest", views.manifest, name="manifest"),
     path("sw.js", views.service_worker, name="service_worker"),
     path("offline/", views.offline, name="offline"),
+    path("ajuda/", views.ajuda, name="ajuda"),
     path("saude/", views.saude, name="saude"),
     path("avisos/", views_avisos.avisos, name="avisos"),
     path("avisos/novo/", views_avisos.aviso_form, name="aviso_novo"),
