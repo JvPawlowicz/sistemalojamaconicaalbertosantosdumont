@@ -5,6 +5,7 @@
   {% if loja.imagem_identidade %}<img class="identidade" src="{% url 'core:identidade' %}" alt="" style="width:120px;height:120px;object-fit:cover;border-radius:50%;margin:0 auto .5rem;display:block;box-shadow:0 6px 20px rgba(11,58,88,.25)">{% endif %}<div class="brand">{% if loja.brasao %}<img src="{% url 'core:brasao' %}" alt="" style="width:96px;height:96px">{% else %}{% include "partials/emblema.html" %}{% endif %}
     <span><strong style="font-size:1.15em">{{ loja.nome }}</strong><small class="muted">{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}{{ loja.potencia }}</small></span></div>
   <p class="login-lema">Força · Sabedoria · Beleza</p>
+  <p class="login-sistema"><strong class="marca-prumo">{{ sistema_nome }}</strong> — {{ sistema_lema }}</p>
   <h1 style="text-align:center;font-size:1.25em">Acesso ao sistema</h1>
   <form method="post" novalidate>{% csrf_token %}
     {% if form.errors %}<div class="alerta alerta-error" role="alert">Usuário ou senha incorretos.</div>{% endif %}

@@ -1,4 +1,6 @@
-# Sistema da Loja — Loja Maçônica Alberto Santos Dumont
+# Prumo — gestão da Loja Maçônica Alberto Santos Dumont
+
+> *Ordem, registro e fraternidade.* Identidade visual e uso da marca em [docs/MARCA.md](docs/MARCA.md).
 
 Sistema de gestão e administração para a Loja (Rito Schröder, GLESP): irmãos, cargos e gestão por **ano maçônico**
 (julho–junho), sessões e presença, **atas com assinatura eletrônica avançada** (hash, desenho, IP, geolocalização,

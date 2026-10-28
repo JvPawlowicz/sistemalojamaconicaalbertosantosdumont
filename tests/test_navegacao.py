@@ -138,7 +138,7 @@ def test_landing_publica_e_pwa(cliente, usuarios):
     from django.test import Client
     anon = Client().get("/")
     html = anon.content.decode()
-    assert anon.status_code == 200 and "Tradição e tecnologia" in html and reverse("login") in html
+    assert anon.status_code == 200 and "fraternidade" in html and reverse("login") in html
     assert "Esquadro e compasso" in html and "data-tilt" in html and "prefers-reduced-motion" not in html  # css fica no arquivo
     # logado, a mesma URL mostra o painel
     assert "O que precisa da sua atenção" in cliente("mestre").get("/").content.decode()

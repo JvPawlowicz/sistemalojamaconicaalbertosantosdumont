@@ -4,7 +4,7 @@ Variáveis: {{data}}, {{data_extenso}}, {{hora}}, {{grau}}, {{tipo}}, {{local}},
 {{numero_loja}}, {{oriente}}, {{veneravel}}, {{secretario}}, {{presentes}}, {{visitantes}}.
 """
 
-CAB, ABR, EXP, ORD, ENC, FOR = "cabecalho", "abertura", "expediente", "ordem_do_dia", "encerramento", "formula"
+CAB, ABR, EXP, ORD, ENC, FOR, COM = "cabecalho", "abertura", "expediente", "ordem_do_dia", "encerramento", "formula", "completa"
 
 MODELOS = [
     # titulo, atalho, categoria, texto
@@ -76,4 +76,37 @@ MODELOS = [
     ("Encerramento — ágape", "encerramento-agape", ENC,
      "Nada mais havendo a tratar, o Venerável Mestre encerrou os trabalhos às ____ horas, convidando os irmãos para o Ágape fraterno. "
      "Eu, {{secretario}}, Secretário, lavrei a presente ata."),
+]
+
+
+# Atas completas: usadas como ponto de partida ao criar a ata (atalho "ata-<tipo da sessão>").
+_ABERTURA = ("Constatada a presença de {{presentes}} irmãos e a regularidade do quórum, o Venerável Mestre declarou abertos os trabalhos "
+             "no Grau de {{grau}}, invocando a proteção do Grande Arquiteto do Universo.")
+_EXPEDIENTE = ("Foi lida e aprovada a ata da sessão anterior. Registrou-se a presença de {{visitantes}} visitante(s). "
+               "O Secretário deu conhecimento do expediente: ____________________. Circularam o Saco de Propostas e Informações e o Tronco de Beneficência.")
+_ENCERRAMENTO = ("Nada mais havendo a tratar, o Venerável Mestre encerrou os trabalhos às ____ horas, do que, para constar, "
+                 "eu, {{secretario}}, Secretário, lavrei a presente ata que, lida e aprovada, vai assinada pelos Irmãos competentes.")
+_CAB = ("ATA Nº ____ da Sessão {{tipo}} de {{grau}}, realizada em {{data_extenso}}, às {{hora}}, no Templo da {{loja}} nº {{numero_loja}}, "
+        "Oriente de {{oriente}}, sob a presidência do Venerável Mestre {{veneravel}}, secretariada por {{secretario}}.")
+
+
+def _completa(ordem):
+    return "\n\n".join([_CAB, _ABERTURA, _EXPEDIENTE, ordem, _ENCERRAMENTO])
+
+
+MODELOS += [
+    ("Ata completa — sessão ordinária", "ata-ordinaria", COM,
+     _completa("Na Ordem do Dia, tratou-se de: ____________________. A palavra foi franqueada a bem da Ordem em geral, da Loja e do quadro.")),
+    ("Ata completa — sessão de instrução", "ata-instrucao", COM,
+     _completa("Na Ordem do Dia, o Irmão ____________________ apresentou a instrução sobre o tema “____________________”, debatida pelos presentes.")),
+    ("Ata completa — sessão econômica", "ata-economica", COM,
+     _completa("Na Ordem do Dia, tratou-se de assuntos administrativos e financeiros: ____________________. O Tesoureiro apresentou o balancete, aprovado pelo Plenário.")),
+    ("Ata completa — sessão magna", "ata-magna", COM,
+     _completa("Em sessão magna, procedeu-se a ____________________, com a presença de autoridades e visitantes, recebidos com as honras de estilo.")),
+    ("Ata completa — iniciação", "ata-iniciacao", COM,
+     _completa("Cumpridas as formalidades regimentais, procedeu-se à Iniciação do profano ____________________, que recebeu a Luz e foi proclamado Aprendiz Maçom.")),
+    ("Ata completa — passagem (promoção)", "ata-promocao", COM,
+     _completa("Cumpridas as formalidades regimentais, procedeu-se à Passagem ao Grau de Companheiro do Irmão ____________________.")),
+    ("Ata completa — exaltação (elevação)", "ata-elevacao", COM,
+     _completa("Cumpridas as formalidades regimentais, procedeu-se à Exaltação ao Grau de Mestre do Irmão ____________________.")),
 ]

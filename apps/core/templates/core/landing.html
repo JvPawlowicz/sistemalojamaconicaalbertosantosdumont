@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark"><meta name="theme-color" content="#4fb3e8">
-  <title>{{ loja.nome }} · Sistema de gestão</title>
+  <title>{{ sistema_nome }} · {{ loja.nome }}</title>
   <meta name="description" content="Sistema de gestão da {{ loja.nome }}: irmãos, sessões, atas com assinatura eletrônica, tesouraria, visitação e muito mais.">
   <link rel="manifest" href="{% url 'core:manifest' %}"><link rel="icon" type="image/svg+xml" href="{% static 'img/emblema.svg' %}">
   <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}">
@@ -25,8 +25,8 @@
 <section class="hero" id="inicio" aria-labelledby="h-hero">
   <div class="hero-fundo" aria-hidden="true"><span class="orbe o1"></span><span class="orbe o2"></span><span class="grade-fundo"></span></div>
   <div class="hero-texto">
-    <p class="etiqueta">{{ loja.potencia }} · Rito {{ loja.rito }}</p>
-    <h1 id="h-hero">Tradição e tecnologia<br>a serviço da <em>Loja</em></h1>
+    <p class="etiqueta"><strong class="marca-prumo">{{ sistema_nome }}</strong> · {{ loja.potencia }} · Rito {{ loja.rito }}</p>
+    <h1 id="h-hero">Ordem, registro<br>e <em>fraternidade</em></h1>
     <p class="lead">Irmãos, sessões, atas com assinatura eletrônica, tesouraria, visitação e muito mais — tudo integrado, seguro e simples de usar, no computador ou no celular.</p>
     <div class="acoes-hero"><a class="btn btn-grande" href="{% url 'login' %}">{% icon "lock" %} Entrar no sistema</a><a class="btn btn-sec btn-grande" href="#recursos">{% icon "chevron-down" %} Conhecer os recursos</a></div>
     <ul class="selos-hero" aria-label="Destaques"><li>{% icon "shield-check" %} 2FA e LGPD</li><li>{% icon "pen-line" %} Assinatura eletrônica</li><li>{% icon "smartphone" %} Funciona no celular</li></ul>

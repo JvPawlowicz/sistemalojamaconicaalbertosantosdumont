@@ -58,7 +58,8 @@ def criar(request, sessao_pk):
     if hasattr(sessao, "ata"):
         return redirect("atas:editar", pk=sessao.ata.pk)
     inicial = {"numero": services.proximo_numero(sessao)}
-    cab = ModeloTexto.objects.filter(categoria=ModeloTexto.Categoria.CABECALHO, ativo=True).first()
+    cab = (ModeloTexto.objects.filter(atalho=f"ata-{sessao.tipo}", ativo=True).first()
+           or ModeloTexto.objects.filter(categoria=ModeloTexto.Categoria.CABECALHO, ativo=True).first())
     if cab:
         from .sanitizar import texto_para_html
 

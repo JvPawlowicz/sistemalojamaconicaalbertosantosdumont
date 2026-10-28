@@ -127,3 +127,17 @@ def test_logo_e_marca_dagua_nos_pdfs(db, settings, tmp_path):
     assert logo_data_uri(loja).startswith("data:image/png;base64,")
     m = Image.open(io.BytesIO(__import__("base64").b64decode(marca_dagua_data_uri(loja).split(",")[1])))
     assert m.getchannel("A").getextrema()[1] == 25  # 255 * 10%
+
+
+def test_ata_nova_parte_do_modelo_completo_do_tipo_da_sessao(cliente, usuarios, sessao):
+    s = cliente("secretario")
+    s.post(reverse("atas:modelos_padroes"))
+    sessao.tipo = "iniciacao"
+    sessao.save()
+    html = s.get(reverse("atas:criar", args=[sessao.pk])).content.decode()
+    assert "Iniciação do profano" in html and "Nada mais havendo a tratar" in html
+
+
+def test_marca_prumo_no_rodape_e_manifesto(cliente, usuarios):
+    assert "Prumo" in cliente("mestre").get(reverse("core:painel")).content.decode()
+    assert cliente("mestre").get(reverse("core:manifest")).json()["short_name"] == "Prumo"

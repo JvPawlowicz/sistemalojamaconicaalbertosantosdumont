@@ -55,7 +55,7 @@
       {% include "partials/mensagens.html" %}
       {% block conteudo %}{% endblock %}
     </main>
-    <footer class="rodape">{{ loja.nome }} · Sistema de gestão (MIT) · <a href="{% url 'core:privacidade' %}">Privacidade (LGPD)</a></footer>
+    <footer class="rodape"><strong class="marca-prumo">{{ sistema_nome }}</strong> · {{ sistema_lema }} · {{ loja.nome }} · MIT · <a href="{% url 'core:privacidade' %}">Privacidade (LGPD)</a></footer>
   </div>
 </div>
 {% else %}

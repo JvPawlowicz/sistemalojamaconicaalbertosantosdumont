@@ -145,6 +145,7 @@ class ModeloTexto(models.Model):
     """Texto pré-cadastrado inserido na ata digitando @."""
 
     class Categoria(models.TextChoices):
+        COMPLETA = "completa", "Ata completa (esqueleto)"
         CABECALHO = "cabecalho", "Cabeçalho"
         ABERTURA = "abertura", "Abertura"
         EXPEDIENTE = "expediente", "Expediente"

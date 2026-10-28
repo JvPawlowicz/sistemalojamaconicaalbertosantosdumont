@@ -214,3 +214,15 @@ html { scroll-behavior: smooth; }
 @media (max-width: 560px) { .brand-txt { display: none; } .navbar-fim kbd { display: none; } }
 @media print { .navbar { display: none !important; } }
 @media (max-width: 900px) { .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; } .tabs a { white-space: nowrap; flex: none; } }
+
+/* ===== Marca Prumo: celeste + ouro, títulos em serifa ===== */
+:root { --ouro: #c9a13b; --ouro-suave: #f3e6bf; --fonte-titulo: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; }
+:root[data-theme="escuro"] { --ouro: #e0be5c; --ouro-suave: #3a3114; }
+.cabecalho-pagina h1, .login-card h1, .landing h1, .l-hero h1 { font-family: var(--fonte-titulo); letter-spacing: -.005em; }
+.cabecalho-pagina h1::after { background: linear-gradient(90deg, var(--celeste), var(--celeste-claro) 55%, var(--ouro)); }
+:root[data-contraste="alto"] .cabecalho-pagina h1::after { background: #ffe600; }
+.navbar { border-bottom: 3px solid var(--celeste); box-shadow: 0 4px 16px rgba(11,58,88,.10), 0 1px 0 var(--ouro); }
+.marca-prumo { font-family: var(--fonte-titulo); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--primary); }
+.login-sistema { text-align: center; color: var(--muted); font-size: .85em; margin: 0 0 .6rem; }
+.rodape { border-top: 1px solid var(--ouro-suave); }
+.selo-ouro { background: var(--ouro-suave); color: #5a4509; border: 1px solid var(--ouro); }
