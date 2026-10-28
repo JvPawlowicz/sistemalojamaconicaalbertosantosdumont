@@ -62,10 +62,10 @@ class LojaForm(ModelFormBase):
             "brasao", "cabecalho_documentos", "texto_legal", "mensalidade_dia_vencimento", "chave_pix", "intersticio_promocao_meses",
             "intersticio_elevacao_meses", "lembrete_sessao_horas", "cobranca_automatica",
             "limite_faltas_consecutivas", "frequencia_minima_percentual", "quorum_minimo", "multa_atraso_percentual",
-            "juros_mensal_percentual", "dias_carencia_atraso", "ata_numero_inicial", "ata_numeracao", "marca_dagua", "marca_dagua_intensidade", "imagem_identidade",
+            "juros_mensal_percentual", "dias_carencia_atraso", "ata_numero_inicial", "ata_numeracao", "marca_dagua", "marca_dagua_intensidade", "aniversario_email", "aniversario_texto", "imagem_identidade",
         ]
         widgets = {"cabecalho_documentos": forms.Textarea(attrs={"rows": 4}),
-                   "texto_legal": forms.Textarea(attrs={"rows": 5})}
+                   "texto_legal": forms.Textarea(attrs={"rows": 5}), "aniversario_texto": forms.Textarea(attrs={"rows": 5})}
 
 
     def clean_brasao(self):

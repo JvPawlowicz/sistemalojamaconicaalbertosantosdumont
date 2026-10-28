@@ -210,3 +210,31 @@ def test_pix_da_mensalidade_so_para_o_dono_ou_tesoureiro(cliente, usuarios):
     assert "PIX" in cliente("mestre").get(reverse("tesouraria:pix", args=[l.pk])).content.decode()
     assert cliente("tesoureiro").get(reverse("tesouraria:pix", args=[l.pk])).status_code == 200
     assert cliente("aprendiz").get(reverse("tesouraria:pix", args=[l.pk])).status_code == 403
+
+
+# --- aniversários ---
+def test_aniversarios_de_vida_e_macônicos_no_painel_e_email_sem_duplicar(cliente, usuarios, mailoutbox):
+    from datetime import date
+
+    from django.core.management import call_command
+
+    from apps.irmaos.aniversarios import do_dia
+    from apps.irmaos.models import AniversarioEnviado
+
+    hoje = timezone.localdate()
+    m = usuarios["mestre"]
+    m.data_nascimento = date(1980, hoje.month, hoje.day)
+    m.data_iniciacao = date(hoje.year - 5, hoje.month, hoje.day)
+    m.email = "mestre@exemplo.com"
+    m.save()
+    tipos = {a["tipo"] for a in do_dia(hoje) if a["irmao"] == m}
+    assert tipos == {"vida", "iniciacao"}
+    html = cliente("aprendiz").get(reverse("core:painel")).content.decode()
+    assert "5 anos de iniciação" in html
+    loja = Loja.atual()
+    loja.aniversario_email = True
+    loja.save()
+    call_command("enviar_lembretes", verbosity=0)
+    call_command("enviar_lembretes", verbosity=0)  # segunda execução no mesmo dia não repete
+    assert AniversarioEnviado.objects.filter(irmao=m).count() == 2
+    assert len([x for x in mailoutbox if "Parabéns" in x.subject]) == 2

@@ -70,6 +70,12 @@ class Loja(models.Model):
     imagem_identidade = models.ImageField(
         "Imagem de identidade visual (busto)", upload_to="loja/", blank=True,
         help_text="Ex.: busto de Alberto Santos Dumont. Aparece na tela de entrada e na página inicial pública.")
+    aniversario_email = models.BooleanField("Enviar e-mail de parabéns nos aniversários", default=False)
+    aniversario_texto = models.TextField(
+        "Texto do e-mail de parabéns", blank=True,
+        default="Querido Irmão {{nome}},\n\nA {{loja}} deseja a você um feliz {{evento}}! Que o Grande Arquiteto do Universo "
+                "continue iluminando o seu caminho.\n\nFraterno abraço.",
+        help_text="Variáveis: {{nome}}, {{loja}}, {{evento}} (ex.: aniversário, 5 anos de iniciação).")
     ata_numero_inicial = models.PositiveIntegerField(
         "Nº da primeira ata registrada no sistema", default=1,
         help_text="Loja que já existe: informe o número da próxima ata do livro (ex.: 1287). A numeração segue daí.")

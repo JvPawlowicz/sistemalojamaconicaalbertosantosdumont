@@ -22,8 +22,8 @@
     {% for s in proximas %}<p><a href="{% url 'sessoes:detalhe' s.pk %}"><strong>{{ s.data_hora|date:"d/m/Y H:i" }}</strong></a> · <span class="muted">{{ s.titulo }}</span></p>
     {% empty %}<p class="muted">Nenhuma sessão agendada.</p>{% endfor %}
   </section>
-  <section class="card" aria-labelledby="h-aniv"><h2 id="h-aniv">{% icon "bell" %} Aniversariantes do mês</h2>
-    {% for i in aniversariantes %}<p class="mb0">{{ i.data_nascimento|date:"d/m" }} — {{ i.nome_completo }}</p>{% empty %}<p class="muted">Nenhum aniversariante.</p>{% endfor %}
+  <section class="card" aria-labelledby="h-aniv"><h2 id="h-aniv">{% icon "bell" %} Aniversários do mês</h2>
+    {% for a in aniversariantes %}<p class="mb0">{{ a.data|date:"d/m" }} — {{ a.irmao.nome_completo }}{% if a.tipo != "vida" %} <span class="selo">{{ a.anos }} ano{{ a.anos|pluralize }} de {% if a.tipo == "iniciacao" %}iniciação{% elif a.tipo == "promocao" %}passagem{% else %}exaltação{% endif %}</span>{% endif %}</p>{% empty %}<p class="muted">Nenhum aniversariante.</p>{% endfor %}
   </section>
 </div>
 {% endblock %}

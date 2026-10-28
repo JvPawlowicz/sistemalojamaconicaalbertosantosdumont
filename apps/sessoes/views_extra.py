@@ -129,10 +129,12 @@ def _itens_do_mes(user, ano, mes):
     for e in Evento.objects.filter(data_hora__date__gte=inicio, data_hora__date__lt=fim):
         if user.pode_ver_grau(e.grau_minimo):
             itens.append((timezone.localtime(e.data_hora), "evento", e.titulo, f"/sessoes/eventos/{e.pk}/"))
-    for i in Irmao.objects.filter(is_active=True, grau__isnull=False, data_nascimento__month=mes):
-        d = datetime(ano, mes, min(i.data_nascimento.day, calendar.monthrange(ano, mes)[1]), 0, 0,
-                     tzinfo=timezone.get_current_timezone())
-        itens.append((d, "aniversario", f"Aniversário de {i.nome_completo}", f"/irmaos/{i.pk}/"))
+    from apps.irmaos.aniversarios import do_mes
+
+    for a in do_mes(ano, mes):
+        d = datetime(ano, mes, a["data"].day, 0, 0, tzinfo=timezone.get_current_timezone())
+        extra = "" if a["anos"] is None else f" ({a['anos']} ano{'s' if a['anos'] != 1 else ''})"
+        itens.append((d, "aniversario", f"{a['rotulo']} de {a['irmao'].nome_completo}{extra}", f"/irmaos/{a['irmao'].pk}/"))
     return sorted(itens, key=lambda x: x[0])
 
 

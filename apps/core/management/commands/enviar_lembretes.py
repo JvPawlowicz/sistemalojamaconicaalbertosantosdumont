@@ -49,6 +49,23 @@ class Command(BaseCommand):
                 avisos += avisar_signatarios(ata, settings.SITE_URL, lembrete=True)
         self.stdout.write(f"{avisos} lembrete(s) de assinatura de ata enviado(s).")
 
+        parabens = 0
+        if loja.aniversario_email:
+            from apps.irmaos.aniversarios import do_dia
+            from apps.irmaos.models import AniversarioEnviado
+
+            for a in do_dia(timezone.localdate()):
+                i = a["irmao"]
+                if not i.email or AniversarioEnviado.objects.filter(irmao=i, tipo=a["tipo"], ano=a["data"].year).exists():
+                    continue
+                evento = "aniversário" if a["tipo"] == "vida" else f"{a['anos']} ano(s) de {a['rotulo'].split(' de ')[-1]}"
+                texto = (loja.aniversario_texto.replace("{{nome}}", i.nome_completo).replace("{{loja}}", loja.nome)
+                         .replace("{{evento}}", evento))
+                if enviar_email(i.email, f"Parabéns — {loja.nome}", texto, contexto="aniversario"):
+                    AniversarioEnviado.objects.create(irmao=i, tipo=a["tipo"], ano=a["data"].year)
+                    parabens += 1
+        self.stdout.write(f"{parabens} e-mail(s) de parabéns enviado(s).")
+
         cobrancas = 0
         if loja.cobranca_automatica:
             for l in Lancamento.objects.filter(status=Lancamento.Status.VENCIDO).select_related("irmao").exclude(irmao__email=""):

@@ -168,3 +168,15 @@ class Familiar(models.Model):
 
     def __str__(self):
         return f"{self.nome} ({self.get_parentesco_display()})"
+
+
+class AniversarioEnviado(models.Model):
+    """Registro dos e-mails de parabéns já enviados (impede envio em duplicidade no mesmo ano)."""
+
+    irmao = models.ForeignKey(Irmao, on_delete=models.CASCADE, related_name="+")
+    tipo = models.CharField(max_length=10)
+    ano = models.PositiveSmallIntegerField()
+    enviado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [("irmao", "tipo", "ano")]

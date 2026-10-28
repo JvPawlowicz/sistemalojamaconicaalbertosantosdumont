@@ -85,7 +85,9 @@ def _painel_logado(request):
     from apps.irmaos.models import Irmao
 
     ativos = Irmao.objects.filter(is_active=True, grau__isnull=False)
-    ctx["aniversariantes"] = ativos.filter(data_nascimento__month=hoje.month).order_by("data_nascimento__day")
+    from apps.irmaos.aniversarios import do_mes
+
+    ctx["aniversariantes"] = do_mes(hoje.year, hoje.month)
     if user.tem_algum_perfil(P.TESOUREIRO):
         from apps.tesouraria.services import saldo_caixa
 
