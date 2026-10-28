@@ -22,21 +22,7 @@ CARGOS = [
     ("Secretário", "SEC", 5), ("Tesoureiro", "TES", 6), ("Mestre de Cerimônias", "MC", 7), ("Chanceler", "CH", 8),
 ]
 
-MODELOS = [
-    ("Cabeçalho da ata", "cabecalho", "cabecalho",
-     "ATA Nº ____ da Sessão {{tipo}} de {{grau}}, realizada em {{data_extenso}}, às {{hora}}, no Templo da {{loja}} nº {{numero_loja}}, "
-     "Oriente de {{oriente}}, sob a presidência do Venerável Mestre {{veneravel}}, secretariada por {{secretario}}."),
-    ("Abertura dos trabalhos", "abertura", "abertura",
-     "Constatada a presença de {{presentes}} irmãos e a regularidade do quórum, o Venerável Mestre declarou abertos os trabalhos "
-     "no Grau de {{grau}}, invocando a proteção do Grande Arquiteto do Universo."),
-    ("Leitura e aprovação da ata anterior", "ata-anterior", "expediente",
-     "Foi lida e, posta em discussão, aprovada sem emendas a ata da sessão anterior."),
-    ("Visitantes", "visitantes", "expediente",
-     "Registrou-se a presença de {{visitantes}} visitante(s), recebidos fraternalmente."),
-    ("Encerramento", "encerramento", "encerramento",
-     "Nada mais havendo a tratar, o Venerável Mestre encerrou os trabalhos às ____ horas, do que, para constar, "
-     "eu, {{secretario}}, Secretário, lavrei a presente ata que, lida e aprovada, vai assinada pelos Irmãos competentes."),
-]
+from apps.atas.modelos_padrao import MODELOS  # noqa: E402
 
 
 class Command(BaseCommand):

@@ -33,7 +33,7 @@
   </div>
   <div class="cena3d" id="cena" aria-hidden="true">
     <div class="anel a1"></div><div class="anel a2"></div><div class="anel a3"></div>
-    <div class="camada c-base">{% include "partials/emblema.html" with classe="emb-grande" %}</div>
+    <div class="camada c-base">{% if loja.imagem_identidade %}<img class="identidade-hero" src="{% url 'core:identidade' %}" alt="{{ loja.nome }}">{% else %}{% include "partials/emblema.html" with classe="emb-grande" %}{% endif %}</div>
     <div class="vidro v1"><span class="v-icone">{% icon "circle-check" %}</span><span><strong>Ata assinada</strong><small>hash e QR verificados</small></span></div>
     <div class="vidro v2"><span class="v-icone">{% icon "users" %}</span><span><strong>Frequência</strong><small>92% no ano maçônico</small></span></div>
     <div class="vidro v3"><span class="v-icone">{% icon "wallet" %}</span><span><strong>Caixa em dia</strong><small>mensalidades conciliadas</small></span></div>

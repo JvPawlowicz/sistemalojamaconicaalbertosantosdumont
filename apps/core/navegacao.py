@@ -57,7 +57,7 @@ SECOES = (
     ), namespaces=("sessoes", "votacoes"), grupo="Loja"),
     Secao("atas", "Atas", "scroll-text", (
         Item("Atas", "atas:lista", extras=("atas:detalhe", "atas:criar", "atas:editar", "atas:assinar")),
-        Item("Modelos de texto", "atas:modelos", _perfil(P.SECRETARIO), extras=("atas:modelo_novo", "atas:modelo_editar")),
+        Item("Modelos de texto", "atas:modelos", _perfil(P.SECRETARIO), extras=("atas:modelo_novo", "atas:modelo_editar", "atas:modelos_padroes")),
     ), namespaces=("atas",), grupo="Loja"),
     Secao("irmaos", "Irmãos", "users", (
         Item("Quadro", "irmaos:lista", extras=("irmaos:detalhe", "irmaos:criar", "irmaos:editar", "irmaos:importar")),

@@ -340,6 +340,13 @@ def brasao(request):
     return servir_arquivo(Loja.atual().brasao, cache=True)
 
 
+def imagem_identidade(request):
+    """Imagem de identidade visual (busto) — pública, usada na entrada e na página inicial."""
+    from .arquivos import servir_arquivo
+
+    return servir_arquivo(Loja.atual().imagem_identidade, cache=True)
+
+
 @login_required
 def foto_irmao(request, pk):
     from apps.irmaos.models import Irmao

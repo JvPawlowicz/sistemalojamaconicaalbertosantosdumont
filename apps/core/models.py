@@ -62,6 +62,14 @@ class Loja(models.Model):
         "Multa por atraso (%)", max_digits=5, decimal_places=2, default=0, help_text="Aplicada uma vez após o vencimento")
     juros_mensal_percentual = models.DecimalField(
         "Juros por mês de atraso (%)", max_digits=5, decimal_places=2, default=0, help_text="Pro rata por dia de atraso")
+    marca_dagua = models.ImageField(
+        "Marca d'água dos documentos", upload_to="loja/", blank=True,
+        help_text="Logo ou imagem exibida suavemente ao fundo de atas, certificados e demais PDFs (PNG ou JPG).")
+    marca_dagua_intensidade = models.PositiveSmallIntegerField(
+        "Intensidade da marca d'água (%)", default=8, help_text="De 3 a 30. Valores baixos deixam o texto mais legível.")
+    imagem_identidade = models.ImageField(
+        "Imagem de identidade visual (busto)", upload_to="loja/", blank=True,
+        help_text="Ex.: busto de Alberto Santos Dumont. Aparece na tela de entrada e na página inicial pública.")
     ata_numero_inicial = models.PositiveIntegerField(
         "Nº da primeira ata registrada no sistema", default=1,
         help_text="Loja que já existe: informe o número da próxima ata do livro (ex.: 1287). A numeração segue daí.")

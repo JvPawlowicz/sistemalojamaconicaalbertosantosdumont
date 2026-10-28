@@ -235,6 +235,7 @@ class ModelosView(ListaView):
                ("Categoria", lambda o: o.get_categoria_display()), ("Ativo", lambda o: "Sim" if o.ativo else "Não")]
     url_novo = "/atas/modelos/novo/"
     rotulo_novo = "Novo modelo"
+    acoes_extra = [("Carregar textos padrão", "/atas/modelos/padroes/")]
 
     def get_objetos(self):
         return ModeloTexto.objects.all()
@@ -375,3 +376,18 @@ def versoes(request, pk):
         "ata": ata, "numeros": numeros, "a": a, "b": b, "diff": _diff_html(textos[a], textos[b]),
         "assinaturas": ass, "snaps": snaps, "atual": ata.versao,
     })
+
+
+@login_required
+def carregar_padroes(request):
+    """Cria os textos padrão que ainda não existem (não altera nem apaga os que a Secretaria já editou)."""
+    if not request.user.tem_perfil(P.SECRETARIO):
+        raise PermissionDenied
+    from .modelos_padrao import MODELOS
+
+    if request.method == "POST":
+        novos = sum(ModeloTexto.objects.get_or_create(atalho=a, defaults={"titulo": t, "categoria": c, "texto": x})[1]
+                    for t, a, c, x in MODELOS)
+        messages.success(request, f"{novos} texto(s) padrão adicionado(s)." if novos else "Todos os textos padrão já estão cadastrados.")
+        return redirect("atas:modelos")
+    return render(request, "atas/padroes.html", {"total": len(MODELOS), "existentes": ModeloTexto.objects.count()})

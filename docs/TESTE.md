@@ -105,6 +105,9 @@ O menu é uma **barra superior** com 8 seções (no celular vira botão ☰) e a
 
 **G3. Numeração das atas** — em *Configurações*, informe o **nº da primeira ata** (loja que já existe) e se a numeração reinicia por gestão. A ata aparece como `1287/2025-2026`.
 
+**G4. Identidade visual e textos padrão**
+*Configurações*: envie o **brasão/logo** (cabeçalho dos PDFs), a **marca d'água** (fundo de atas, certificados e convocações; ajuste a intensidade) e a **imagem de identidade** (ex.: busto de Santos Dumont, usada na entrada e na página inicial). Em *Atas › Modelos de texto* use **Carregar textos padrão** (28 textos prontos para o Secretário; digite `@` na ata).
+
 **H. Outros**
 *Agenda* (+ exportar .ics), *Agenda social* (confirmar presença), *Expediente*, *Comissões*, *Patrimônio*,
 *Relatórios* (PDF/XLSX/CSV), *Meus dados (LGPD)*, tema escuro / alto contraste / fonte maior (botões no topo) e a tela no celular.

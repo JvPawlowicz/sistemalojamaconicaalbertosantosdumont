@@ -7,6 +7,7 @@ app_name = "core"
 urlpatterns = [
     path("", views.painel, name="painel"),
     path("midia/brasao/", views.brasao, name="brasao"),
+    path("midia/identidade/", views.imagem_identidade, name="identidade"),
     path("midia/irmao/<int:pk>/foto/", views.foto_irmao, name="foto_irmao"),
     path("manifest.webmanifest", views.manifest, name="manifest"),
     path("sw.js", views.service_worker, name="service_worker"),

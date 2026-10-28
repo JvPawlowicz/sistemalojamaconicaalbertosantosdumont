@@ -90,3 +90,40 @@ def test_numeracao_da_ata_parte_do_numero_inicial_da_loja(db, sessao, usuarios):
     loja.ata_numeracao = "gestao"
     loja.save()
     assert atas_services.proximo_numero(sessao) == 1288  # mesma gestão
+
+
+def test_textos_padrao_do_secretario_sao_idempotentes(cliente, usuarios):
+    from apps.atas.models import ModeloTexto
+    from apps.atas.modelos_padrao import MODELOS
+
+    assert cliente("mestre").post(reverse("atas:modelos_padroes")).status_code == 403
+    s = cliente("secretario")
+    assert s.get(reverse("atas:modelos_padroes")).status_code == 200
+    s.post(reverse("atas:modelos_padroes"))
+    assert ModeloTexto.objects.count() == len(MODELOS) >= 25
+    ModeloTexto.objects.filter(atalho="encerramento").update(texto="Editado pela Secretaria")
+    s.post(reverse("atas:modelos_padroes"))
+    assert ModeloTexto.objects.count() == len(MODELOS)
+    assert ModeloTexto.objects.get(atalho="encerramento").texto == "Editado pela Secretaria"
+
+
+def test_logo_e_marca_dagua_nos_pdfs(db, settings, tmp_path):
+    import io
+
+    from django.core.files.base import ContentFile
+    from PIL import Image
+
+    from apps.core.pdf import logo_data_uri, marca_dagua_data_uri
+
+    settings.MEDIA_ROOT = tmp_path
+    loja = Loja.atual()
+    assert logo_data_uri(loja) == "" and marca_dagua_data_uri(loja) == ""
+    buf = io.BytesIO()
+    Image.new("RGBA", (50, 50), (10, 100, 160, 255)).save(buf, "PNG")
+    loja.brasao.save("l.png", ContentFile(buf.getvalue()))
+    loja.marca_dagua.save("m.png", ContentFile(buf.getvalue()))
+    loja.marca_dagua_intensidade = 10
+    loja.save()
+    assert logo_data_uri(loja).startswith("data:image/png;base64,")
+    m = Image.open(io.BytesIO(__import__("base64").b64decode(marca_dagua_data_uri(loja).split(",")[1])))
+    assert m.getchannel("A").getextrema()[1] == 25  # 255 * 10%

@@ -104,3 +104,5 @@ html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
   .ata-assinatura path { stroke-dashoffset: 0 !important; animation: none !important; }
   .recurso, .ata-folha, .camada { transition: none; }
 }
+
+.identidade-hero { width: min(24rem, 62vw); height: min(24rem, 62vw); object-fit: cover; border-radius: 50%; border: 6px solid var(--celeste); box-shadow: 0 20px 60px rgba(11,58,88,.35); }

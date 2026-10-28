@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>{% include "core/_pdf_marca.html" %}
 @page { size: A4; margin: 2.2cm 2cm 2.4cm; @bottom-center { content: "Página " counter(page) " de " counter(pages); font-size: 9pt; color: #555; } }
 body { font-family: Georgia, "Times New Roman", serif; font-size: 12pt; line-height: 1.55; color: #111; }
 .cab { text-align: center; white-space: pre-line; font-weight: bold; border-bottom: 2px solid #1f3a5f; padding-bottom: .4cm; margin-bottom: .6cm; }
@@ -11,7 +11,7 @@ body { font-family: Georgia, "Times New Roman", serif; font-size: 12pt; line-hei
 .legal { font-size: 9pt; border: 1px solid #999; padding: .25cm; margin-top: .6cm; }
 {% if minuta %}body::before { content: "MINUTA — AGUARDANDO ASSINATURAS"; position: fixed; top: 45%; left: 5%; font-size: 34pt; color: rgba(150,0,0,.12); transform: rotate(-25deg); }{% endif %}
 </style></head><body>
-<div class="cab">{{ loja.cabecalho }}</div>
+{% if logo %}<div class="logo-cab"><img src="{{ logo }}" alt=""></div>{% endif %}<div class="cab">{{ loja.cabecalho }}</div>
 <div class="tit">Ata nº {{ ata.identificacao }}{% if ata.livro %} — Livro {{ ata.livro }}, folha {{ ata.folha }}{% endif %}<br><small>Sessão {{ ata.sessao.titulo }} — {{ ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ata.versao }})</small></div>
 <div class="texto rico">{{ ata.conteudo_html }}</div>
 <div class="assin">

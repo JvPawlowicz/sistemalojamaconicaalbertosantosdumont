@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Textos padrão{% endblock %}
+{% block conteudo %}
+<div class="card"><h1>Textos padrão para as atas</h1>
+<p>Carrega {{ total }} textos prontos (cabeçalhos, aberturas, expediente, ordem do dia, iniciação/passagem/exaltação, votação, posse, pesar e encerramentos) para você inserir digitando <kbd>@</kbd> na ata.</p>
+<p class="muted">Os que já existem não são alterados. Depois é só editar cada um conforme o costume da Loja.</p>
+<form method="post">{% csrf_token %}<div class="acoes"><button class="btn" type="submit">{% icon "check" %} Carregar textos padrão</button><a class="btn btn-sec" href="{% url 'atas:modelos' %}">Cancelar</a></div></form></div>
+{% endblock %}

@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>{% include "core/_pdf_marca.html" %}
 @page { size: A4 landscape; margin: 1.6cm; } body { font-family: Georgia, serif; color: #111; }
 .moldura { border: 3px double #1f3a5f; padding: 1.2cm 1.6cm; min-height: 15.6cm; }
 .cab { text-align: center; white-space: pre-line; font-weight: bold; }
@@ -8,7 +8,7 @@ h1 { text-align: center; letter-spacing: .25em; margin: .6cm 0; font-size: 26pt;
 .ass img { max-height: 1.7cm; } .linha { border-top: 1px solid #000; padding-top: 2px; font-size: 11pt; }
 .ev { font-size: 7.5pt; color: #444; word-break: break-all; margin-top: .4cm; }
 </style></head><body><div class="moldura">
-<div class="cab">{{ loja.cabecalho }}</div>
+{% if logo %}<div class="logo-cab"><img src="{{ logo }}" alt=""></div>{% endif %}<div class="cab">{{ loja.cabecalho }}</div>
 <h1>CERTIFICADO DE VISITA</h1>
 <div class="corpo">Certificamos que o Irmão <strong>{{ visitante.nome }}</strong>, <strong>{{ visitante.get_grau_display }} Maçom</strong>, da Loja <strong>{{ visitante.loja_nome }}{% if visitante.loja_numero %} nº {{ visitante.loja_numero }}{% endif %}</strong>{% if visitante.oriente %}, Oriente de {{ visitante.oriente }}{% endif %}{% if visitante.potencia %}, jurisdicionada à {{ visitante.potencia }}{% endif %}, visitou os nossos trabalhos na Sessão {{ sessao.titulo }}, realizada em {{ sessao.data_hora|date:"d/m/Y" }}, sendo recebido fraternalmente.</div>
 <table class="ass"><tr>
