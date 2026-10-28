@@ -16,6 +16,6 @@
 {% block scripts %}<link rel="stylesheet" href="{% static 'css/editor.css' %}"><script src="{% static 'vendor/editor-ata.js' %}"></script>
 <script>
   var ed = EditorAta.init({ raiz: 'editor-ata', campo: 'ata-conteudo', sessao: '{{ sessao.pk }}', chave: 'ata-{{ ata.pk|default:"nova" }}-{{ sessao.pk }}',
-    urlBusca: "{% url 'atas:modelos_buscar' %}", urlRender: "{% url 'atas:modelos_renderizar' %}", salvoEm: {{ ata.atualizada_em|date:"U"|default:"0" }} });
+    urlBusca: "{% url 'atas:modelos_buscar' %}", urlRender: "{% url 'atas:modelos_renderizar' %}", urlSalvarModelo: "{% url 'atas:modelo_rapido' %}", salvoEm: {{ ata.atualizada_em|date:"U"|default:"0" }} });
   document.addEventListener('keydown', function (e) { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); document.getElementById('form-ata').requestSubmit(); } });
 </script>{% endblock %}

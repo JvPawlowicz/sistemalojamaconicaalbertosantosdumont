@@ -398,7 +398,7 @@ def manifest(request):
 
     loja = Loja.atual()
     dados = {
-        "name": f"Prumo — {loja.nome}", "short_name": "Prumo", "lang": "pt-BR", "start_url": reverse("core:painel"),
+        "name": f"Compasso — {loja.nome}", "short_name": "Compasso", "lang": "pt-BR", "start_url": reverse("core:painel"),
         "scope": "/", "display": "standalone", "background_color": "#f1f8fd", "theme_color": "#4fb3e8",
         "description": "Gestão da Loja: sessões, atas, tesouraria e muito mais.",
         "icons": [

@@ -134,6 +134,26 @@ export function init(cfg) {
   });
   barra.appendChild(est);
   add(botao('@', 'Inserir texto pronto ou nome de irmão', () => { ch().insertContent('@').run(); }, () => false));
+  // Textos padrão cadastrados pelo Secretário: lista completa e salvar a seleção como novo texto padrão
+  const pad = document.createElement('select'); pad.className = 'ed-sel input'; pad.setAttribute('aria-label', 'Inserir texto padrão');
+  const povoar = async () => {
+    pad.innerHTML = ''; const p0 = document.createElement('option'); p0.value = ''; p0.textContent = '★ Textos padrão…'; pad.appendChild(p0);
+    try {
+      const r = await fetch(cfg.urlBusca + '?sessao=' + encodeURIComponent(cfg.sessao) + '&q=&todos=1', { credentials: 'same-origin' });
+      (await r.json()).itens.forEach((m, i) => { const o = document.createElement('option'); o.value = i; o.textContent = m.categoria + ' — ' + m.titulo; o._texto = m.texto; pad.appendChild(o); });
+    } catch (e) {}
+  };
+  povoar();
+  pad.addEventListener('change', () => { const o = pad.options[pad.selectedIndex]; if (o && o._texto) ch().insertContent('<p>' + esc(o._texto) + '</p>').run(); pad.value = ''; });
+  barra.appendChild(pad);
+  add(botao('★+', 'Salvar o trecho selecionado como texto padrão', async () => {
+    const { from, to } = editor.state.selection; const texto = editor.state.doc.textBetween(from, to, '\n').trim();
+    if (!texto) { alert('Selecione primeiro o trecho que deseja guardar como texto padrão.'); return; }
+    const titulo = prompt('Nome do texto padrão (ex.: Abertura — sessão solene):'); if (!titulo || !cfg.urlSalvarModelo) return;
+    const tok = (document.querySelector('input[name=csrfmiddlewaretoken]') || {}).value || '';
+    const r = await fetch(cfg.urlSalvarModelo, { method: 'POST', credentials: 'same-origin', headers: { 'X-CSRFToken': tok, 'Content-Type': 'application/json' }, body: JSON.stringify({ titulo, texto }) });
+    alert(r.ok ? 'Texto padrão salvo. Ele já aparece em “★ Textos padrão” e ao digitar @.' : 'Não foi possível salvar o texto padrão.'); if (r.ok) povoar();
+  }, () => false));
 
   // Ditado (Web Speech API, pt-BR)
   const Reconhecimento = window.SpeechRecognition || window.webkitSpeechRecognition; let rec = null;

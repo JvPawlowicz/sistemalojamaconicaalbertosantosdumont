@@ -274,7 +274,7 @@ def buscar_modelos(request):
             itens.append({"tipo": "modelo", "grupo": "Textos prontos", "titulo": m.titulo, "atalho": m.atalho,
                           "detalhe": f"@{m.atalho} · {m.get_categoria_display()}", "categoria": m.get_categoria_display(),
                           "texto": services.renderizar_modelo(m.texto, sessao)})
-    itens = itens[:10]
+    itens = itens if request.GET.get("todos") else itens[:10]
     if q:
         for i in sessao.elegiveis().filter(nome_completo__icontains=q, grau__isnull=False)[:6]:
             titulo = "Ir∴ " + i.nome_completo
@@ -392,3 +392,28 @@ def carregar_padroes(request):
         messages.success(request, f"{novos} texto(s) padrão adicionado(s)." if novos else "Todos os textos padrão já estão cadastrados.")
         return redirect("atas:modelos")
     return render(request, "atas/padroes.html", {"total": len(MODELOS), "existentes": ModeloTexto.objects.count()})
+
+
+@login_required
+@require_POST
+def modelo_rapido(request):
+    """Salva um trecho selecionado na ata como texto padrão (para o Secretário reutilizar com @)."""
+    import json
+
+    from django.utils.text import slugify
+
+    if not request.user.tem_perfil(P.SECRETARIO):
+        raise PermissionDenied
+    try:
+        dados = json.loads(request.body)
+        titulo, texto = str(dados["titulo"]).strip()[:100], str(dados["texto"]).strip()
+    except (ValueError, KeyError):
+        return JsonResponse({"erro": "dados inválidos"}, status=400)
+    if not titulo or not texto:
+        return JsonResponse({"erro": "informe nome e texto"}, status=400)
+    base = slugify(titulo)[:34] or "texto"
+    atalho, n = base, 2
+    while ModeloTexto.objects.filter(atalho=atalho).exists():
+        atalho, n = f"{base}-{n}", n + 1
+    m = ModeloTexto.objects.create(titulo=titulo, atalho=atalho, categoria=ModeloTexto.Categoria.FORMULA, texto=texto)
+    return JsonResponse({"id": m.pk, "atalho": m.atalho})

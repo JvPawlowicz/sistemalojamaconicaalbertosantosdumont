@@ -138,6 +138,22 @@ def test_ata_nova_parte_do_modelo_completo_do_tipo_da_sessao(cliente, usuarios, 
     assert "Iniciação do profano" in html and "Nada mais havendo a tratar" in html
 
 
-def test_marca_prumo_no_rodape_e_manifesto(cliente, usuarios):
-    assert "Prumo" in cliente("mestre").get(reverse("core:painel")).content.decode()
-    assert cliente("mestre").get(reverse("core:manifest")).json()["short_name"] == "Prumo"
+def test_marca_compasso_no_rodape_e_manifesto(cliente, usuarios):
+    assert "Compasso" in cliente("mestre").get(reverse("core:painel")).content.decode()
+    assert cliente("mestre").get(reverse("core:manifest")).json()["short_name"] == "Compasso"
+
+
+def test_secretario_salva_trecho_como_texto_padrao_e_lista_todos(cliente, usuarios, sessao):
+    import json
+
+    from apps.atas.models import ModeloTexto
+
+    s = cliente("secretario")
+    for _ in range(2):
+        r = s.post(reverse("atas:modelo_rapido"), json.dumps({"titulo": "Abertura solene", "texto": "Texto {{loja}}"}), content_type="application/json")
+        assert r.status_code == 200
+    assert set(ModeloTexto.objects.values_list("atalho", flat=True)) == {"abertura-solene", "abertura-solene-2"}
+    assert cliente("mestre").post(reverse("atas:modelo_rapido"), "{}", content_type="application/json").status_code == 403
+    s.post(reverse("atas:modelos_padroes"))
+    todos = s.get(reverse("atas:modelos_buscar"), {"sessao": sessao.pk, "q": "", "todos": 1}).json()["itens"]
+    assert len(todos) > 10

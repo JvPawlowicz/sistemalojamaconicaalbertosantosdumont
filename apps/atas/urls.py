@@ -10,6 +10,7 @@ urlpatterns = [
     path("nova/<int:sessao_pk>/", views.criar, name="criar"),
     path("modelos/", views.ModelosView.as_view(), name="modelos"),
     path("modelos/padroes/", views.carregar_padroes, name="modelos_padroes"),
+    path("modelos/rapido/", views.modelo_rapido, name="modelo_rapido"),
     path("modelos/novo/", views.NovoModelo.as_view(), name="modelo_novo"),
     path("modelos/renderizar/", views.renderizar_texto, name="modelos_renderizar"),
     path("modelos/buscar/", views.buscar_modelos, name="modelos_buscar"),
