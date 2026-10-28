@@ -152,3 +152,20 @@ html { scroll-behavior: smooth; }
 .cartao-rodape { margin-top: .8rem; font-size: .75rem; color: #2c5a78; }
 @media (prefers-reduced-motion: reduce) { .cartao { transition: none; } .cartao:hover:not([aria-pressed="true"]) { transform: none; } }
 .aviso { border-left: 5px solid var(--celeste); } .aviso-fixado { background: linear-gradient(90deg, var(--celeste-suave), var(--surface) 40%); }
+
+/* Urna e apuração */
+.urna-opcoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .8rem; }
+.urna-op { position: relative; cursor: pointer; } .urna-op input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.urna-op > span { display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: 1.1rem .8rem; border: 2px solid var(--border); border-radius: 16px; background: var(--surface); font-weight: 700; transition: transform .15s, border-color .15s, box-shadow .15s; }
+.urna-op small { font-weight: 400; color: var(--muted); } .urna-op .icon { width: 1.8rem; height: 1.8rem; }
+.urna-op:hover > span { transform: translateY(-2px); box-shadow: var(--shadow); }
+.urna-op input:checked + span { border-color: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 22%, transparent); }
+.urna-op input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+.urna-op.favoravel .icon { color: var(--ok); } .urna-op.contrario .icon { color: var(--danger); }
+.barras { display: grid; gap: .5rem; margin: .8rem 0; } .barra { height: 2.2rem; border-radius: 10px; background: var(--surface-2); position: relative; overflow: hidden; }
+.barra::before { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: var(--celeste); border-radius: 10px; transition: width .9s cubic-bezier(.2,.7,.2,1); animation: crescer 1s both; }
+.barra.sim::before { background: color-mix(in srgb, var(--ok) 55%, var(--surface)); } .barra.nao::before { background: color-mix(in srgb, var(--danger) 50%, var(--surface)); }
+.barra span { position: relative; padding: 0 .8rem; line-height: 2.2rem; font-weight: 600; }
+.resultado.res-ok { border-top: 4px solid var(--ok); } .resultado.res-no { border-top: 4px solid var(--danger); }
+@keyframes crescer { from { width: 0; } }
+@media (prefers-reduced-motion: reduce) { .barra::before { animation: none; transition: none; } }

@@ -7,3 +7,6 @@
 <table class="tabela"><tbody>{% for e in escala %}<tr><td>{{ e.cargo.nome }}</td><td>{{ e.irmao.nome_completo }}{% if e.substituicao %} <span class="selo selo-warn" title="Titular: {{ e.titular|default:'—' }}">substituto</span>{% endif %}</td></tr>
 {% empty %}<tr><td class="vazio">Escala ainda não definida.</td></tr>{% endfor %}</tbody></table></section>
 </div>
+{% if user|tem_perfil:"hospitaleiro" %}<form method="post" action="{% url 'hospitalaria:tronco_rapido' sessao.pk %}" class="card" style="display:flex;gap:.8rem;align-items:end;flex-wrap:wrap">{% csrf_token %}
+<div><h2>{% icon "piggy-bank" %} Tronco de Beneficência</h2><p class="ajuda mb0">Registre a arrecadação desta sessão.</p></div>
+<div class="campo mb0"><label for="tr-valor">Valor (R$)</label><input class="input" id="tr-valor" name="valor" inputmode="decimal" required style="max-width:10rem"></div><button class="btn" type="submit">{% icon "check" %} Registrar</button></form>{% endif %}

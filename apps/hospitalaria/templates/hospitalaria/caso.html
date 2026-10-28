@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ c.nome }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>{{ c.nome }}</h1><p>{{ c.get_tipo_display }} · desde {{ c.data_inicio|date:"d/m/Y" }} · {% selo c.status c.get_status_display %}</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'hospitalaria:painel' %}">{% icon "arrow-left" %} Casos</a>
+<form method="post" action="{% url 'hospitalaria:caso_status' c.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit">{% if c.status == "acompanhando" %}Encerrar caso{% else %}Reabrir caso{% endif %}</button></form></div></div>
+<div class="grade-2"><section class="card"><h2>{% icon "heart-handshake" %} Situação</h2><p style="white-space:pre-wrap">{{ c.descricao }}</p><p class="muted">Responsável pelo contato: {{ c.responsavel|default:"não definido" }}</p></section>
+<form method="post" class="card"><h2>{% icon "plus" %} Registrar acompanhamento</h2>{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">{% icon "check" %} Registrar</button></form></div>
+<section class="card"><h2>{% icon "history" %} Histórico</h2>{% for a in acompanhamentos %}<p><strong>{{ a.data|date:"d/m/Y" }}</strong> · {{ a.get_tipo_display }} · <span class="muted">{{ a.registrado_por.first_name }}</span><br>{{ a.descricao }}</p>{% empty %}<p class="muted">Nenhum acompanhamento registrado.</p>{% endfor %}</section>
+{% if movimentos %}<section class="card"><h2>{% icon "piggy-bank" %} Ajuda do Tronco</h2>{% for m in movimentos %}<p>{{ m.data|date:"d/m/Y" }} — {{ m.valor|moeda }} ({{ m.get_tipo_display }})</p>{% endfor %}</section>{% endif %}{% endblock %}

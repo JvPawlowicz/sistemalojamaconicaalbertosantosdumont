@@ -36,5 +36,7 @@ urlpatterns = [
     path("expediente/", include("apps.expediente.urls")),
     path("comissoes/", include("apps.comissoes.urls")),
     path("relatorios/", include("apps.relatorios.urls")),
+    path("votacoes/", include("apps.votacoes.urls")),
+    path("hospitalaria/", include("apps.hospitalaria.urls")),
     path("", include("apps.core.urls")),
 ]

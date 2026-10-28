@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     "apps.expediente",
     "apps.comissoes",
     "apps.relatorios",
+    "apps.votacoes",
+    "apps.hospitalaria",
 ]
 
 MIDDLEWARE = [

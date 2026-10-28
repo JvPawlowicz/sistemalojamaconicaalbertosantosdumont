@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Tronco de Beneficência{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Tronco de Beneficência</h1><p>Ano maçônico {{ ano.nome }}</p></div></div>
+<div class="grade"><div class="card indicador"><span class="rotulo">Saldo atual</span><span class="valor">{{ saldo|moeda }}</span></div><div class="card indicador"><span class="rotulo">Arrecadado no ano</span><span class="valor" style="color:var(--ok)">{{ arrecadado|moeda }}</span></div><div class="card indicador"><span class="rotulo">Destinado no ano</span><span class="valor" style="color:var(--danger)">{{ destinado|moeda }}</span></div></div>
+<div class="grade-2 mt"><div class="tabela-wrap"><table class="tabela"><thead><tr><th>Data</th><th>Descrição</th><th>Tipo</th><th class="num">Valor</th></tr></thead><tbody>
+{% for m in movs %}<tr><td class="nowrap">{{ m.data|date:"d/m/Y" }}</td><td>{{ m.descricao|default:"—" }}{% if m.caso %}<br><small class="muted">caso: {{ m.caso.nome }}</small>{% endif %}{% if m.comprovante %} <a href="{% url 'hospitalaria:comprovante' m.pk %}" target="_blank" rel="noopener">{% icon "file-text" %}<span class="sr-only">Comprovante</span></a>{% endif %}</td><td>{{ m.get_tipo_display }}</td>
+<td class="num" style="color:{% if m.tipo == 'arrecadacao' %}var(--ok){% else %}var(--danger){% endif %}">{% if m.tipo == 'destinacao' %}−{% endif %}{{ m.valor|moeda }}</td></tr>{% empty %}<tr><td colspan="4" class="vazio">Sem movimentos.</td></tr>{% endfor %}</tbody></table></div>
+{% if form %}<form method="post" enctype="multipart/form-data" class="card"><h2>{% icon "plus" %} Novo movimento</h2>{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">{% icon "check" %} Registrar</button></form>{% endif %}</div>{% endblock %}

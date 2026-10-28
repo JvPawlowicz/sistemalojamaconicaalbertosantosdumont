@@ -53,7 +53,8 @@ SECOES = (
         Item("Sessões", "sessoes:lista", extras=("sessoes:detalhe", "sessoes:criar", "sessoes:editar")),
         Item("Eventos", "sessoes:eventos", extras=("sessoes:evento", "sessoes:evento_novo", "sessoes:evento_editar")),
         Item("Frequência", "sessoes:frequencia"),
-    ), namespaces=("sessoes",), grupo="Loja"),
+        Item("Votações", "votacoes:lista", extras=("votacoes:detalhe", "votacoes:criar")),
+    ), namespaces=("sessoes", "votacoes"), grupo="Loja"),
     Secao("atas", "Atas", "scroll-text", (
         Item("Atas", "atas:lista", extras=("atas:detalhe", "atas:criar", "atas:editar", "atas:assinar")),
         Item("Modelos de texto", "atas:modelos", _perfil(P.SECRETARIO), extras=("atas:modelo_novo", "atas:modelo_editar")),
@@ -82,6 +83,10 @@ SECOES = (
              extras=("irmaos:categoria_editar",)),
         Item("Minhas mensalidades", "tesouraria:minhas"),
     ), namespaces=("tesouraria",), nomes=("irmaos:categorias", "irmaos:categoria_editar"), grupo="Financeiro"),
+    Secao("hospitalaria", "Hospitalaria", "heart-handshake", (
+        Item("Casos", "hospitalaria:painel", _perfil(P.HOSPITALEIRO), extras=("hospitalaria:caso", "hospitalaria:caso_novo")),
+        Item("Tronco de Beneficência", "hospitalaria:tronco", _perfil(P.HOSPITALEIRO, P.TESOUREIRO)),
+    ), visivel=_perfil(P.HOSPITALEIRO, P.TESOUREIRO), namespaces=("hospitalaria",), grupo="Financeiro"),
     Secao("relatorios", "Relatórios", "chart-column", (Item("Relatórios", "relatorios:indice", extras=("relatorios:ver",)),),
           visivel=_perfil(P.SECRETARIO, P.TESOUREIRO), namespaces=("relatorios",), grupo="Gestão"),
     Secao("admin", "Administração", "settings", (

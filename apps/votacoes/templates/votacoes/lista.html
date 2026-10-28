@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Votações{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Votações e escrutínios</h1><p>Voto sigiloso: o sistema registra <strong>quem votou</strong>, nunca <strong>como votou</strong>.</p></div>
+<div class="acoes">{% if pode_gerir %}<a class="btn" href="{% url 'votacoes:criar' %}">{% icon "plus" %} Nova votação</a>{% endif %}</div></div>
+<div class="grade">{% for v in votacoes %}<a class="card" href="{% url 'votacoes:detalhe' v.pk %}" style="text-decoration:none;color:inherit"><h2>{% icon "vote" %} {{ v.titulo }}</h2>
+<p class="muted">{{ v.get_tipo_display }}{% if v.sessao %} · sessão de {{ v.sessao.data_hora|date:"d/m/Y" }}{% endif %}</p>
+<p class="mb0">{% selo v.status v.get_status_display %}{% if v.id in ja_votei %} <span class="selo selo-ok">você votou</span>{% elif v.status == "aberta" %} <span class="selo selo-warn">aguardando seu voto</span>{% endif %}</p></a>
+{% empty %}<div class="card vazio" style="grid-column:1/-1">Nenhuma votação.</div>{% endfor %}</div>{% endblock %}

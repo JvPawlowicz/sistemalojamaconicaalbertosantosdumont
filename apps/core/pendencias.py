@@ -39,6 +39,12 @@ def tarefas_do_usuario(user):
             tarefas.append(_t(f"Confirmar presença: {e.titulo} ({e.data_hora:%d/%m})",
                               reverse("sessoes:evento", args=[e.pk]), "calendar", "info", "Responder"))
 
+    from apps.votacoes.models import Votacao
+
+    for v in Votacao.objects.filter(status=Votacao.Status.ABERTA):
+        if v.pode_votar(user)[0]:
+            tarefas.append(_t(f"Votação aberta: {v.titulo}", reverse("votacoes:detalhe", args=[v.pk]), "vote", "urgente", "Votar"))
+
     # --- secretaria ---
     if user.tem_perfil(P.SECRETARIO):
         for s in Sessao.objects.filter(status=Sessao.Status.REALIZADA, ata__isnull=True).order_by("-data_hora")[:3]:
@@ -97,6 +103,17 @@ def tarefas_do_usuario(user):
         sem_cat = Irmao.objects.filter(is_active=True, grau__isnull=False, categoria__isnull=True).count()
         if sem_cat:
             tarefas.append(_t(f"{sem_cat} irmão(s) sem categoria de cobrança", reverse("irmaos:lista"), "users", "info", "Ajustar"))
+
+    if user.tem_perfil(P.HOSPITALEIRO):
+        from datetime import timedelta as _td
+
+        from apps.hospitalaria.models import CasoHospitalaria
+
+        limite = hoje - _td(days=15)
+        atrasados = [c for c in CasoHospitalaria.objects.filter(status="acompanhando") if c.ultimo_contato < limite]
+        if atrasados:
+            tarefas.append(_t(f"{len(atrasados)} caso(s) de hospitalaria sem contato há mais de 15 dias",
+                              reverse("hospitalaria:painel"), "heart-handshake", "atencao", "Ver"))
 
     # --- administração ---
     if user.tem_perfil(P.ADMINISTRADOR):

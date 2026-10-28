@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ v.titulo }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>{{ v.titulo }}</h1><p>{{ v.get_tipo_display }} · {% selo v.status v.get_status_display %} · habilitados: grau {{ v.get_grau_minimo_display }} ou superior{% if v.exigir_presenca and v.sessao %}, presentes na sessão{% endif %}</p></div>
+<div class="acoes"><a class="btn btn-sec" href="{% url 'votacoes:lista' %}">{% icon "arrow-left" %} Votações</a>
+{% if pode_gerir %}{% if v.status == "rascunho" %}<form method="post" action="{% url 'votacoes:abrir' v.pk %}">{% csrf_token %}<button class="btn" type="submit" data-confirmar="Abrir a votação agora?">{% icon "vote" %} Abrir votação</button></form>
+{% elif v.status == "aberta" %}<form method="post" action="{% url 'votacoes:encerrar' v.pk %}">{% csrf_token %}<button class="btn btn-perigo" type="submit" data-confirmar="Encerrar a votação? Não será mais possível votar e o resultado será divulgado.">{% icon "lock" %} Encerrar e apurar</button></form>{% endif %}{% endif %}</div></div>
+{% if v.descricao %}<div class="card" style="white-space:pre-wrap">{{ v.descricao }}</div>{% endif %}
+{% if v.candidato %}<p class="muted">Candidato: <strong>{{ v.candidato.nome }}</strong>{% if v.tipo == "escrutinio" %} · aprovado se houver no máximo {{ v.negativos_maximos }} voto(s) contrário(s){% endif %}</p>{% endif %}
+
+{% if v.status == "aberta" %}
+<section class="card" aria-labelledby="h-voto"><h2 id="h-voto">{% icon "vote" %} Seu voto</h2>
+{% if ja_votei %}<div class="alerta alerta-success">{% icon "circle-check" %}<span>Seu voto foi registrado em sigilo. Não é possível alterá-lo.</span></div>
+{% elif pode_votar %}<form method="post" action="{% url 'votacoes:votar' v.pk %}" class="urna">{% csrf_token %}
+<div class="urna-opcoes" role="radiogroup" aria-label="Opções de voto">
+<label class="urna-op favoravel"><input type="radio" name="opcao" value="sim" required><span>{% icon "circle-check" %} Favorável<small>bola branca</small></span></label>
+<label class="urna-op contrario"><input type="radio" name="opcao" value="nao"><span>{% icon "circle-x" %} Contrário<small>bola preta</small></span></label>
+<label class="urna-op abstencao"><input type="radio" name="opcao" value="abstencao"><span>{% icon "scale" %} Abstenção<small>não conta</small></span></label></div>
+<button class="btn btn-grande mt" type="submit" data-confirmar="Confirmar o voto? Depois de confirmado ele não pode ser alterado.">{% icon "check" %} Confirmar voto</button></form>
+{% else %}<div class="alerta alerta-warning">{% icon "triangle-alert" %}<span>{{ motivo }}</span></div>{% endif %}
+<p class="ajuda">Participação: {{ n_participantes }} de {{ n_habilitados }} habilitado(s). O resultado só aparece ao encerrar.</p></section>
+{% elif v.status == "encerrada" %}
+<section class="card resultado {% if res.aprovada %}res-ok{% else %}res-no{% endif %}" aria-labelledby="h-res"><h2 id="h-res">{% icon "stamp" %} Resultado</h2>
+<p style="font-size:1.4em"><strong>{% if res.aprovada %}Aprovado{% else %}Não aprovado{% endif %}</strong></p>
+<div class="barras" role="img" aria-label="Favoráveis {{ res.sim }}, contrários {{ res.nao }}, abstenções {{ res.abstencao }}">
+<div class="barra sim" style="--w: {% widthratio res.sim res.total 100 %}%"><span>Favoráveis · {{ res.sim }}</span></div>
+<div class="barra nao" style="--w: {% widthratio res.nao res.total 100 %}%"><span>Contrários · {{ res.nao }}</span></div>
+<div class="barra abs" style="--w: {% widthratio res.abstencao res.total 100 %}%"><span>Abstenções · {{ res.abstencao }}</span></div></div>
+<p class="ajuda">{{ res.participantes }} participante(s) de {{ res.habilitados }} habilitado(s) · apurado em {{ v.encerrada_em|date:"d/m/Y H:i" }}</p>
+{% if pode_gerir and v.tipo == "escrutinio" and v.candidato and not v.resultado_aplicado %}<form method="post" action="{% url 'votacoes:aplicar' v.pk %}">{% csrf_token %}<button class="btn" type="submit" data-confirmar="Aplicar o resultado ao candidato?">{% icon "check" %} Aplicar resultado ao candidato</button></form>{% elif v.resultado_aplicado %}<span class="selo selo-ok">resultado aplicado ao candidato</span>{% endif %}</section>
+{% else %}<div class="alerta alerta-info">{% icon "bell" %}<span>Votação em preparação. Abra quando a sessão estiver pronta.</span></div>{% endif %}
+{% if pode_gerir and participacoes %}<section class="card"><h2>{% icon "users" %} Quem já votou</h2><p class="ajuda">Lista de participação (não mostra o voto).</p>{% for p in participacoes %}<span class="selo selo-muted" style="margin:.15rem">{{ p.irmao.nome_completo }}</span>{% endfor %}</section>{% endif %}
+{% endblock %}

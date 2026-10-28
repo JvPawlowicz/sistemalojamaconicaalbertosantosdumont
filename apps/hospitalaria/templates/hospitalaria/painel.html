@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Hospitalaria{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Hospitalaria</h1><p>Acompanhamento sigiloso de irmãos e familiares. <span class="selo selo-warn">dados sensíveis</span></p></div><div class="acoes"><a class="btn" href="{% url 'hospitalaria:caso_novo' %}">{% icon "plus" %} Novo caso</a></div></div>
+<div class="grade"><div class="card indicador"><span class="rotulo">Casos em acompanhamento</span><span class="valor">{{ casos|length }}</span></div>
+<div class="card indicador"><span class="rotulo">Sem contato há mais de 15 dias</span><span class="valor" style="color:var(--danger)">{{ sem_contato|length }}</span></div>
+<a class="card indicador" href="{% url 'hospitalaria:tronco' %}" style="text-decoration:none;color:inherit"><span class="rotulo">Saldo do Tronco</span><span class="valor">{{ saldo|moeda }}</span></a></div>
+<div class="tabela-wrap mt"><table class="tabela"><thead><tr><th>Beneficiado</th><th>Tipo</th><th>Desde</th><th>Último contato</th><th>Responsável</th><th><span class="sr-only">Abrir</span></th></tr></thead><tbody>
+{% for c in casos %}<tr><td><strong>{{ c.nome }}</strong>{% if c.parentesco %}<br><small class="muted">{{ c.parentesco }}</small>{% endif %}</td><td>{{ c.get_tipo_display }}</td><td>{{ c.data_inicio|date:"d/m/Y" }}</td>
+<td>{{ c.ultimo_contato|date:"d/m/Y" }}{% if c in sem_contato %} <span class="selo selo-danger">atrasado</span>{% endif %}</td><td>{{ c.responsavel|default:"—" }}</td><td><a class="btn btn-sec btn-peq" href="{% url 'hospitalaria:caso' c.pk %}">Abrir</a></td></tr>
+{% empty %}<tr><td colspan="6" class="vazio">Nenhum caso em acompanhamento.</td></tr>{% endfor %}</tbody></table></div>{% endblock %}

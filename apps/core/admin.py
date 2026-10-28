@@ -6,7 +6,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from apps.irmaos.models import Irmao
 
 _APPS = {"core", "irmaos", "cargos", "sessoes", "atas", "tesouraria", "visitas", "documentos", "candidatos",
-         "patrimonio", "expediente", "comissoes"}
+         "patrimonio", "expediente", "comissoes", "votacoes", "hospitalaria"}
 
 
 class IrmaoAdmin(SimpleHistoryAdmin):
