@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "apps.relatorios",
     "apps.votacoes",
     "apps.hospitalaria",
+    "apps.agape",
 ]
 
 MIDDLEWARE = [

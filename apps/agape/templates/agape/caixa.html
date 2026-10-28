@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Caixa do Ágape{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Caixa do Ágape</h1><p>Independente do caixa da loja.</p></div></div>
+{% include "agape/_sub.html" with sub="caixa" pode=True %}
+<div class="grade"><div class="card indicador"><span class="rotulo">Saldo</span><span class="valor">{{ saldo|moeda }}</span></div><div class="card indicador"><span class="rotulo">Entradas</span><span class="valor" style="color:var(--ok)">{{ entradas|moeda }}</span></div><div class="card indicador"><span class="rotulo">Saídas</span><span class="valor" style="color:var(--danger)">{{ saidas|moeda }}</span></div></div>
+<div class="grade-2 mt"><div class="tabela-wrap"><table class="tabela"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th class="num">Valor</th></tr></thead><tbody>
+{% for m in movs %}<tr><td class="nowrap">{{ m.data|date:"d/m/Y" }}</td><td>{{ m.descricao }}{% if m.agape %}<br><small class="muted">{{ m.agape }}</small>{% endif %}</td><td>{{ m.get_categoria_display }}</td>
+<td class="num" style="color:{% if m.tipo == 'entrada' %}var(--ok){% else %}var(--danger){% endif %}">{% if m.tipo == 'saida' %}−{% endif %}{{ m.valor|moeda }}</td></tr>{% empty %}<tr><td colspan="4" class="vazio">Sem lançamentos.</td></tr>{% endfor %}</tbody></table></div>
+<form method="post" class="card"><h2>{% icon "plus" %} Novo lançamento</h2>{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">{% icon "check" %} Registrar</button></form></div>{% endblock %}

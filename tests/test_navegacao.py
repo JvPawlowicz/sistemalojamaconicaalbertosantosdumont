@@ -15,7 +15,7 @@ def test_menu_enxuto_por_perfil(usuarios):
     assert _secoes(usuarios, "aprendiz") == ["inicio", "agenda", "atas", "irmaos", "acervo", "financeiro"]
     assert "relatorios" not in _secoes(usuarios, "mestre") and "admin" not in _secoes(usuarios, "mestre")
     assert _secoes(usuarios, "tesoureiro")[-1] == "relatorios"
-    assert _secoes(usuarios, "veneravel") == ["inicio", "agenda", "atas", "irmaos", "acervo", "financeiro", "hospitalaria", "relatorios", "admin"]
+    assert _secoes(usuarios, "veneravel") == ["inicio", "agenda", "atas", "irmaos", "acervo", "financeiro", "relatorios", "admin"]
     assert len(_secoes(usuarios, "veneravel")) <= 8  # antes: 22 itens no menu
 
 

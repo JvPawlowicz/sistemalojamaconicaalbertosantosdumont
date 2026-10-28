@@ -1,9 +1,6 @@
 {% load loja %}
 <nav aria-label="Menu principal">
 <ul class="nav">
-{% for grupo, itens in nav.grupos.items %}
-  {% if grupo %}<li class="nav-grupo">{{ grupo }}</li>{% endif %}
-  {% for g in itens %}<li><a href="{{ g.url }}" {% if g.ativa %}aria-current="page"{% endif %}>{% icon g.secao.icone %} {{ g.secao.titulo }}</a></li>{% endfor %}
-{% endfor %}
+{% for grupo, itens in nav.grupos.items %}{% for g in itens %}<li><a href="{{ g.url }}" {% if g.ativa %}aria-current="page"{% endif %}>{% icon g.secao.icone %}<span>{{ g.secao.titulo }}</span></a></li>{% endfor %}{% endfor %}
 </ul>
 </nav>

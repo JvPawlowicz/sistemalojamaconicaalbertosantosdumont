@@ -1,15 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Esquadro e compasso">
   <title>Esquadro e compasso</title>
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <!-- esquadro: vértice embaixo, braços a 45° -->
-    <path d="M60 104 L16 60 M60 104 L104 60" stroke="#0a6aa1" stroke-width="7"/>
-    <path d="M60 104 L16 60 M60 104 L104 60" stroke="#8fd0f2" stroke-width="2.4" stroke-dasharray="1 9"/>
-    <!-- compasso: charneira em cima, pernas abertas -->
-    <path d="M60 12 L26 88 M60 12 L94 88" stroke="#0b3a58" stroke-width="6"/>
-    <circle cx="60" cy="14" r="6.5" fill="#ffffff" stroke="#0b3a58" stroke-width="4.5"/>
-    <path d="M26 88 L22 99 M94 88 L98 99" stroke="#0b3a58" stroke-width="4"/>
-    <path d="M40 54 Q60 44 80 54" stroke="#0b3a58" stroke-width="3.2"/>
+  <g fill="none" stroke-linejoin="miter">
+    <!-- compasso: pernas e charneira -->
+    <path stroke="#0b3a58" d="M60 20 L30 98 M60 20 L90 98" stroke-width="5.2" stroke-linecap="butt"/>
+    <path fill="#0b3a58" d="M27.6 97.1 L32.4 98.9 L26 108.3 Z M92.4 97.1 L87.6 98.9 L94 108.3 Z" stroke-width="0"/>
+    <!-- esquadro -->
+    <path stroke="#1b95d6" d="M16 56 L60 100 L104 56" stroke-width="11" stroke-linecap="butt"/>
+    <!-- entrelaçamento: esquadro sobre a perna esquerda -->
+    <path stroke="#1b95d6" d="M28 68 L47 87" stroke-width="11" stroke-linecap="butt"/>
+    <!-- perna direita sobre o esquadro -->
+    <path stroke="#ffffff" d="M78.5 66 L86 86" stroke-width="9.5" stroke-linecap="butt"/>
+    <path stroke="#0b3a58" d="M79.4 68 L85.4 86" stroke-width="5.2" stroke-linecap="butt"/>
   </g>
-  <circle cx="60" cy="66" r="15" fill="#e6f4fb" stroke="#0a6aa1" stroke-width="3"/>
-  <text x="60" y="73" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="21" fill="#0b3a58">G</text>
+  <circle fill="#ffffff" stroke="#0b3a58" cx="60" cy="18" r="7.5" stroke-width="4.2"/>
+  <circle fill="#0b3a58" cx="60" cy="18" r="2.3"/>
+  <text fill="#0b3a58" x="60" y="70.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="25">G</text>
 </svg>

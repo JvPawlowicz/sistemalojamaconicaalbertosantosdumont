@@ -166,9 +166,12 @@ def test_tronco_saldo_sessao_e_permissoes(cliente, usuarios, hospitaleiro, sessa
     assert "Tronco de Beneficência" in h.get(reverse("sessoes:detalhe", args=[sessao.pk])).content.decode()
 
 
-def test_menu_mostra_hospitalaria_apenas_a_quem_pode(usuarios, hospitaleiro):
+def test_abas_hospitalaria_so_para_quem_pode(usuarios, hospitaleiro):
     from apps.core import navegacao as nav
-    assert "hospitalaria" in [s.chave for s in nav.secoes_visiveis(hospitaleiro)]
-    assert "hospitalaria" in [s.chave for s in nav.secoes_visiveis(usuarios["tesoureiro"])]
-    assert "hospitalaria" not in [s.chave for s in nav.secoes_visiveis(usuarios["secretario"])]
-    assert "hospitalaria" not in [s.chave for s in nav.secoes_visiveis(usuarios["aprendiz"])]
+
+    def abas(u):
+        return [i.url_name for s in nav.secoes_visiveis(u) for i in nav.itens_visiveis(s, u)]
+
+    assert "hospitalaria:painel" in abas(hospitaleiro) and "hospitalaria:tronco" in abas(hospitaleiro)
+    assert "hospitalaria:tronco" in abas(usuarios["tesoureiro"]) and "hospitalaria:painel" not in abas(usuarios["tesoureiro"])
+    assert "hospitalaria:painel" not in abas(usuarios["secretario"]) and "hospitalaria:tronco" not in abas(usuarios["aprendiz"])

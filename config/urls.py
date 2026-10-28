@@ -38,5 +38,6 @@ urlpatterns = [
     path("relatorios/", include("apps.relatorios.urls")),
     path("votacoes/", include("apps.votacoes.urls")),
     path("hospitalaria/", include("apps.hospitalaria.urls")),
+    path("agape/", include("apps.agape.urls")),
     path("", include("apps.core.urls")),
 ]

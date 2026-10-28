@@ -96,7 +96,14 @@ Os testes automáticos rodam com `python -m pytest`.
 
 **G. Navegação** (confira os atalhos)
 O **Início** lista o que precisa da sua atenção, cada item com botão direto. Pressione `Ctrl+K` (ou `/`) e busque um irmão, ata ou página.
-O menu tem 8 seções com abas; conta e sair ficam em *Conta* (canto superior direito).
+O menu é uma **barra superior** com 8 seções (no celular vira botão ☰) e abas; conta e sair ficam em *Conta* (canto superior direito).
+
+**G2. Ágape** (*Financeiro › Ágape*, perfil Tesoureiro)
+1. *Novo Ágape* (ligue à sessão): todos os irmãos entram como "vai"; cada irmão pode marcar *Vou / Não vou* na própria tela. *Sincronizar* usa a presença da sessão.
+2. Adicione **visitantes**: o custo é da loja. *Repassar* lança a despesa no caixa da loja e a entrada no **caixa do Ágape** (separado).
+3. *Dar baixa* no rateio de cada irmão que vai; confira *Caixa do Ágape* e o *Inventário* (refrigerantes: estoque mínimo, compra com custo, consumo, ajuste).
+
+**G3. Numeração das atas** — em *Configurações*, informe o **nº da primeira ata** (loja que já existe) e se a numeração reinicia por gestão. A ata aparece como `1287/2025-2026`.
 
 **H. Outros**
 *Agenda* (+ exportar .ics), *Agenda social* (confirmar presença), *Expediente*, *Comissões*, *Patrimônio*,

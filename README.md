@@ -107,8 +107,8 @@ WhatsApp (certificados) é opcional via Evolution API (`EVOLUTION_*`); o canal p
 
 `apps/core` (Loja, ano maçônico, termo, assinatura, e-mail) · `apps/irmaos` · `apps/cargos` · `apps/sessoes` ·
 `apps/atas` · `apps/tesouraria` · `apps/visitas` · `apps/documentos` · `apps/candidatos` · `apps/patrimonio` ·
-`apps/expediente` · `apps/comissoes` · `apps/relatorios`.
+`apps/expediente` · `apps/comissoes` · `apps/relatorios` · `apps/votacoes` · `apps/hospitalaria` · `apps/agape`.
 
 ## Fora do escopo atual
 
-Votação/escrutínio no sistema, sessão online (Jitsi) e integração bancária (PIX/boleto com baixa automática).
+Integração bancária automática (PIX/boleto com baixa automática).

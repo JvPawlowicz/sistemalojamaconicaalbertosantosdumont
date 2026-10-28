@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}{{ a.descricao }}{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>{{ a.descricao }} · {{ a.data|date:"d/m/Y" }}</h1><p>{% if a.sessao %}Sessão {{ a.sessao.get_tipo_display|lower }} de {{ a.sessao.data_hora|date:"d/m/Y" }} · {% endif %}{{ a.valor_por_pessoa|moeda }} por pessoa · {% if a.aberto %}<span class="selo selo-warn">aberto</span>{% else %}<span class="selo">encerrado</span>{% endif %}</p></div>
+{% if pode %}<div class="acoes"><a class="btn btn-sec" href="{% url 'agape:editar' a.pk %}">{% icon "pencil" %} Editar</a>
+<form method="post" action="{% url 'agape:encerrar' a.pk %}">{% csrf_token %}<button class="btn btn-sec" type="submit">{% if a.aberto %}Encerrar{% else %}Reabrir{% endif %}</button></form></div>{% endif %}</div>
+{% include "agape/_sub.html" with sub="lista" %}
+{% if a.aberto %}<div class="card"><h2>{% icon "utensils" %} Você vai ao Ágape?</h2>
+<form method="post" action="{% url 'agape:confirmar' a.pk %}" class="acoes">{% csrf_token %}
+<button class="btn" name="vai" value="1" type="submit" {% if minha.vai %}aria-pressed="true"{% endif %}>{% icon "check" %} Vou</button>
+<button class="btn btn-sec" name="vai" value="0" type="submit" {% if minha and not minha.vai %}aria-pressed="true"{% endif %}>{% icon "x" %} Não vou</button></form></div>{% endif %}
+<div class="grade mt"><div class="card indicador"><span class="rotulo">Irmãos que vão</span><span class="valor">{{ a.n_irmaos }}</span></div>
+<div class="card indicador"><span class="rotulo">Visitantes (loja paga)</span><span class="valor">{{ a.n_visitantes }}</span></div>
+<div class="card indicador"><span class="rotulo">Total de pessoas</span><span class="valor">{{ a.total_pessoas }}</span></div>
+{% if pode %}<div class="card indicador"><span class="rotulo">Rateio a receber</span><span class="valor">{{ a.a_receber|moeda }}</span></div>{% endif %}</div>
+<div class="grade-2 mt">
+<section><h2>Irmãos <small class="muted">(subpresença)</small></h2>
+{% if pode and a.sessao %}<form method="post" action="{% url 'agape:sincronizar' a.pk %}" class="mb">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit">{% icon "refresh-cw" %} Sincronizar com a presença da sessão</button></form>{% endif %}
+<div class="tabela-wrap"><table class="tabela"><thead><tr><th>Irmão</th><th>Vai?</th>{% if pode %}<th>Rateio</th>{% endif %}</tr></thead><tbody>
+{% for p in participantes %}<tr><td>{{ p.irmao.nome_completo }}</td>
+<td>{% if pode %}<form method="post" action="{% url 'agape:participante' a.pk p.irmao_id %}">{% csrf_token %}<input type="hidden" name="acao" value="vai"><button class="btn btn-sec btn-peq" type="submit" aria-label="Alternar presença de {{ p.irmao.nome_completo }}">{% if p.vai %}<span class="selo selo-ok">vai</span>{% else %}<span class="selo">não vai</span>{% endif %}</button></form>{% else %}{% if p.vai %}<span class="selo selo-ok">vai</span>{% else %}<span class="selo">não vai</span>{% endif %}{% endif %}</td>
+{% if pode %}<td>{% if p.vai %}<form method="post" action="{% url 'agape:participante' a.pk p.irmao_id %}">{% csrf_token %}<input type="hidden" name="acao" value="pago"><button class="btn btn-sec btn-peq" type="submit">{% if p.pago %}<span class="selo selo-ok">pago {{ p.pago_em|date:"d/m" }}</span>{% else %}Dar baixa{% endif %}</button></form>{% else %}—{% endif %}</td>{% endif %}</tr>{% endfor %}</tbody></table></div></section>
+<section><h2>Visitantes <small class="muted">(custo da loja)</small></h2>
+<ul class="lista-simples">{% for v in visitantes %}<li>{{ v.nome }}{% if v.loja %} <small class="muted">· {{ v.loja }}</small>{% endif %}
+{% if pode and not a.repasse_id %}<form method="post" action="{% url 'agape:visitante_excluir' a.pk v.pk %}" style="display:inline">{% csrf_token %}<button class="btn btn-sec btn-peq" type="submit" aria-label="Remover {{ v.nome }}">{% icon "x" %}</button></form>{% endif %}</li>{% empty %}<li class="muted">Sem visitantes.</li>{% endfor %}</ul>
+{% if pode %}<form method="post" action="{% url 'agape:visitante_novo' a.pk %}" class="card">{% csrf_token %}{% include "partials/form.html" with form=form_v %}<button class="btn" type="submit">{% icon "plus" %} Adicionar visitante</button></form>
+{% if a.n_visitantes and not a.repasse_id %}<form method="post" action="{% url 'agape:repasse' a.pk %}" class="mt">{% csrf_token %}<button class="btn" type="submit">{% icon "arrow-left-right" %} Repassar {{ a.custo_visitantes|moeda }} da loja ao Ágape</button><p class="ajuda">Lança a despesa no caixa da loja e a entrada no caixa do Ágape.</p></form>{% elif a.repasse_id %}<p class="selo selo-ok mt">Repasse da loja feito: {{ a.repasse.valor|moeda }}</p>{% endif %}{% endif %}</section></div>
+{% endblock %}

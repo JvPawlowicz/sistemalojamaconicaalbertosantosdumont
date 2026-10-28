@@ -115,6 +115,17 @@ def tarefas_do_usuario(user):
             tarefas.append(_t(f"{len(atrasados)} caso(s) de hospitalaria sem contato há mais de 15 dias",
                               reverse("hospitalaria:painel"), "heart-handshake", "atencao", "Ver"))
 
+    # --- Ágape ---
+    if user.tem_perfil(P.TESOUREIRO):
+        from apps.agape.models import Agape, Item
+
+        baixos = [i for i in Item.objects.filter(ativo=True) if i.baixo]
+        if baixos:
+            tarefas.append(_t(f"Ágape: {len(baixos)} item(ns) do inventário para repor", reverse("agape:inventario"), "glass-water", "atencao", "Ver"))
+        for a in Agape.objects.filter(status="aberto", data__lt=hoje):
+            tarefas.append(_t(f"Ágape de {a.data:%d/%m} ainda aberto: dar baixa nos rateios e repassar os visitantes",
+                              reverse("agape:detalhe", args=[a.pk]), "utensils", "atencao", "Abrir"))
+
     # --- administração ---
     if user.tem_perfil(P.ADMINISTRADOR):
         abertas = SolicitacaoLGPD.objects.filter(status="aberta").count()

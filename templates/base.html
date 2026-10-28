@@ -22,17 +22,14 @@
 {% if user.is_authenticated %}
 {% navegacao as nav %}
 <div class="app">
-  <aside class="sidebar" id="sidebar" aria-label="Menu principal">
-    <a class="brand" href="{% url 'core:painel' %}">
+  <header class="navbar">
+    <a class="brand" href="{% url 'core:painel' %}" aria-label="{{ loja.nome }} — início">
       {% if loja.brasao %}<img src="{% url 'core:brasao' %}" alt="">{% else %}{% include "partials/emblema.html" %}{% endif %}
-      <span><strong>{{ loja.nome }}</strong><small>{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}Rito {{ loja.rito }}</small></span>
+      <span class="brand-txt"><strong>{{ loja.nome }}</strong><small>{% if loja.numero %}Nº {{ loja.numero }} · {% endif %}Rito {{ loja.rito }}</small></span>
     </a>
-    {% include "partials/menu.html" %}
-  </aside>
-  <div class="main">
-    <header class="topbar">
-      <button class="controles menu-btn" type="button" data-acao="menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar" style="border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);padding:.4rem .6rem">{% icon "menu" %}</button>
-      <span class="grow"><strong>{{ user.nome_completo|default:user.username }}</strong> <span class="muted somente-largo">· {{ grau_nome|default:"Técnico" }}</span></span>
+    <button class="controles menu-btn" type="button" data-acao="menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">{% icon "menu" %}</button>
+    <div class="nav-wrap" id="sidebar">{% include "partials/menu.html" %}</div>
+    <div class="navbar-fim">
       <button type="button" class="btn btn-sec btn-peq no-print" data-acao="buscar" aria-label="Buscar (Ctrl+K)" aria-haspopup="dialog">{% icon "search" %}<span class="somente-largo"> Buscar</span> <kbd>Ctrl K</kbd></button>
       <span class="controles" role="group" aria-label="Acessibilidade">
         <button type="button" data-acao="tema" aria-label="Alternar tema claro/escuro" title="Tema">{% icon "sun" %}</button>
@@ -40,8 +37,9 @@
         <button type="button" data-acao="fonte" aria-label="Alternar tamanho da fonte" title="Tamanho da fonte">{% icon "type" %}</button>
       </span>
       <details class="menu-usuario">
-        <summary class="btn btn-sec btn-peq" aria-label="Minha conta">{% icon "user" %}<span class="somente-largo"> Conta</span> {% icon "chevron-down" %}</summary>
+        <summary class="btn btn-sec btn-peq" aria-label="Minha conta">{% icon "user" %}<span class="somente-largo"> {{ user.first_name|default:user.username }}</span> {% icon "chevron-down" %}</summary>
         <div class="menu-usuario-lista" role="menu">
+          <p class="menu-usuario-nome"><strong>{{ user.nome_completo|default:user.username }}</strong><small>{{ grau_nome|default:"Técnico" }}</small></p>
           <a role="menuitem" href="{% url 'irmaos:meu_perfil' %}">{% icon "user" %} Meu cadastro</a>
           <a role="menuitem" href="{% url 'irmaos:carteirinha' %}">{% icon "id-card" %} Carteirinha digital</a>
           <a role="menuitem" href="{% url 'core:meus_dados' %}">{% icon "shield-check" %} Meus dados (LGPD)</a>
@@ -49,7 +47,9 @@
           <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button role="menuitem" type="submit">{% icon "log-out" %} Sair</button></form>
         </div>
       </details>
-    </header>
+    </div>
+  </header>
+  <div class="main">
     <main class="conteudo" id="conteudo" tabindex="-1">
       {% if nav.abas %}<nav class="tabs" aria-label="{{ nav.secao.titulo }}">{% for a in nav.abas %}<a href="{{ a.url }}" {% if a.ativa %}aria-current="page"{% endif %}>{{ a.rotulo }}</a>{% endfor %}</nav>{% endif %}
       {% include "partials/mensagens.html" %}

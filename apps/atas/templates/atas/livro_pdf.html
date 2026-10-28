@@ -10,7 +10,7 @@ body { font-family: Georgia, "Times New Roman", serif; font-size: 12pt; line-hei
 </style></head><body>
 <div class="capa"><div class="cab">{{ loja.cabecalho }}</div><h1>LIVRO DE ATAS</h1><p>Ano maçônico {{ ano.nome }}</p><p>{{ blocos|length }} ata(s) assinada(s)</p></div>
 {% for b in blocos %}<div class="ata"><div class="cab">{{ loja.cabecalho }}</div>
-<div class="tit">Ata nº {{ b.ata.numero|default:"____" }}{% if b.ata.livro %} — Livro {{ b.ata.livro }}, folha {{ b.ata.folha }}{% endif %}<br><small>{{ b.ata.sessao.titulo }} — {{ b.ata.sessao.data_hora|date:"d/m/Y" }}</small></div>
+<div class="tit">Ata nº {{ b.ata.identificacao }}{% if b.ata.livro %} — Livro {{ b.ata.livro }}, folha {{ b.ata.folha }}{% endif %}<br><small>{{ b.ata.sessao.titulo }} — {{ b.ata.sessao.data_hora|date:"d/m/Y" }}</small></div>
 <div class="texto rico">{{ b.ata.conteudo_html }}</div>
 <p>{% for a in b.assinaturas %}<span class="ass-item">{% if a.imagem_src %}<img src="{{ a.imagem_src }}" alt="">{% endif %}<span class="linha" style="display:block">{{ a.irmao.nome_completo }}<br>{{ a.assinado_em|date:"d/m/Y H:i" }}</span><span class="ev" style="display:block">IP {{ a.ip|default:"—" }} · {{ a.codigo }}</span></span>{% endfor %}</p>
 <p class="ev">{{ texto_legal }} Hash SHA-256: {{ b.hash }}</p></div>{% endfor %}

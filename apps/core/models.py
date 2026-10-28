@@ -62,6 +62,12 @@ class Loja(models.Model):
         "Multa por atraso (%)", max_digits=5, decimal_places=2, default=0, help_text="Aplicada uma vez após o vencimento")
     juros_mensal_percentual = models.DecimalField(
         "Juros por mês de atraso (%)", max_digits=5, decimal_places=2, default=0, help_text="Pro rata por dia de atraso")
+    ata_numero_inicial = models.PositiveIntegerField(
+        "Nº da primeira ata registrada no sistema", default=1,
+        help_text="Loja que já existe: informe o número da próxima ata do livro (ex.: 1287). A numeração segue daí.")
+    ata_numeracao = models.CharField(
+        "Numeração das atas", max_length=10, default="continua",
+        choices=[("continua", "Contínua (não reinicia)"), ("gestao", "Reinicia a cada gestão (ano maçônico)")])
     dias_carencia_atraso = models.PositiveSmallIntegerField("Dias de carência antes de multa/juros", default=0)
     cobranca_automatica = models.BooleanField(
         "Enviar cobrança por e-mail automaticamente às mensalidades vencidas (semanal)", default=False)

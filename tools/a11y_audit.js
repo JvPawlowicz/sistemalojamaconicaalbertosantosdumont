@@ -14,7 +14,7 @@ const paginas = ['/entrar/', '/', '/sessoes/agenda/', '/sessoes/', '/sessoes/1/'
   '/sessoes/1/?aba=visitantes', '/sessoes/1/?aba=cerimonias', '/irmaos/', '/irmaos/novo/', '/irmaos/1/', '/cargos/', '/atas/', '/atas/1/',
   '/tesouraria/', '/tesouraria/mensalidades/', '/tesouraria/caixa/', '/tesouraria/orcamento/', '/relatorios/', '/relatorios/frequencia/',
   '/documentos/', '/candidatos/', '/patrimonio/', '/expediente/', '/comissoes/', '/configuracoes/', '/meus-dados/', '/irmaos/meu-perfil/',
-  '/visitas/', '/sessoes/eventos/', '/atas/modelos/'];
+  '/visitas/', '/sessoes/eventos/', '/atas/modelos/', '/agape/', '/agape/caixa/', '/agape/inventario/', '/votacoes/', '/hospitalaria/', '/hospitalaria/tronco/', '/irmaos/carteirinha/', '/avisos/'];
 const modos = [['claro', {}], ['escuro', { theme: 'escuro' }], ['contraste', { contraste: 'alto' }]];
 (async () => {
   const b = await chromium.launch(); const falhas = [];

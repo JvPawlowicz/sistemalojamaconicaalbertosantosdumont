@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load loja %}
+{% block titulo %}Inventário do Ágape{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina"><div><h1>Inventário do Ágape</h1><p>Refrigerantes, bebidas e descartáveis.</p></div><div class="acoes"><a class="btn btn-sec" href="{% url 'agape:item_novo' %}">{% icon "plus" %} Novo item</a></div></div>
+{% include "agape/_sub.html" with sub="inventario" pode=True %}
+<div class="grade-2"><div class="tabela-wrap"><table class="tabela"><thead><tr><th>Item</th><th class="num">Estoque</th><th class="num">Mínimo</th><th><span class="sr-only">Editar</span></th></tr></thead><tbody>
+{% for i in itens %}<tr><td>{{ i.nome }}{% if not i.ativo %} <span class="selo">inativo</span>{% endif %}</td><td class="num">{{ i.estoque }} {{ i.unidade }}{% if i.baixo %} <span class="selo selo-danger">repor</span>{% endif %}</td><td class="num">{{ i.minimo }}</td><td><a class="btn btn-sec btn-peq" href="{% url 'agape:item_editar' i.pk %}">Editar</a></td></tr>
+{% empty %}<tr><td colspan="4" class="vazio">Cadastre os itens (ex.: Coca-Cola 2L, Guaraná 2L, Cerveja lata).</td></tr>{% endfor %}</tbody></table></div>
+<form method="post" class="card"><h2>{% icon "package" %} Movimentar estoque</h2>{% csrf_token %}{% include "partials/form.html" %}<button class="btn" type="submit">{% icon "check" %} Registrar</button></form></div>
+<h2 class="mt">Últimos movimentos</h2><div class="tabela-wrap"><table class="tabela"><thead><tr><th>Data</th><th>Item</th><th>Tipo</th><th class="num">Qtd</th><th>Ágape</th></tr></thead><tbody>
+{% for m in historico %}<tr><td>{{ m.data|date:"d/m/Y" }}</td><td>{{ m.item }}</td><td>{{ m.get_tipo_display }}</td><td class="num">{{ m.quantidade }}</td><td>{{ m.agape|default:"—" }}</td></tr>{% empty %}<tr><td colspan="5" class="vazio">Sem movimentos.</td></tr>{% endfor %}</tbody></table></div>{% endblock %}

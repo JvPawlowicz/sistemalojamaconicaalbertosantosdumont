@@ -12,7 +12,7 @@ body { font-family: Georgia, "Times New Roman", serif; font-size: 12pt; line-hei
 {% if minuta %}body::before { content: "MINUTA — AGUARDANDO ASSINATURAS"; position: fixed; top: 45%; left: 5%; font-size: 34pt; color: rgba(150,0,0,.12); transform: rotate(-25deg); }{% endif %}
 </style></head><body>
 <div class="cab">{{ loja.cabecalho }}</div>
-<div class="tit">Ata nº {{ ata.numero|default:"____" }}{% if ata.livro %} — Livro {{ ata.livro }}, folha {{ ata.folha }}{% endif %}<br><small>Sessão {{ ata.sessao.titulo }} — {{ ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ata.versao }})</small></div>
+<div class="tit">Ata nº {{ ata.identificacao }}{% if ata.livro %} — Livro {{ ata.livro }}, folha {{ ata.folha }}{% endif %}<br><small>Sessão {{ ata.sessao.titulo }} — {{ ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ata.versao }})</small></div>
 <div class="texto rico">{{ ata.conteudo_html }}</div>
 <div class="assin">
 {% for a in assinaturas %}<div class="ass-item">{% if a.imagem_src %}<img src="{{ a.imagem_src }}" alt="">{% endif %}

@@ -6,7 +6,7 @@
 {% elif integra and not vigente and documento_confere %}<div class="alerta alerta-warning">{% icon "triangle-alert" %}<span><strong>Assinatura íntegra, porém de uma versão anterior.</strong> A ata foi revisada depois desta assinatura; o texto daquela versão está arquivado e confere com o hash assinado.</span></div>
 {% else %}<div class="alerta alerta-error">{% icon "circle-x" %}<span><strong>Atenção:</strong> a verificação de integridade falhou. O documento ou o registro pode ter sido alterado.</span></div>{% endif %}
 <dl class="lista-def">
-<dt>Documento</dt><dd>Ata {{ ass.ata.numero|default:"s/nº" }} — {{ ass.ata.sessao.titulo }} de {{ ass.ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ass.versao }})</dd>
+<dt>Documento</dt><dd>Ata {{ ass.ata.identificacao }} — {{ ass.ata.sessao.titulo }} de {{ ass.ata.sessao.data_hora|date:"d/m/Y" }} (versão {{ ass.versao }})</dd>
 <dt>Assinada por</dt><dd>{{ ass.irmao.nome_completo }}</dd>
 <dt>Em</dt><dd>{{ ass.assinado_em|date:"d/m/Y H:i:s" }}</dd>
 <dt>IP</dt><dd>{{ ass.ip|default:"—" }}</dd>

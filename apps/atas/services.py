@@ -42,11 +42,21 @@ def renderizar_modelo(texto, sessao):
     return _VAR.sub(lambda m: valores.get(m.group(1), m.group(0)), texto)
 
 
-def proximo_numero():
+def proximo_numero(sessao=None):
+    """Próximo nº de ata: segue o último cadastrado; sem atas, parte do número inicial configurado na Loja.
+
+    Com numeração por gestão, reinicia (a partir de 1) a cada ano maçônico.
+    """
     from .models import Ata
 
-    ultimo = Ata.objects.exclude(numero__isnull=True).order_by("-numero").first()
-    return (ultimo.numero + 1) if ultimo else 1
+    loja = Loja.atual()
+    qs = Ata.objects.exclude(numero__isnull=True)
+    if loja.ata_numeracao == "gestao" and sessao is not None:
+        qs = qs.filter(sessao__ano=sessao.ano)
+        ultimo = qs.order_by("-numero").first()
+        return (ultimo.numero + 1) if ultimo else 1
+    ultimo = qs.order_by("-numero").first()
+    return (ultimo.numero + 1) if ultimo else max(loja.ata_numero_inicial, 1)
 
 
 def avisar_signatarios(ata, base_url, lembrete=False, apenas_pendentes=True):

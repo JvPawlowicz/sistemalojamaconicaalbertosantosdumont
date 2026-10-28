@@ -62,12 +62,13 @@ SECOES = (
     Secao("irmaos", "Irmãos", "users", (
         Item("Quadro", "irmaos:lista", extras=("irmaos:detalhe", "irmaos:criar", "irmaos:editar", "irmaos:importar")),
         Item("Cargos e gestão", "cargos:quadro"),
+        Item("Hospitalaria", "hospitalaria:painel", _perfil(P.HOSPITALEIRO), extras=("hospitalaria:caso", "hospitalaria:caso_novo")),
         Item("Candidatos", "candidatos:painel", _mestre, extras=("candidatos:detalhe", "candidatos:criar")),
         Item("Comissões", "comissoes:lista", _mestre, extras=("comissoes:nova", "comissoes:editar")),
         Item("Visitação", "visitas:realizadas", extras=("visitas:nova_realizada", "visitas:visitantes",
                                                        "visitas:visitante_novo", "visitas:visitante_editar", "visitas:lojas", "visitas:loja_nova", "visitas:loja_editar",
                                                        "visitas:certificado_recebido")),
-    ), namespaces=("irmaos", "cargos", "candidatos", "comissoes", "visitas"), grupo="Loja"),
+    ), namespaces=("irmaos", "cargos", "candidatos", "comissoes", "visitas", "hospitalaria"), grupo="Loja"),
     Secao("acervo", "Acervo", "book-open", (
         Item("Biblioteca", "documentos:lista", extras=("documentos:ver", "documentos:enviar")),
         Item("Expediente", "expediente:lista", _perfil(P.SECRETARIO), extras=("expediente:novo",)),
@@ -81,12 +82,11 @@ SECOES = (
         Item("Categorias", "tesouraria:categorias", _perfil(P.TESOUREIRO)),
         Item("Categorias de irmão", "irmaos:categorias", _perfil(P.TESOUREIRO, P.ADMINISTRADOR),
              extras=("irmaos:categoria_editar",)),
+        Item("Ágape", "agape:lista", extras=("agape:detalhe", "agape:criar", "agape:editar", "agape:inventario", "agape:item_novo",
+                                           "agape:item_editar", "agape:caixa")),
+        Item("Tronco", "hospitalaria:tronco", _perfil(P.HOSPITALEIRO, P.TESOUREIRO)),
         Item("Minhas mensalidades", "tesouraria:minhas"),
-    ), namespaces=("tesouraria",), nomes=("irmaos:categorias", "irmaos:categoria_editar"), grupo="Financeiro"),
-    Secao("hospitalaria", "Hospitalaria", "heart-handshake", (
-        Item("Casos", "hospitalaria:painel", _perfil(P.HOSPITALEIRO), extras=("hospitalaria:caso", "hospitalaria:caso_novo")),
-        Item("Tronco de Beneficência", "hospitalaria:tronco", _perfil(P.HOSPITALEIRO, P.TESOUREIRO)),
-    ), visivel=_perfil(P.HOSPITALEIRO, P.TESOUREIRO), namespaces=("hospitalaria",), grupo="Financeiro"),
+    ), namespaces=("tesouraria", "agape"), nomes=("irmaos:categorias", "irmaos:categoria_editar", "hospitalaria:tronco"), grupo="Financeiro"),
     Secao("relatorios", "Relatórios", "chart-column", (Item("Relatórios", "relatorios:indice", extras=("relatorios:ver",)),),
           visivel=_perfil(P.SECRETARIO, P.TESOUREIRO), namespaces=("relatorios",), grupo="Gestão"),
     Secao("admin", "Administração", "settings", (

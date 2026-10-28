@@ -10,7 +10,8 @@
 - Acesso controlado por **grau** (Aprendiz, Companheiro, Mestre) e por **cargo/perfil**.
 - Dados sensíveis (LGPD): trilha de auditoria, 2FA para cargos administrativos, backups criptografados.
 - Tudo é associado a um **Ano Maçônico** (jul–jun), que serve de eixo para gestões, presença, orçamento e relatórios.
-- Fora de escopo por ora: **Hospitalaria / Tronco de Beneficência** e **votação/escrutínio no sistema**.
+- **Ágape**: módulo próprio dentro do Financeiro — caixa separado do da loja, subpresença (quem vai), visitantes pagos pela loja (repasse) e inventário de bebidas.
+- **Hospitalaria / Tronco de Beneficência** e **votação sigilosa** já fazem parte do sistema.
 - A GLESP já tem sistema próprio de presença. Este sistema **não substitui nem integra** o da Potência: serve como **registro interno** da loja (a presença aqui é espelho para consulta, relatórios e frequência; pode-se exportar planilha para facilitar o lançamento na Potência).
 - Escala: quadro de ~20 irmãos e ~4 sessões por mês.
 - Licença do projeto: **MIT**. Só usar dependências com licença permissiva compatível (MIT, BSD, Apache-2.0, ISC); evitar GPL/AGPL.

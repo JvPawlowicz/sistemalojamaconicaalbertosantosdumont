@@ -49,7 +49,15 @@ class Ata(models.Model):
         ordering = ["-sessao__data_hora"]
 
     def __str__(self):
-        return f"Ata {self.numero or 's/nº'} — {self.sessao}"
+        return f"Ata {self.identificacao} — {self.sessao}"
+
+    @property
+    def identificacao(self):
+        """Nº da ata concatenado à gestão (ano maçônico), ex.: 1287/2025-2026."""
+        if not self.numero:
+            return "s/nº"
+        ano = self.sessao.ano.nome.replace("/", "-")
+        return f"{self.numero}/{ano}"
 
     @property
     def conteudo_html(self):

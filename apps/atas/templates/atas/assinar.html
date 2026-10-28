@@ -1,7 +1,7 @@
 {% extends "base.html" %}{% load static loja %}
 {% block titulo %}Assinar ata{% endblock %}
 {% block conteudo %}
-<div class="cabecalho-pagina"><div><h1>Assinar ata {{ ata.numero|default:"s/nº" }}</h1><p>{{ ata.sessao.titulo }} · {{ ata.sessao.data_hora|date:"d/m/Y" }} · versão {{ ata.versao }}</p></div></div>
+<div class="cabecalho-pagina"><div><h1>Assinar ata {{ ata.identificacao }}</h1><p>{{ ata.sessao.titulo }} · {{ ata.sessao.data_hora|date:"d/m/Y" }} · versão {{ ata.versao }}</p></div></div>
 <details class="card"><summary><strong>Ler a ata antes de assinar</strong></summary><div class="texto-ata ata-rich mt">{{ ata.conteudo_html }}</div></details>
 <form method="post" enctype="multipart/form-data" class="card" id="form-assinar">{% csrf_token %}
   <h2>{% icon "pen-line" %} Sua assinatura</h2>

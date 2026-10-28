@@ -37,6 +37,7 @@ body { background: var(--bg); }
 
 /* Emblema (esquadro e compasso) */
 .emblema { width: 3rem; height: 3rem; flex: none; }
+.emb-halo { stroke: var(--emb-halo, var(--surface)); } .emb-ponta { fill: var(--emb-compasso); }
 .emb-compasso { stroke: var(--emb-compasso); } .emb-compasso.emb-charneira { fill: var(--surface); }
 .emb-esquadro { stroke: var(--emb-esquadro); } .emb-pontos { stroke: var(--emb-pontos); }
 .emb-medalhao { fill: var(--emb-medalhao-bg); stroke: var(--emb-medalhao-borda); } .emb-g { fill: var(--emb-g); }
@@ -169,3 +170,47 @@ html { scroll-behavior: smooth; }
 .resultado.res-ok { border-top: 4px solid var(--ok); } .resultado.res-no { border-top: 4px solid var(--danger); }
 @keyframes crescer { from { width: 0; } }
 @media (prefers-reduced-motion: reduce) { .barra::before { animation: none; transition: none; } }
+
+/* ===== Barra de navegação superior (substitui a barra lateral) ===== */
+.app { display: block; min-height: 100vh; }
+.navbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: .75rem; padding: .45rem 1rem; background: var(--nav-bg); color: var(--nav-texto); border-bottom: 3px solid var(--celeste); box-shadow: 0 4px 16px rgba(11,58,88,.10); }
+:root[data-contraste="alto"] .navbar { border-bottom-color: #ffe600; }
+.navbar a { color: var(--nav-texto); }
+.navbar .brand { padding: 0; gap: .6rem; flex: none; }
+.navbar .brand .emblema, .navbar .brand img { width: 44px; height: 44px; padding: 3px; border-radius: 12px; }
+.brand-txt strong { display: block; font-size: .88em; line-height: 1.15; max-width: 15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand-txt small { font-size: .72em; color: var(--nav-suave); }
+.nav-wrap { flex: 1 1 auto; min-width: 0; }
+.nav-wrap .nav { display: flex; gap: .15rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: .15rem 0; }
+.nav-wrap .nav::-webkit-scrollbar { display: none; }
+.nav-wrap .nav li { flex: none; }
+.nav-wrap .nav a { flex-direction: column; gap: .1rem; padding: .35rem .7rem; font-size: .74rem; line-height: 1.15; min-width: 4.4rem; justify-content: center; text-align: center; border-radius: 12px; }
+.nav-wrap .nav a .icon { width: 1.35rem; height: 1.35rem; stroke-width: 1.9; }
+.nav-wrap .nav a[aria-current="page"]::before { left: 22%; right: 22%; top: auto; bottom: -.18rem; height: 3px; width: auto; border-radius: 3px; }
+.navbar-fim { display: flex; align-items: center; gap: .5rem; flex: none; }
+.navbar .controles button, .navbar .menu-btn { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); padding: .4rem .55rem; cursor: pointer; line-height: 1; }
+.navbar .menu-btn { display: none; margin-left: auto; }
+.menu-usuario-lista { right: 0; }
+.menu-usuario-nome { margin: 0; padding: .55rem .7rem .4rem; border-bottom: 1px solid var(--border); display: grid; gap: .1rem; }
+.menu-usuario-nome small { color: var(--muted); }
+.main { min-height: calc(100vh - 66px); }
+.tabs { top: 66px; }
+.subtabs { display: flex; gap: .4rem; flex-wrap: wrap; margin: 0 0 1rem; }
+.subtabs a { display: inline-flex; align-items: center; gap: .4rem; padding: .45rem .85rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); text-decoration: none; font-size: .9rem; }
+.subtabs a[aria-current="page"] { background: var(--celeste); color: var(--on-celeste, #05283f); border-color: var(--celeste); font-weight: 700; }
+.lista-simples { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; gap: .35rem; }
+.lista-simples li { display: flex; align-items: center; gap: .5rem; padding: .4rem .6rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+@media (max-width: 1100px) {
+  .navbar { flex-wrap: wrap; }
+  .navbar .menu-btn { display: inline-flex; order: 2; margin-left: auto; }
+  .navbar-fim { order: 3; }
+  .nav-wrap { order: 4; flex-basis: 100%; display: none; }
+  .nav-wrap.aberta { display: block; }
+  .nav-wrap .nav { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); overflow: visible; }
+  .nav-wrap .nav a { width: 100%; }
+  .brand-txt strong { max-width: 11rem; }
+  .tabs { top: 0; position: static; }
+}
+@media (max-width: 560px) { .brand-txt { display: none; } .navbar-fim kbd { display: none; } }
+@media print { .navbar { display: none !important; } }
+@media (max-width: 900px) { .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; } .tabs a { white-space: nowrap; flex: none; } }

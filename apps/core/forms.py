@@ -62,7 +62,7 @@ class LojaForm(ModelFormBase):
             "brasao", "cabecalho_documentos", "texto_legal", "mensalidade_dia_vencimento", "chave_pix", "intersticio_promocao_meses",
             "intersticio_elevacao_meses", "lembrete_sessao_horas", "cobranca_automatica",
             "limite_faltas_consecutivas", "frequencia_minima_percentual", "quorum_minimo", "multa_atraso_percentual",
-            "juros_mensal_percentual", "dias_carencia_atraso",
+            "juros_mensal_percentual", "dias_carencia_atraso", "ata_numero_inicial", "ata_numeracao",
         ]
         widgets = {"cabecalho_documentos": forms.Textarea(attrs={"rows": 4}),
                    "texto_legal": forms.Textarea(attrs={"rows": 5})}
